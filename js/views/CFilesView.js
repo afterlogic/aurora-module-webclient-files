@@ -171,7 +171,7 @@ function CFilesView(bPopup)
 		
 		this.quotaProc(iProc);
 		this.quotaDesc(-1 < iProc ?
-			TextUtils.i18n('CORE/INFO_QUOTA', {
+			TextUtils.i18n('CORECLIENT/INFO_QUOTA', {
 				'PROC': iProc,
 				'QUOTA': TextUtils.getFriendlySize(iQuota)
 			}) : '');
@@ -190,7 +190,7 @@ function CFilesView(bPopup)
 		
 		if (this.loading())
 		{
-			sInfoText = TextUtils.i18n('CORE/INFO_LOADING');
+			sInfoText = TextUtils.i18n('CORECLIENT/INFO_LOADING');
 		}
 		else if (this.loadedFiles())
 		{
@@ -426,7 +426,7 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 				this.files.push(oFile);
 				if (this.uploadingFiles().length === 0)
 				{
-					Screens.showReport(TextUtils.i18n('CORE/REPORT_UPLOAD_COMPLETE'));
+					Screens.showReport(TextUtils.i18n('CORECLIENT/REPORT_UPLOAD_COMPLETE'));
 				}
 			}
 		}
@@ -827,7 +827,7 @@ CFilesView.prototype.executeDelete = function ()
 	;
 	if (!this.isPublic && aChecked && aChecked.length > 0)
 	{
-		Popups.showPopup(ConfirmPopup, [TextUtils.i18n('CORE/CONFIRM_ARE_YOU_SURE'), _.bind(this.deleteItems, this, aChecked)]);
+		Popups.showPopup(ConfirmPopup, [TextUtils.i18n('CORECLIENT/CONFIRM_ARE_YOU_SURE'), _.bind(this.deleteItems, this, aChecked)]);
 	}
 };
 
