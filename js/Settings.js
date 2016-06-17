@@ -15,6 +15,7 @@ module.exports = {
 	AllowSharing: true,
 	PublicHash: '',
 	PublicName: '',
+	EnableUploadSizeLimit: false,
 	UploadSizeLimitMb: 0,
 	
 	init: function (oAppDataSection) {
@@ -25,6 +26,7 @@ module.exports = {
 			this.AllowSharing = !!oAppDataSection.AllowSharing;
 			this.PublicHash = Types.pString(oAppDataSection.PublicHash);
 			this.PublicName = Types.pString(oAppDataSection.PublicName);
+			this.EnableUploadSizeLimit = !!oAppDataSection.EnableUploadSizeLimit;
 			this.UploadSizeLimitMb = Types.pString(oAppDataSection.UploadSizeLimitMb);
 		}
 	},
