@@ -879,14 +879,9 @@ CFilesView.prototype.getStorageByType = function (sStorageType)
  */
 CFilesView.prototype.addStorageIfNot = function (sStorageType)
 {
-	var sDisplayName = '';
+	var sDisplayName = TextUtils.i18n('%MODULENAME%/LABEL_' + sStorageType.toUpperCase()  + '_STORAGE');
 	
-	switch (sStorageType)
-	{
-		case 'personal': sDisplayName = TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE'); break;
-		case 'corporate': sDisplayName = TextUtils.i18n('%MODULENAME%/LABEL_CORPORATE_STORAGE'); break;
-		case 'shared': sDisplayName = TextUtils.i18n('%MODULENAME%/LABEL_SHARED_STORAGE'); break;
-	}
+	console.log(sDisplayName);
 	
 	if (!this.getStorageByType(sStorageType))
 	{
@@ -902,6 +897,7 @@ CFilesView.prototype.getStorages = function ()
 {
 	if (!this.isPublic)
 	{
+/*		
 		this.addStorageIfNot('personal');
 		if (Settings.AllowCollaboration)
 		{
@@ -911,9 +907,10 @@ CFilesView.prototype.getStorages = function ()
 				this.addStorageIfNot('shared');
 			}
 		}
+*/		
 		if (!this.isPopup)
 		{
-			this.getExternalFileStorages();
+			Ajax.send('GetStorages', null, this.onGetStoragesResponse, this);
 		}
 		else
 		{
@@ -926,16 +923,11 @@ CFilesView.prototype.getStorages = function ()
 	}
 };
 
-CFilesView.prototype.getExternalFileStorages = function ()
-{
-	Ajax.send('GetExternalStorages', null, this.onGetExternalStoragesResponse, this);
-};
-
 /**
  * @param {Object} oResponse
  * @param {Object} oRequest
  */
-CFilesView.prototype.onGetExternalStoragesResponse = function (oResponse, oRequest)
+CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 {
 	var oResult = oResponse.Result;
 	if (oResult)
