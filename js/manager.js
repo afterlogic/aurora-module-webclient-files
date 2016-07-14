@@ -41,11 +41,11 @@ module.exports = function (oAppData, iUserRole, bPublic) {
 			return {
 				enableModule: Settings.enableModule,
 				start: function (ModulesManager) {
-					ModulesManager.run('SettingsClient', 'registerSettingsTab', [
-						function () { return require('modules/%ModuleName%/js/views/FilesSettingsPaneView.js'); },
-						Settings.HashModuleName,
-						TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
-					]);
+//					ModulesManager.run('SettingsClient', 'registerSettingsTab', [
+//						function () { return require('modules/%ModuleName%/js/views/FilesSettingsPaneView.js'); },
+//						Settings.HashModuleName,
+//						TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
+//					]);
 				},
 				getScreens: function () {
 					var oScreens = {};
