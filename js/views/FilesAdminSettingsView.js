@@ -22,6 +22,7 @@ function CFilesAdminSettingsView()
 	/* Editable fields */
 	this.enableUploadSizeLimit = ko.observable(Settings.EnableUploadSizeLimit);
 	this.uploadSizeLimitMb = ko.observable(Settings.UploadSizeLimitMb);
+	this.enableCorporate = ko.observable(Settings.EnableCorporate);
 	/*-- Editable fields */
 }
 
@@ -33,7 +34,8 @@ CFilesAdminSettingsView.prototype.getCurrentValues = function()
 {
 	return [
 		this.enableUploadSizeLimit(),
-		this.uploadSizeLimitMb()
+		this.uploadSizeLimitMb(),
+		this.enableCorporate()
 	];
 };
 
@@ -41,13 +43,15 @@ CFilesAdminSettingsView.prototype.revertGlobalValues = function()
 {
 	this.enableUploadSizeLimit(Settings.EnableUploadSizeLimit);
 	this.uploadSizeLimitMb(Settings.UploadSizeLimitMb);
+	this.enableCorporate(Settings.EnableCorporate);
 };
 
 CFilesAdminSettingsView.prototype.getParametersForSave = function ()
 {
 	return {
 		'EnableUploadSizeLimit': this.enableUploadSizeLimit(),
-		'UploadSizeLimitMb': Types.pInt(this.uploadSizeLimitMb())
+		'UploadSizeLimitMb': Types.pInt(this.uploadSizeLimitMb()),
+		'EnableCorporate': this.enableCorporate()
 	};
 };
 

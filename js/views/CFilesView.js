@@ -874,40 +874,10 @@ CFilesView.prototype.getStorageByType = function (sStorageType)
 	});	
 };
 
-/**
- * @param {string} sStorageType
- */
-CFilesView.prototype.addStorageIfNot = function (sStorageType)
-{
-	var sDisplayName = TextUtils.i18n('%MODULENAME%/LABEL_' + sStorageType.toUpperCase()  + '_STORAGE');
-	
-	console.log(sDisplayName);
-	
-	if (!this.getStorageByType(sStorageType))
-	{
-		this.storages.push({
-			isExternal: false,
-			type: sStorageType,
-			displayName: sDisplayName
-		});
-	}
-};
-
 CFilesView.prototype.getStorages = function ()
 {
 	if (!this.isPublic)
 	{
-/*		
-		this.addStorageIfNot('personal');
-		if (Settings.AllowCollaboration)
-		{
-			this.addStorageIfNot('corporate');
-			if (Settings.AllowSharing)
-			{
-				this.addStorageIfNot('shared');
-			}
-		}
-*/		
 		if (!this.isPopup)
 		{
 			Ajax.send('GetStorages', null, this.onGetStoragesResponse, this);
