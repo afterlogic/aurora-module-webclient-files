@@ -25,13 +25,20 @@
 						<label for="enableUploadSizeLimit" data-bind="i18n: {'key': '%MODULENAME%/LABEL_ENABLE_UPLOAD_SIZE_LIMIT'}"></label>
 					</span>
 				</div>			
-				<div class="row"> 
+				<div class="row">
 					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_UPLOAD_SIZE_LIMIT'}"></span>
 					<span class="value">
 						<input class="input" type="text" data-bind="value: uploadSizeLimitMb" style="width: 50px; margin-right: 5px;">
-						<span data-bind="i18n: {'key': 'CORECLIENT/LABEL_MEGABYTES'}"></span> 
+						<span data-bind="i18n: {'key': 'CORECLIENT/LABEL_MEGABYTES'}"></span>
 					</span>
-				</div>			
+				</div>
+				<div class="row">
+					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
+					<span class="value">
+						<input class="input" type="text" data-bind="value: userSpaceLimitMb" style="width: 50px; margin-right: 5px;">
+						<span data-bind="i18n: {'key': 'CORECLIENT/LABEL_MEGABYTES'}"></span>
+					</span>
+				</div>
 			</div>		
 
 			<div class="buttons">

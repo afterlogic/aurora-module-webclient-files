@@ -8,7 +8,7 @@
 						<span data-bind="i18n: {'key': '%MODULENAME%/ACTION_UPLOAD_FILES'}"></span> 
 					</span>
 				</div>
-				<div class="middle_bar" data-bind="">
+				<div class="middle_bar" data-bind="css: {'quota_visible': -1 < quotaProc()}">
 					<!-- ko template: { name: '%ModuleName%_StoragesPanelView'} --><!-- /ko -->
 					<div class="panel_bottom">
 						<span class="volumer" data-bind="visible: -1 < quotaProc()">

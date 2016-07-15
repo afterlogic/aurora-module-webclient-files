@@ -16,6 +16,7 @@ module.exports = {
 	EnableUploadSizeLimit: false,
 	UploadSizeLimitMb: 0,
 	EnableCorporate: false,
+	UserSpaceLimitMb: 0,
 	
 	init: function (oAppDataSection) {
 		if (oAppDataSection)
@@ -24,8 +25,9 @@ module.exports = {
 			this.PublicHash = Types.pString(oAppDataSection.PublicHash);
 			this.PublicName = Types.pString(oAppDataSection.PublicName);
 			this.EnableUploadSizeLimit = !!oAppDataSection.EnableUploadSizeLimit;
-			this.UploadSizeLimitMb = Types.pString(oAppDataSection.UploadSizeLimitMb);
+			this.UploadSizeLimitMb = Types.pInt(oAppDataSection.UploadSizeLimitMb);
 			this.EnableCorporate = !!oAppDataSection.EnableCorporate;
+			this.UserSpaceLimitMb = Types.pInt(oAppDataSection.UserSpaceLimitMb);
 		}
 	},
 	

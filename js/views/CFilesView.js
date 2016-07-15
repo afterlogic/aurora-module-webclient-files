@@ -156,7 +156,6 @@ function CFilesView(bPopup)
 	this.quotaProc = ko.observable(-1);
 	
 	ko.computed(function () {
-		
 		if (!UserSettings.ShowQuotaBar)
 		{
 			return true;
@@ -165,7 +164,8 @@ function CFilesView(bPopup)
 		var
 			iQuota = this.quota(),
 			iUsed = this.used(),
-			iProc = 0 < iQuota ? Math.ceil((iUsed / iQuota) * 100) : -1;
+			iProc = 0 < iQuota ? Math.ceil((iUsed / iQuota) * 100) : -1
+		;
 
 		iProc = 100 < iProc ? 100 : iProc;
 		
@@ -174,10 +174,8 @@ function CFilesView(bPopup)
 			TextUtils.i18n('CORECLIENT/INFO_QUOTA', {
 				'PROC': iProc,
 				'QUOTA': TextUtils.getFriendlySize(iQuota)
-			}) : '');
-
-		return true;
-		
+			}) : '')
+		;
 	}, this);
 	
 	this.dragover = ko.observable(false);
@@ -398,9 +396,9 @@ CFilesView.prototype.onFileUploadProgress = function (sFileUid, iUploadedSize, i
 /**
  * Finds attachment by uid. Calls it's function to complete upload.
  *
- * @param {string} sFileUid
- * @param {boolean} bResponseReceived
- * @param {Object} oResult
+ * @param {string} sFileUid File identificator.
+ * @param {boolean} bResponseReceived Indicates if upload was successfull.
+ * @param {Object} oResult Response from the server.
  */
 CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceived, oResult)
 {
@@ -419,7 +417,14 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 			if (oFile.uploadError())
 			{
 				this.uploadError(true);
-				Screens.showError(oFile.statusText());
+				if (oResult && oResult.ErrorCode === Enums.Errors.CanNotUploadFileQuota)
+				{
+					Popups.showPopup(AlertPopup, [TextUtils.i18n('CORECLIENT/ERROR_CANT_UPLOAD_FILE_QUOTA')]);
+				}
+				else
+				{
+					Screens.showError(oFile.statusText());
+				}
 			}
 			else
 			{
@@ -690,16 +695,18 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 };
 
 /**
- * @param {Object} oResponse
- * @param {Object} oRequest
+ * Runs after getting quota information from the server. Fill quota values.
+ * 
+ * @param {Object} oResponse Response from the server.
+ * @param {Object} oRequest Request parameters to the server.
  */
 CFilesView.prototype.onGetQuotaResponse = function (oResponse, oRequest)
 {
 	var oResult = oResponse.Result;
 	if (oResult && oResult.Quota)
 	{
-		this.quota(oResult.Quota[0] + oResult.Quota[1]);
-		this.used(oResult.Quota[0]);
+		this.quota(oResult.Quota.Limit);
+		this.used(oResult.Quota.Used);
 	}
 };
 
