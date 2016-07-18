@@ -28,7 +28,7 @@
 				<div class="row">
 					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_UPLOAD_SIZE_LIMIT'}"></span>
 					<span class="value">
-						<input class="input" type="text" data-bind="value: uploadSizeLimitMb" style="width: 50px; margin-right: 5px;">
+						<input class="input" type="text" data-bind="value: uploadSizeLimitMb, enable: enableUploadSizeLimit, css: {'disabled': !enableUploadSizeLimit()}" style="width: 50px; margin-right: 5px;">
 						<span data-bind="i18n: {'key': 'CORECLIENT/LABEL_MEGABYTES'}"></span>
 					</span>
 				</div>
