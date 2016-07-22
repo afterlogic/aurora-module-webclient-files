@@ -2,7 +2,7 @@
 	<span class="search_block">
 		<span class="input" data-bind="css: {'focus': isSearchFocused}">
 			<span class="icon search" data-bind="i18n: {'key': 'CORECLIENT/ACTION_SEARCH'}"></span>
-			<input class="field" spellcheck="false" type="text" data-bind="hasfocus: isSearchFocused, value: searchPattern, onEnter: onSearch" />
+			<input class="field" spellcheck="false" type="text" data-bind="hasfocus: isSearchFocused, value: newSearchPattern, onEnter: onSearch, valueUpdate: 'afterkeydown'" />
 		</span>
 	</span>
 	<span class="item new_folder" data-bind="click: onCreateFolderClick, customTooltip: '%MODULENAME%/ACTION_NEW_FOLDER'">

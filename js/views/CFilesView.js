@@ -109,6 +109,7 @@ function CFilesView(bPopup)
 		_.bind(this.onItemDelete, this), _.bind(this.onItemDblClick, this), _.bind(this.onEnter, this), this.columnCount, true, true, true);
 		
 	this.searchPattern = ko.observable('');
+	this.newSearchPattern = ko.observable('');
 	this.isSearchFocused = ko.observable(false);
 
 	this.renameCommand = Utils.createCommand(this, this.executeRename, function () {
@@ -651,36 +652,39 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		oParameters = oRequest.Parameters
 	;
 	
-	this.onGetQuotaResponse(oResponse, oRequest);
-	
 	if (oResult)
 	{
-		var 
-			aFolderList = [],
-			aFileList = [],
-			sThumbSessionUid = Date.now().toString()
-		;
-
-		_.each(oResult.Items, function (oData) {
-			if (oData.IsFolder)
-			{
-				var oFolder = new CFolderModel();
-				oFolder.parse(oData);
-				aFolderList.push(oFolder);
-			}
-			else
-			{
-				var oFile = new CFileModel();
-				oFile.parse(oData, this.isPopup);
-				oFile.getInThumbQueue(sThumbSessionUid);
-				aFileList.push(oFile);
-			}
-		}, this);
+		this.onGetQuotaResponse(oResponse, oRequest);
 		
 		if (this.isPublic || oParameters.Type === this.storageType())
 		{
+			var 
+				aFolderList = [],
+				aFileList = [],
+				sThumbSessionUid = Date.now().toString()
+			;
+
+			_.each(oResult.Items, function (oData) {
+				if (oData.IsFolder)
+				{
+					var oFolder = new CFolderModel();
+					oFolder.parse(oData);
+					aFolderList.push(oFolder);
+				}
+				else
+				{
+					var oFile = new CFileModel();
+					oFile.parse(oData, this.isPopup);
+					oFile.getInThumbQueue(sThumbSessionUid);
+					aFileList.push(oFile);
+				}
+			}, this);
+
 			this.folders(aFolderList);
 			this.files(aFileList);
+			
+			this.newSearchPattern(oParameters.Pattern);
+			this.searchPattern(oParameters.Pattern);
 		}
 		
 		this.loading(false);
@@ -967,7 +971,6 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 		}, 1500);				
 	}
 	
-	this.searchPattern(Types.pString(sPattern));
 	if (oPath === undefined || oPath.id() === '')
 	{
 		this.pathItems.removeAll();
@@ -990,7 +993,7 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	Ajax.send('GetFiles', {
 			'Type': sType,
 			'Path': this.path(),
-			'Pattern': this.searchPattern()
+			'Pattern': Types.pString(sPattern)
 		}, this.onGetFilesResponse, this
 	);
 };
@@ -1245,7 +1248,7 @@ CFilesView.prototype.onCreateLinkClick = function ()
 
 CFilesView.prototype.onSearch = function ()
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern());
+	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.newSearchPattern());
 };
 
 CFilesView.prototype.clearSearch = function ()
