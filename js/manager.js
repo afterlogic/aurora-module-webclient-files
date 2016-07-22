@@ -56,9 +56,12 @@ module.exports = function (oAppData, iUserRole, bPublic) {
 					return oScreens;
 				},
 				getHeaderItem: function () {
-					var CHeaderItemView = require('modules/CoreClient/js/views/CHeaderItemView.js');
+					var
+						CHeaderItemView = require('modules/CoreClient/js/views/CHeaderItemView.js'),
+						sTabTitle = Settings.CustomTabTitle !== '' ? Settings.CustomTabTitle : TextUtils.i18n('%MODULENAME%/ACTION_SHOW_FILES')
+					;
 
-					HeaderItemView = new CHeaderItemView(TextUtils.i18n('%MODULENAME%/ACTION_SHOW_FILES'));
+					HeaderItemView = new CHeaderItemView(sTabTitle);
 
 					return {
 						item: HeaderItemView,

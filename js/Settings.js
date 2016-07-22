@@ -17,6 +17,7 @@ module.exports = {
 	UploadSizeLimitMb: 0,
 	EnableCorporate: false,
 	UserSpaceLimitMb: 0,
+	CustomTabTitle: '',
 	
 	init: function (oAppDataSection) {
 		if (oAppDataSection)
@@ -28,6 +29,7 @@ module.exports = {
 			this.UploadSizeLimitMb = Types.pInt(oAppDataSection.UploadSizeLimitMb);
 			this.EnableCorporate = !!oAppDataSection.EnableCorporate;
 			this.UserSpaceLimitMb = Types.pInt(oAppDataSection.UserSpaceLimitMb);
+			this.CustomTabTitle = Types.pString(oAppDataSection.CustomTabTitle);
 		}
 	},
 	
