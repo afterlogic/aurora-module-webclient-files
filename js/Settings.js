@@ -33,5 +33,21 @@ module.exports = {
 	
 	update: function (sEnableModule) {
 		this.enableModule(sEnableModule === '1');
+	},
+	
+	/**
+	 * Updates settings from settings tab in admin panel.
+	 * 
+	 * @param {boolean} bEnableUploadSizeLimit Indicates if upload size limit is enabled.
+	 * @param {number} iUploadSizeLimitMb Value of upload size limit in Mb.
+	 * @param {boolean} bEnableCorporate Indicates if corporate storage is enabled.
+	 * @param {number} iUserSpaceLimitMb Value of user space limit in Mb.
+	 */
+	updateAdmin: function (bEnableUploadSizeLimit, iUploadSizeLimitMb, bEnableCorporate, iUserSpaceLimitMb)
+	{
+		this.EnableUploadSizeLimit = bEnableUploadSizeLimit;
+		this.UploadSizeLimitMb = iUploadSizeLimitMb;
+		this.EnableCorporate = bEnableCorporate;
+		this.UserSpaceLimitMb = iUserSpaceLimitMb;
 	}
 };

@@ -60,11 +60,13 @@ CFilesAdminSettingsView.prototype.getParametersForSave = function ()
 };
 
 /**
- * @param {Object} oParameters
+ * Applies saved values to the Settings object.
+ * 
+ * @param {Object} oParameters Parameters which were saved on the server side.
  */
 CFilesAdminSettingsView.prototype.applySavedValues = function (oParameters)
 {
-//	Settings.update(oParameters.EnableUploadSizeLimit, oParameters.UploadSizeLimitMb);
+	Settings.updateAdmin(oParameters.EnableUploadSizeLimit, oParameters.UploadSizeLimitMb, oParameters.EnableCorporate, oParameters.UserSpaceLimitMb);
 };
 
 /**
