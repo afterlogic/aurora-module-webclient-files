@@ -37,7 +37,6 @@ CSharePopup.prototype.onShow = function (oItem)
 	this.pub('');
 		
 	Ajax.send('CreatePublicLink', {
-			'Account': App.defaultAccountId(),
 			'Type': oItem.storageType(),
 			'Path': oItem.path(),
 			'Name': oItem.fileName(),
@@ -66,7 +65,6 @@ CSharePopup.prototype.onCancelSharingClick = function ()
 	if (this.item)
 	{
 		Ajax.send('DeletePublicLink', {
-				'Account': App.defaultAccountId(),
 				'Type': this.item.storageType(),
 				'Path': this.item.path(),
 				'Name': this.item.fileName()

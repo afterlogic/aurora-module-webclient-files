@@ -913,11 +913,11 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 	var oResult = oResponse.Result;
 	if (oResult)
 	{
-		_.each(oResult, function(oStorage){
+		_.each(oResult, function(oStorage) {
 			if (oStorage.Type && !this.getStorageByType(oStorage.Type))
 			{
 				this.storages.push({
-					isExternal: true,
+					isExternal: oStorage.IsExternal,
 					type: oStorage.Type,
 					displayName: oStorage.DisplayName
 				});
