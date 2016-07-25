@@ -8,6 +8,7 @@ var
 	TextUtils = require('modules/CoreClient/js/utils/Text.js'),
 	Types = require('modules/CoreClient/js/utils/Types.js'),
 	Utils = require('modules/CoreClient/js/utils/Common.js'),
+	UrlUtils = require('modules/CoreClient/js/utils/Url.js'),
 	
 	App = require('modules/CoreClient/js/App.js'),
 	CJua = require('modules/CoreClient/js/CJua.js'),
@@ -1028,7 +1029,7 @@ CFilesView.prototype.getPublicFiles = function (oPath)
 	}
 	
 	Ajax.send('GetPublicFiles', {
-			'Hash': Settings.PublicHash,
+			'Hash': UrlUtils.getRequestParam('files-pub'),
 			'Path': this.path()
 		}, this.onGetFilesResponse, this
 	);
