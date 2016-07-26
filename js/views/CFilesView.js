@@ -235,12 +235,14 @@ function CFilesView(bPopup)
 		return (oStorage && oStorage.isExternal);
 	}, this);
 	this.timerId = null;
+	
+	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
 
 CFilesView.prototype.ViewTemplate = App.isPublic() ? '%ModuleName%_PublicFilesView' : '%ModuleName%_FilesView';
-CFilesView.prototype.__name = 'CFilesView';
+CFilesView.prototype.ViewConstructorName = 'CFilesView';
 
 /**
  * @param {object} $popupDom
