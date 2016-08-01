@@ -70,11 +70,11 @@ function CFileModel()
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	this.shared = ko.observable(false);
-	this.owner = ko.observable('');
+	this.ownerName = ko.observable('');
 	
 	this.ownerHeaderText = ko.computed(function () {
 		return TextUtils.i18n('%MODULENAME%/LABEL_OWNER_EMAIL', {
-			'OWNER': this.owner()
+			'OWNER': this.ownerName()
 		});
 	}, this);
 	
@@ -206,7 +206,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.size(Types.pInt(oData.Size));
 	oDateModel.parse(oData['LastModified']);
 	this.lastModified(oDateModel.getShortDate());
-	this.owner(Types.pString(oData.Owner));
+	this.ownerName(Types.pString(oData.Owner));
 	this.thumb(!!oData.Thumb);
 	this.thumbnailExternalLink(Types.pString(oData.ThumbnailLink));
 	this.hash(Types.pString(oData.Hash));
@@ -242,7 +242,7 @@ CFileModel.prototype.onUploadSelectOwn = function (sFileUid, oFileData, sFileNam
 	oDateModel.parse(oDate.getTime() /1000);
 	this.fileName(sFileName);
 	this.lastModified(oDateModel.getShortDate());
-	this.owner(sOwner);
+	this.ownerName(sOwner);
 	this.path(sPath);
 	this.storageType(sStorageType);
 };
