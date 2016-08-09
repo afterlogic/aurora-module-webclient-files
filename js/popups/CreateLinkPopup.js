@@ -5,8 +5,8 @@ var
 	$ = require('jquery'),
 	ko = require('knockout'),
 	
-	Utils = require('modules/CoreClient/js/utils/Common.js'),
-	CAbstractPopup = require('modules/CoreClient/js/popups/CAbstractPopup.js'),
+	Utils = require('%PathToCoreWebclientModule%/js/utils/Common.js'),
+	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js'),
 	
 	Ajax = require('modules/%ModuleName%/js/Ajax.js'),
 	CFileModel = require('modules/%ModuleName%/js/models/CFileModel.js')

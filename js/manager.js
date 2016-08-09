@@ -13,7 +13,7 @@ module.exports = function (oAppData, iUserRole, bPublic) {
 		var
 			_ = require('underscore'),
 
-			TextUtils = require('modules/CoreClient/js/utils/Text.js'),
+			TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 
 			Ajax = require('modules/%ModuleName%/js/Ajax.js'),
 			Settings = require('modules/%ModuleName%/js/Settings.js'),
@@ -57,7 +57,7 @@ module.exports = function (oAppData, iUserRole, bPublic) {
 				},
 				getHeaderItem: function () {
 					var
-						CHeaderItemView = require('modules/CoreClient/js/views/CHeaderItemView.js'),
+						CHeaderItemView = require('%PathToCoreWebclientModule%/js/views/CHeaderItemView.js'),
 						sTabTitle = Settings.CustomTabTitle !== '' ? Settings.CustomTabTitle : TextUtils.i18n('%MODULENAME%/ACTION_SHOW_FILES')
 					;
 

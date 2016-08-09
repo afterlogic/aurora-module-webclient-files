@@ -4,18 +4,18 @@ var
 	_ = require('underscore'),
 	ko = require('knockout'),
 	
-	FilesUtils = require('modules/CoreClient/js/utils/Files.js'),
-	TextUtils = require('modules/CoreClient/js/utils/Text.js'),
-	Types = require('modules/CoreClient/js/utils/Types.js'),
+	FilesUtils = require('%PathToCoreWebclientModule%/js/utils/Files.js'),
+	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
+	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	
-	Browser = require('modules/CoreClient/js/Browser.js'),
-	WindowOpener = require('modules/CoreClient/js/WindowOpener.js'),
+	Browser = require('%PathToCoreWebclientModule%/js/Browser.js'),
+	WindowOpener = require('%PathToCoreWebclientModule%/js/WindowOpener.js'),
 	
-	CAbstractFileModel = require('modules/CoreClient/js/models/CAbstractFileModel.js'),
-	CDateModel = require('modules/CoreClient/js/models/CDateModel.js'),
+	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js'),
+	CDateModel = require('%PathToCoreWebclientModule%/js/models/CDateModel.js'),
 	
-	Popups = require('modules/CoreClient/js/Popups.js'),
-	EmbedHtmlPopup = require('modules/CoreClient/js/popups/EmbedHtmlPopup.js'),
+	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
+	EmbedHtmlPopup = require('%PathToCoreWebclientModule%/js/popups/EmbedHtmlPopup.js'),
 	
 	Settings = require('modules/%ModuleName%/js/Settings.js')
 ;
