@@ -51,6 +51,8 @@ function CFilesView(bPopup)
 	this.loaded = ko.observable(false);
 	this.isPublic = App.isPublic();
 	
+	this.sPublicHash = UrlUtils.getRequestParam('files-pub');
+	
 	this.storages = ko.observableArray();
 	this.folders = ko.observableArray();
 	this.files = ko.observableArray();
@@ -677,6 +679,10 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				else
 				{
 					var oFile = new CFileModel();
+					if (this.sPublicHash) 
+					{
+						oFile.sPublicHash = this.sPublicHash;
+					}
 					oFile.parse(oData, this.isPopup);
 					oFile.getInThumbQueue(sThumbSessionUid);
 					aFileList.push(oFile);
@@ -1031,7 +1037,7 @@ CFilesView.prototype.getPublicFiles = function (oPath)
 	}
 	
 	Ajax.send('GetPublicFiles', {
-			'Hash': UrlUtils.getRequestParam('files-pub'),
+			'Hash': this.sPublicHash,
 			'Path': this.path()
 		}, this.onGetFilesResponse, this
 	);

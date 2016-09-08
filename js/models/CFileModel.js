@@ -36,6 +36,8 @@ function CFileModel()
 	
 	this.selected = ko.observable(false);
 	this.checked = ko.observable(false);
+	
+	this.sPublicHash = '';
 
 	this.isExternal = ko.observable(false);
 	this.isLink = ko.observable(false);
@@ -90,7 +92,7 @@ function CFileModel()
 	this.uploaded = ko.observable(true);
 
 	this.viewLink = ko.computed(function () {
-		return this.isLink() ? this.linkUrl() : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash());
+		return this.isLink() ? this.linkUrl() : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash(), this.sPublicHash);
 	}, this);
 
 	this.isViewable = ko.computed(function () {
@@ -128,7 +130,7 @@ function CFileModel()
 		}
 		else
 		{
-			return FilesUtils.getThumbnailLink(Settings.ServerModuleName, this.hash());
+			return FilesUtils.getThumbnailLink(Settings.ServerModuleName, this.hash(), this.sPublicHash);
 		}
 	}, this);
 
