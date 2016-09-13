@@ -1,29 +1,42 @@
 'use strict';
 
-module.exports = function (oAppData, iUserRole, bPublic) {
+module.exports = function (oAppData) {
+	require('modules/%ModuleName%/js/enums.js');
+
 	var
-		bAdminUser = iUserRole === Enums.UserRole.SuperAdmin,
-		bPowerUser = iUserRole === Enums.UserRole.NormalUser
+		_ = require('underscore'),
+				
+		App = require('%PathToCoreWebclientModule%/js/App.js'),
+
+		TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
+
+		Ajax = require('modules/%ModuleName%/js/Ajax.js'),
+		Settings = require('modules/%ModuleName%/js/Settings.js'),
+		oSettings = _.extend({}, oAppData[Settings.ServerModuleName] || {}, oAppData['%ModuleName%'] || {}),
+
+		HeaderItemView = null,
+		
+		bAdminUser = App.getUserRole() === Enums.UserRole.SuperAdmin,
+		bPowerUser = App.getUserRole() === Enums.UserRole.NormalUser
 	;
-	
-	if (bAdminUser || bPowerUser)
+
+	Settings.init(oSettings);
+
+	if (App.isPublic())
 	{
-		require('modules/%ModuleName%/js/enums.js');
-
-		var
-			_ = require('underscore'),
-
-			TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
-
-			Ajax = require('modules/%ModuleName%/js/Ajax.js'),
-			Settings = require('modules/%ModuleName%/js/Settings.js'),
-			oSettings = _.extend({}, oAppData[Settings.ServerModuleName] || {}, oAppData['%ModuleName%'] || {}),
-
-			HeaderItemView = null
-		;
-
-		Settings.init(oSettings);
-
+		return {
+			getScreens: function () {
+				var oScreens = {};
+				oScreens[Settings.HashModuleName] = function () {
+					var CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js');
+					return new CFilesView();
+				};
+				return oScreens;
+			}
+		};
+	}
+	else if (bAdminUser || bPowerUser)
+	{
 		if (bAdminUser)
 		{
 			return {
