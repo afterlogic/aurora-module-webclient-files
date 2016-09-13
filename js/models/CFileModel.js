@@ -41,29 +41,15 @@ function CFileModel()
 
 	this.isExternal = ko.observable(false);
 	this.isLink = ko.observable(false);
-	this.linkType = ko.observable(0);
+	this.linkType = ko.observable('');
 	this.linkUrl = ko.observable('');
 	this.thumbnailExternalLink = ko.observable('');
 	this.embedType = ko.observable('');
-	this.linkType.subscribe(function (iLinkType) {
+	this.linkType.subscribe(function (sLinkType) {
 		var sEmbedType = '';
-		switch (iLinkType)
+		if (sLinkType === 'oembeded')
 		{
-			case Enums.FileStorageLinkType.YouTube:
-				sEmbedType = 'YouTube';
-				break;
-			case Enums.FileStorageLinkType.Vimeo:
-				if (!Browser.ie || Browser.ie11)
-				{
-					sEmbedType = 'Vimeo';
-				}
-				break;
-			case Enums.FileStorageLinkType.SoundCloud:
-				if (!Browser.ie || Browser.ie10AndAbove)
-				{
-					sEmbedType = 'SoundCloud';
-				}
-				break;
+			sEmbedType = 'oembeded';
 		}
 		this.hasHtmlEmbed(sEmbedType !== '');
 		this.embedType(sEmbedType);
@@ -124,7 +110,7 @@ function CFileModel()
 	}, this);
 
 	this.thumbnailLink = ko.computed(function () {
-		if (this.isExternal() || (this.isLink() && (this.linkType() === Enums.FileStorageLinkType.GoogleDrive || this.linkType() === Enums.FileStorageLinkType.YouTube || this.linkType() === Enums.FileStorageLinkType.Vimeo || this.linkType() === Enums.FileStorageLinkType.SoundCloud)))
+		if (this.isExternal() || (this.isLink()))
 		{
 			return this.thumbnailExternalLink();
 		}
@@ -161,7 +147,7 @@ CFileModel.prototype.parseLink = function (oData, sLinkUrl)
 	this.linkUrl(sLinkUrl);
 	this.fileName(Types.pString(oData.Name));
 	this.size(Types.pInt(oData.Size));
-	this.linkType(Enums.has('FileStorageLinkType', Types.pInt(oData.LinkType)) ? Types.pInt(oData.LinkType) : Enums.FileStorageLinkType.Unknown);
+	this.linkType(Enums.has('FileStorageLinkType', Types.pString(oData.LinkType)) ? Types.pString(oData.LinkType) : '');
 	this.allowDownload(false);
 	if (oData.Thumb)
 	{
@@ -202,7 +188,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	if (this.isLink())
 	{
 		this.linkUrl(Types.pString(oData.LinkUrl));
-		this.linkType(Types.pInt(oData.LinkType));
+		this.linkType(Types.pString(oData.LinkType));
 	}
 	
 	this.size(Types.pInt(oData.Size));
