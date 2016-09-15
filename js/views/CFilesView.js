@@ -492,10 +492,13 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 			sToPath = oFolder instanceof CFolderModel ? oFolder.fullPath() : '',
 			aChecked = [],
 			aItems = [],
-			sStorageType = oFolder instanceof CFolderModel ? oFolder.storageType() : oFolder.type
+			sStorageType = oFolder instanceof CFolderModel ? oFolder.storageType() : oFolder.type,
+			oToStorage = this.getStorageByType(sStorageType),
+			oFromStorage = this.getStorageByType(this.storageType()),
+			bSameStorage = oToStorage.type === oFromStorage.type
 		;
 		
-		if (this.path() !== sToPath && this.storageType() === sStorageType || this.storageType() !== sStorageType)
+		if (bSameStorage && this.path() !== sToPath || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal)
 		{
 			if (oFolder instanceof CFolderModel)
 			{
