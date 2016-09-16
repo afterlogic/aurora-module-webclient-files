@@ -17,7 +17,7 @@ module.exports = function (oAppData) {
 		HeaderItemView = null,
 		
 		bAdminUser = App.getUserRole() === Enums.UserRole.SuperAdmin,
-		bPowerUser = App.getUserRole() === Enums.UserRole.NormalUser
+		bNormalUser = App.getUserRole() === Enums.UserRole.NormalUser
 	;
 
 	Settings.init(oSettings);
@@ -35,7 +35,7 @@ module.exports = function (oAppData) {
 			}
 		};
 	}
-	else if (bAdminUser || bPowerUser)
+	else if (bAdminUser || bNormalUser)
 	{
 		if (bAdminUser)
 		{
@@ -49,7 +49,7 @@ module.exports = function (oAppData) {
 				}
 			};
 		}
-		else if (bPowerUser)
+		else if (bNormalUser)
 		{
 			return {
 				enableModule: Settings.enableModule,
