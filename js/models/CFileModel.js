@@ -297,6 +297,7 @@ CFileModel.prototype.viewFile = function ()
 		oWin.document.write('<form action="?/Api/" method="post" id="view_form" target="view_iframe" style="display: none;"></form>');
 		oWin.document.write('<iframe name="view_iframe" style="width: 100%; height: 100%; border: none;"></iframe>');
 		$(oWin.document.body).css({'margin': '0', 'padding': '0'});
+		$('<title>' + this.fileName() + '</title>').appendTo($(oWin.document).find('head'));
 		var oForm = $(oWin.document).find('#view_form');
 		this.createFormFields(oForm, 'ViewFile');
 		oForm.submit();
