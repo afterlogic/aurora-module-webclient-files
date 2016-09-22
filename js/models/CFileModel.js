@@ -2,13 +2,14 @@
 
 var
 	_ = require('underscore'),
+	$ = require('jquery'),
 	ko = require('knockout'),
 	
 	FilesUtils = require('%PathToCoreWebclientModule%/js/utils/Files.js'),
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	
-	Browser = require('%PathToCoreWebclientModule%/js/Browser.js'),
+	UserSettings = require('%PathToCoreWebclientModule%/js/Settings.js'),
 	WindowOpener = require('%PathToCoreWebclientModule%/js/WindowOpener.js'),
 	
 	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js'),
@@ -233,6 +234,24 @@ CFileModel.prototype.onUploadSelectOwn = function (sFileUid, oFileData, sFileNam
 	this.ownerName(sOwner);
 	this.path(sPath);
 	this.storageType(sStorageType);
+};
+
+CFileModel.prototype.downloadFile = function ()
+{
+	var oForm = $('<form action="?/Api/" method="post" target="my_iframe"></form>').appendTo(document.body);
+	$('<input type="hidden" name="AuthToken" />').val($.cookie('AuthToken')).appendTo(oForm);
+	$('<input type="hidden" name="TenantName" />').val(UserSettings.TenantName).appendTo(oForm);
+	$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
+					'Type': this.type(),
+					'Name': this.fileName(),
+					'Path': this.path()
+				})).appendTo(oForm);
+	$('<iframe style="display: none;" name="my_iframe"></iframe>').appendTo(document.body);
+	oForm.submit();
+		
+//	setTimeout(function () {
+//		oIframe.remove();
+//	}, 200000);
 };
 
 /**
