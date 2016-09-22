@@ -284,14 +284,14 @@ CFileModel.prototype.viewFile = function ()
 		oWin.document.write('<input type="hidden" name="Method" value="ViewFile" />');
 		oWin.document.write('<input type="hidden" name="AuthToken" value="' + $.cookie('AuthToken') + '" />');
 		oWin.document.write('<input type="hidden" name="TenantName" value="' + UserSettings.TenantName + '" />');
-		oWin.document.write('<input type="hidden" name="Parameters" value="' + JSON.stringify({
-			'Type': this.type(),
-			'Name': this.fileName(),
-			'Path': this.path()
-		}) + '" />');
 		oWin.document.write('</form>');
 		oWin.document.write('<iframe name="my_iframe"></iframe>');
 		var oForm = $(oWin.document).find('#myform');
+		var inp = $('<input type="hidden" name="Parameters" />').val(JSON.stringify({
+			'Type': this.type(),
+			'Name': this.fileName(),
+			'Path': this.path()
+		})).appendTo(oForm);
 		oForm.submit();
 	}
 };
