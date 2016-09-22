@@ -238,20 +238,29 @@ CFileModel.prototype.onUploadSelectOwn = function (sFileUid, oFileData, sFileNam
 
 CFileModel.prototype.downloadFile = function ()
 {
-	var oForm = $('<form action="?/Api/" method="post" target="my_iframe"></form>').appendTo(document.body);
-	$('<input type="hidden" name="AuthToken" />').val($.cookie('AuthToken')).appendTo(oForm);
-	$('<input type="hidden" name="TenantName" />').val(UserSettings.TenantName).appendTo(oForm);
-	$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
-					'Type': this.type(),
-					'Name': this.fileName(),
-					'Path': this.path()
-				})).appendTo(oForm);
-	$('<iframe style="display: none;" name="my_iframe"></iframe>').appendTo(document.body);
-	oForm.submit();
-		
-//	setTimeout(function () {
-//		oIframe.remove();
-//	}, 200000);
+	if (this.allowDownload())
+	{
+		var
+			oForm = $('<form action="?/Api/" method="post" target="my_iframe"></form>').appendTo(document.body),
+			oIframe = $('<iframe style="display: none;" name="my_iframe"></iframe>').appendTo(document.body)
+		;
+
+		$('<input type="hidden" name="Module" />').val('Files').appendTo(oForm);
+		$('<input type="hidden" name="Method" />').val('DownloadFile').appendTo(oForm);
+		$('<input type="hidden" name="AuthToken" />').val($.cookie('AuthToken')).appendTo(oForm);
+		$('<input type="hidden" name="TenantName" />').val(UserSettings.TenantName).appendTo(oForm);
+		$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
+			'Type': this.type(),
+			'Name': this.fileName(),
+			'Path': this.path()
+		})).appendTo(oForm);
+
+		oForm.submit();
+
+		setTimeout(function () {
+			oIframe.remove();
+		}, 200000);
+	}
 };
 
 /**
@@ -269,7 +278,21 @@ CFileModel.prototype.viewFile = function ()
 	}
 	else
 	{
-		this.viewCommonFile();
+		var oWin = WindowOpener.open('', this.fileName(), true);
+		oWin.document.write('<form action="?/Api/" method="post" id="myform" target="my_iframe">');
+		oWin.document.write('<input type="hidden" name="Module" value="Files" />');
+		oWin.document.write('<input type="hidden" name="Method" value="ViewFile" />');
+		oWin.document.write('<input type="hidden" name="AuthToken" value="' + $.cookie('AuthToken') + '" />');
+		oWin.document.write('<input type="hidden" name="TenantName" value="' + UserSettings.TenantName + '" />');
+		oWin.document.write('<input type="hidden" name="Parameters" value="' + JSON.stringify({
+			'Type': this.type(),
+			'Name': this.fileName(),
+			'Path': this.path()
+		}) + '" />');
+		oWin.document.write('</form>');
+		oWin.document.write('<iframe name="my_iframe"></iframe>');
+		var oForm = $(oWin.document).find('#myform');
+		oForm.submit();
 	}
 };
 
