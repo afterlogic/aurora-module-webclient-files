@@ -236,36 +236,50 @@ CFileModel.prototype.onUploadSelectOwn = function (sFileUid, oFileData, sFileNam
 	this.storageType(sStorageType);
 };
 
+/**
+ * Fills form with fields for further file downloading or viewing via post to iframe.
+ * 
+ * @param {object} oForm Jquery object.
+ * @param {string} sMethod Method name.
+ */
+CFileModel.prototype.createFormFields = function (oForm, sMethod)
+{
+	$('<input type="hidden" name="Module" />').val('Files').appendTo(oForm);
+	$('<input type="hidden" name="Method" />').val(sMethod).appendTo(oForm);
+	$('<input type="hidden" name="AuthToken" />').val($.cookie('AuthToken')).appendTo(oForm);
+	$('<input type="hidden" name="TenantName" />').val(UserSettings.TenantName).appendTo(oForm);
+	$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
+	$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
+		'Type': this.type(),
+		'Name': this.fileName(),
+		'Path': this.path()
+	})).appendTo(oForm);
+
+};
+
+/**
+ * Downloads file via post to iframe.
+ */
 CFileModel.prototype.downloadFile = function ()
 {
 	if (this.allowDownload())
 	{
 		var
-			oForm = $('<form action="?/Api/" method="post" target="my_iframe"></form>').appendTo(document.body),
-			oIframe = $('<iframe style="display: none;" name="my_iframe"></iframe>').appendTo(document.body)
+			sIframeName = 'download_iframe_' + Math.random(),
+			oForm = $('<form action="?/Api/" method="post" target="' + sIframeName + '"></form>').hide().appendTo(document.body),
+			oIframe = $('<iframe name="' + sIframeName + '"></iframe>').hide().appendTo(document.body)
 		;
-
-		$('<input type="hidden" name="Module" />').val('Files').appendTo(oForm);
-		$('<input type="hidden" name="Method" />').val('DownloadFile').appendTo(oForm);
-		$('<input type="hidden" name="AuthToken" />').val($.cookie('AuthToken')).appendTo(oForm);
-		$('<input type="hidden" name="TenantName" />').val(UserSettings.TenantName).appendTo(oForm);
-		$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
-		$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
-			'Type': this.type(),
-			'Name': this.fileName(),
-			'Path': this.path()
-		})).appendTo(oForm);
-
+		this.createFormFields(oForm, 'DownloadFile');
 		oForm.submit();
-
 		setTimeout(function () {
+			oForm.remove();
 			oIframe.remove();
 		}, 200000);
 	}
 };
 
 /**
- * Starts viewing attachment on click.
+ * Opens file viewing via post to iframe.
  */
 CFileModel.prototype.viewFile = function ()
 {
@@ -280,20 +294,11 @@ CFileModel.prototype.viewFile = function ()
 	else
 	{
 		var oWin = WindowOpener.open('', this.fileName(), true);
-		oWin.document.write('<form action="?/Api/" method="post" id="myform" target="my_iframe">');
-		oWin.document.write('<input type="hidden" name="Module" value="Files" />');
-		oWin.document.write('<input type="hidden" name="Method" value="ViewFile" />');
-		oWin.document.write('<input type="hidden" name="AuthToken" value="' + $.cookie('AuthToken') + '" />');
-		oWin.document.write('<input type="hidden" name="TenantName" value="' + UserSettings.TenantName + '" />');
-		oWin.document.write('</form>');
-		oWin.document.write('<iframe name="my_iframe"></iframe>');
-		var oForm = $(oWin.document).find('#myform');
-		$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
-		$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
-			'Type': this.type(),
-			'Name': this.fileName(),
-			'Path': this.path()
-		})).appendTo(oForm);
+		oWin.document.write('<form action="?/Api/" method="post" id="view_form" target="view_iframe" style="display: none;"></form>');
+		oWin.document.write('<iframe name="view_iframe" style="width: 100%; height: 100%; border: none;"></iframe>');
+		$(oWin.document.body).css({'margin': '0', 'padding': '0'});
+		var oForm = $(oWin.document).find('#view_form');
+		this.createFormFields(oForm, 'ViewFile');
 		oForm.submit();
 	}
 };
