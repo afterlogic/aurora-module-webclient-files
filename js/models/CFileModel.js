@@ -249,6 +249,7 @@ CFileModel.prototype.downloadFile = function ()
 		$('<input type="hidden" name="Method" />').val('DownloadFile').appendTo(oForm);
 		$('<input type="hidden" name="AuthToken" />').val($.cookie('AuthToken')).appendTo(oForm);
 		$('<input type="hidden" name="TenantName" />').val(UserSettings.TenantName).appendTo(oForm);
+		$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
 		$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
 			'Type': this.type(),
 			'Name': this.fileName(),
@@ -287,7 +288,8 @@ CFileModel.prototype.viewFile = function ()
 		oWin.document.write('</form>');
 		oWin.document.write('<iframe name="my_iframe"></iframe>');
 		var oForm = $(oWin.document).find('#myform');
-		var inp = $('<input type="hidden" name="Parameters" />').val(JSON.stringify({
+		$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
+		$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
 			'Type': this.type(),
 			'Name': this.fileName(),
 			'Path': this.path()
