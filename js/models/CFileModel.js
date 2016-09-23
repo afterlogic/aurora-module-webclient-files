@@ -252,9 +252,8 @@ CFileModel.prototype.createFormFields = function (oForm, sMethod)
 	$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
 		'Type': this.type(),
 		'Name': encodeURIComponent(this.fileName()),
-		'Path': this.path()
+		'Path': encodeURIComponent(this.path())
 	})).appendTo(oForm);
-
 };
 
 /**
@@ -294,7 +293,7 @@ CFileModel.prototype.viewFile = function ()
 	else
 	{
 		var oWin = WindowOpener.open('', this.fileName(), true);
-		oWin.document.write('<form action="?/Api/" method="post" id="view_form" target="view_iframe"></form>');
+		oWin.document.write('<form action="?/Api/" method="post" id="view_form" target="view_iframe" style="display: none;"></form>');
 		oWin.document.write('<iframe name="view_iframe" style="width: 100%; height: 100%; border: none;"></iframe>');
 		$(oWin.document.body).css({'margin': '0', 'padding': '0'});
 		$('<title>' + this.fileName() + '</title>').appendTo($(oWin.document).find('head'));
