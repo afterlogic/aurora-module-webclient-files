@@ -251,7 +251,7 @@ CFileModel.prototype.createFormFields = function (oForm, sMethod)
 	$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
 	$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
 		'Type': this.type(),
-		'Name': this.fileName(),
+		'Name': encodeURIComponent(this.fileName()),
 		'Path': this.path()
 	})).appendTo(oForm);
 
