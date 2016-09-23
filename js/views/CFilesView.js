@@ -51,7 +51,7 @@ function CFilesView(bPopup)
 	this.loaded = ko.observable(false);
 	this.isPublic = App.isPublic();
 	
-	this.sPublicHash = UrlUtils.getRequestParam('files-pub');
+	this.sPublicHash = Settings.PublicHash;
 	
 	this.storages = ko.observableArray();
 	this.folders = ko.observableArray();
@@ -61,21 +61,15 @@ function CFilesView(bPopup)
 	this.rootPath = ko.observable(TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE'));
 	this.storageType = ko.observable(Enums.FileStorageType.Personal);
 	this.storageType.subscribe(function () {
-		var  oStorage = null;
-		
-		if (this.isPublic)
+		if (!this.isPublic)
 		{
-			this.rootPath(Settings.PublicName);
-		}
-		else
-		{
-			oStorage = this.getStorageByType(this.storageType());
+			var oStorage = this.getStorageByType(this.storageType());
 			if (oStorage)
 			{
 				this.rootPath(oStorage.displayName);
 			}
+			this.selector.listCheckedAndSelected(false);
 		}
-		this.selector.listCheckedAndSelected(false);
 	}, this);
 	
 	this.iPathIndex = ko.observable(-1);
@@ -268,7 +262,8 @@ CFilesView.prototype.onBind = function ($popupDom)
 CFilesView.prototype.hotKeysBind = function ()
 {
 	$(document).on('keydown', _.bind(function(ev) {
-		if (this.shown() && ev && ev.keyCode === Enums.Key.s && this.selector.useKeyboardKeys() && !Utils.isTextFieldFocused()) {
+		if (this.shown() && ev && ev.keyCode === Enums.Key.s && this.selector.useKeyboardKeys() && !Utils.isTextFieldFocused())
+		{
 			ev.preventDefault();
 			this.isSearchFocused(true);
 		}
@@ -691,12 +686,12 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 					aFileList.push(oFile);
 				}
 			}, this);
-
+			
 			this.folders(aFolderList);
 			this.files(aFileList);
 			
-			this.newSearchPattern(oParameters.Pattern);
-			this.searchPattern(oParameters.Pattern);
+			this.newSearchPattern(oParameters.Pattern || '');
+			this.searchPattern(oParameters.Pattern || '');
 		}
 		
 		this.loading(false);
