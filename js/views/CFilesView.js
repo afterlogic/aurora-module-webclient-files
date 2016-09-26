@@ -58,10 +58,14 @@ function CFilesView(bPopup)
 	this.files = ko.observableArray();
 	this.uploadingFiles = ko.observableArray();
 
-	this.rootPath = ko.observable(TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE'));
+	this.rootPath = ko.observable(this.isPublic ? Settings.PublicFolderName : TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE'));
 	this.storageType = ko.observable(Enums.FileStorageType.Personal);
 	this.storageType.subscribe(function () {
-		if (!this.isPublic)
+		if (this.isPublic)
+		{
+			this.rootPath(Settings.PublicFolderName);
+		}
+		else
 		{
 			var oStorage = this.getStorageByType(this.storageType());
 			if (oStorage)

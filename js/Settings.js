@@ -12,6 +12,7 @@ module.exports = {
 	
 	enableModule: ko.observable(true),
 	PublicHash: '',
+	PublicFolderName: '',
 	EnableUploadSizeLimit: false,
 	UploadSizeLimitMb: 0,
 	EnableCorporate: false,
@@ -23,6 +24,7 @@ module.exports = {
 		{
 			this.enableModule =  ko.observable(!!oAppDataSection.EnableModule);
 			this.PublicHash = Types.pString(oAppDataSection.PublicHash);
+			this.PublicFolderName = Types.pString(oAppDataSection.PublicFolderName);
 			this.EnableUploadSizeLimit = !!oAppDataSection.EnableUploadSizeLimit;
 			this.UploadSizeLimitMb = Types.pInt(oAppDataSection.UploadSizeLimitMb);
 			this.EnableCorporate = !!oAppDataSection.EnableCorporate;
