@@ -126,6 +126,10 @@ function CFileModel()
 	}, this);
 	
 	this.sHtmlEmbed = ko.observable('');
+	
+	this.thumbDom = ko.observable(null);
+	this.thumbDom.subscribe(this.loadThumb, this);
+	this.thumbnailLink.subscribe(this.loadThumb, this);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
@@ -136,6 +140,20 @@ _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
 CFileModel.prototype.getInstance = function ()
 {
 	return new CFileModel();
+};
+
+CFileModel.prototype.loadThumb = function ()
+{
+	if (!this.hasHtmlEmbed() && this.thumb() && this.thumbDom() !== null && this.thumbnailLink() !== '')
+	{
+		var
+			sIframeName = 'thumb_iframe_' + Math.random(),
+			oForm = $('<form action="?/Api/" method="post" target="' + sIframeName + '"></form>').hide().appendTo(this.thumbDom())
+		;
+		this.createFormFields(oForm, 'GetFileThumbnail');
+		$('<iframe name="' + sIframeName + '" class="thumb download"></iframe>').appendTo(this.thumbDom());
+		oForm.submit();
+	}
 };
 
 /**
@@ -201,10 +219,10 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.hash(Types.pString(oData.Hash));
 	this.sHtmlEmbed(oData.OembedHtml ? oData.OembedHtml : '');
 	
-	if (this.thumb() && this.thumbnailExternalLink() === '')
-	{
-		FilesUtils.thumbQueue(this.thumbnailSessionUid(), this.thumbnailLink(), this.thumbnailSrc);
-	}
+//	if (this.thumb() && this.thumbnailExternalLink() === '')
+//	{
+//		FilesUtils.thumbQueue(this.thumbnailSessionUid(), this.thumbnailLink(), this.thumbnailSrc);
+//	}
 	
 	this.content(Types.pString(oData.Content));
 };
