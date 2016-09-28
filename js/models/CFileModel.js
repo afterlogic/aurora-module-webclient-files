@@ -18,6 +18,7 @@ var
 	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
 	EmbedHtmlPopup = require('%PathToCoreWebclientModule%/js/popups/EmbedHtmlPopup.js'),
 	
+	Ajax = require('modules/%ModuleName%/js/Ajax.js'),
 	Settings = require('modules/%ModuleName%/js/Settings.js')
 ;
 
@@ -126,6 +127,7 @@ function CFileModel()
 	}, this);
 	
 	this.sHtmlEmbed = ko.observable('');
+	this.contentType = ko.observable('');
 	
 	this.thumbDom = ko.observable(null);
 	this.thumbDom.subscribe(this.loadThumb, this);
@@ -144,15 +146,14 @@ CFileModel.prototype.getInstance = function ()
 
 CFileModel.prototype.loadThumb = function ()
 {
-	if (!this.hasHtmlEmbed() && this.thumb() && this.thumbDom() !== null && this.thumbnailLink() !== '')
+	if (!this.hasHtmlEmbed() && this.thumb() && this.thumbnailLink() !== '')
 	{
-		var
-			sIframeName = 'thumb_iframe_' + Math.random(),
-			oForm = $('<form action="?/Api/" method="post" target="' + sIframeName + '"></form>').hide().appendTo(this.thumbDom())
-		;
-		this.createFormFields(oForm, 'GetFileThumbnail');
-		$('<iframe name="' + sIframeName + '" class="thumb download"></iframe>').appendTo(this.thumbDom());
-		oForm.submit();
+		Ajax.send('GetFileThumbnail', { Type: this.type(), Name: this.fileName(), Path: this.path() }, function (oResponse) {
+			if (oResponse.Result)
+			{
+				this.thumbnailSrc('data:' + this.contentType() + ';base64,' + oResponse.Result);
+			}
+		}, this);
 	}
 };
 
@@ -225,6 +226,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 //	}
 	
 	this.content(Types.pString(oData.Content));
+	this.contentType(Types.pString(oData.ContentType));
 };
 
 /**
