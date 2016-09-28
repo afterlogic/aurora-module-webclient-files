@@ -686,7 +686,6 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 						oFile.sPublicHash = this.sPublicHash;
 					}
 					oFile.parse(oData, this.isPopup);
-					oFile.getInThumbQueue(sThumbSessionUid);
 					aFileList.push(oFile);
 				}
 			}, this);

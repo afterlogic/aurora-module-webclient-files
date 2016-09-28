@@ -111,27 +111,12 @@ function CFileModel()
 		return !this.isPopupItem() && !this.visibleOpenLink();
 	}, this);
 
-	this.thumbnailLink = ko.computed(function () {
-		if (this.isExternal() || (this.isLink()))
-		{
-			return this.thumbnailExternalLink();
-		}
-		else
-		{
-			return FilesUtils.getThumbnailLink(Settings.ServerModuleName, this.hash(), this.sPublicHash);
-		}
-	}, this);
-
 	this.canShare = ko.computed(function () {
 		return (this.storageType() === Enums.FileStorageType.Personal || this.storageType() === Enums.FileStorageType.Corporate);
 	}, this);
 	
 	this.sHtmlEmbed = ko.observable('');
 	this.contentType = ko.observable('');
-	
-	this.thumbDom = ko.observable(null);
-	this.thumbDom.subscribe(this.loadThumb, this);
-	this.thumbnailLink.subscribe(this.loadThumb, this);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
@@ -142,19 +127,6 @@ _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
 CFileModel.prototype.getInstance = function ()
 {
 	return new CFileModel();
-};
-
-CFileModel.prototype.loadThumb = function ()
-{
-	if (!this.hasHtmlEmbed() && this.thumb() && this.thumbnailLink() !== '')
-	{
-		Ajax.send('GetFileThumbnail', { Type: this.type(), Name: this.fileName(), Path: this.path() }, function (oResponse) {
-			if (oResponse.Result)
-			{
-				this.thumbnailSrc('data:' + this.contentType() + ';base64,' + oResponse.Result);
-			}
-		}, this);
-	}
 };
 
 /**
@@ -220,10 +192,17 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.hash(Types.pString(oData.Hash));
 	this.sHtmlEmbed(oData.OembedHtml ? oData.OembedHtml : '');
 	
-//	if (this.thumb() && this.thumbnailExternalLink() === '')
-//	{
-//		FilesUtils.thumbQueue(this.thumbnailSessionUid(), this.thumbnailLink(), this.thumbnailSrc);
-//	}
+	if (this.thumb())
+	{
+		if (this.thumbnailExternalLink() === '')
+		{
+			FilesUtils.thumbBase64Queue(this);
+		}
+		else
+		{
+			this.thumbnailSrc(this.thumbnailExternalLink());
+		}
+	}
 	
 	this.content(Types.pString(oData.Content));
 	this.contentType(Types.pString(oData.ContentType));
