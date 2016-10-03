@@ -837,7 +837,7 @@ CFilesView.prototype.onShareIconClick = function (oItem)
  */
 CFilesView.prototype.onRenameResponse = function (oResult, oRequest)
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern());
+	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
 };
 
 
@@ -945,7 +945,7 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 		this.iPathIndex(-1);
 	}
 	
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()));
+	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
 };
 
 /**
@@ -969,7 +969,7 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	this.error(false);
 	this.storageType(sType);
 	self.loadedFiles(false);
-	if (bNotLoading)
+	if (bNotLoading && (this.files().length > 0 || this.folders().length > 0))
 	{
 		this.timerId = setTimeout(function() {
 			if (!self.loadedFiles() && !self.error())
@@ -978,10 +978,12 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 				self.files([]);
 				self.loading(true);
 			}
-		}, 1500);				
+		}, 3000);				
 	}
 	else
 	{
+		this.folders([]);
+		this.files([]);
 		this.loading(true);
 	}
 	
@@ -1198,7 +1200,7 @@ CFilesView.prototype.onCancelUpload = function (sFileUid)
  */
 CFilesView.prototype.onCreateFolderResponse = function (oResponse, oRequest)
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()));
+	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
 };
 
 /**
@@ -1235,7 +1237,7 @@ CFilesView.prototype.onCreateFolderClick = function ()
  */
 CFilesView.prototype.onCreateLinkResponse = function (oResponse, oRequest)
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()));
+	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
 };
 
 /**
