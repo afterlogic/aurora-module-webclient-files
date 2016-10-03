@@ -980,6 +980,10 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 			}
 		}, 1500);				
 	}
+	else
+	{
+		this.loading(true);
+	}
 	
 	if (oPath === undefined || oPath.id() === '')
 	{
