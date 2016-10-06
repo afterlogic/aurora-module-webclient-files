@@ -16,7 +16,7 @@ function CMobileSyncSettingsView()
 {
 	this.davServer = ko.observable('');
 	this.credentialsHintText = ko.computed(function () {
-		return TextUtils.i18n('COREWEBCLIENT/INFO_MOBILE_CREDENTIALS', {'LOGIN': App.userAccountLogin()});
+		return TextUtils.i18n('COREWEBCLIENT/INFO_MOBILE_CREDENTIALS', {'LOGIN': App.userPublicId()});
 	}, this);
 	this.bDemo = UserSettings.IsDemo;
 }
