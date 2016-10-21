@@ -8,8 +8,8 @@ var
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	Utils = require('%PathToCoreWebclientModule%/js/utils/Common.js'),
-	UrlUtils = require('%PathToCoreWebclientModule%/js/utils/Url.js'),
 	
+	Api = require('%PathToCoreWebclientModule%/js/Api.js'),
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	CJua = require('%PathToCoreWebclientModule%/js/CJua.js'),
 	CSelector = require('%PathToCoreWebclientModule%/js/CSelector.js'),
@@ -832,11 +832,15 @@ CFilesView.prototype.onShareIconClick = function (oItem)
 };
 
 /**
- * @param {Object} oResult
+ * @param {Object} oResponse
  * @param {Object} oRequest
  */
-CFilesView.prototype.onRenameResponse = function (oResult, oRequest)
+CFilesView.prototype.onRenameResponse = function (oResponse, oRequest)
 {
+	if (!oResponse.Result)
+	{
+		Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILE_RENAME'));
+	}
 	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
 };
 
