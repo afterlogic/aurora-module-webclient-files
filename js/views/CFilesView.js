@@ -1012,7 +1012,7 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	
 	Ajax.send('GetFiles', {
 			'Type': sType,
-			'Path': this.path(),
+			'Path': (oPath instanceof CFolderModel) ? oPath.fullPath() : this.path(),
 			'Pattern': Types.pString(sPattern)
 		}, this.onGetFilesResponse, this
 	);
