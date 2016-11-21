@@ -117,6 +117,8 @@ function CFileModel()
 	
 	this.sHtmlEmbed = ko.observable('');
 	this.contentType = ko.observable('');
+	
+	this.sMainAction = 'view';
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
@@ -206,6 +208,11 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	
 	this.content(Types.pString(oData.Content));
 	this.contentType(Types.pString(oData.ContentType));
+
+	if (oData.MainAction)
+	{
+		this.sMainAction = Types.pString(oData.MainAction);
+	}
 };
 
 /**

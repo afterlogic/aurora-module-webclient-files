@@ -33,6 +33,8 @@ function CFolderModel()
 	this.storageType = ko.observable(Enums.FileStorageType.Personal);
 	this.displayName = ko.observable('');
 	this.id = ko.observable('');
+	
+	this.sMainAction = 'list';
 }
 
 CFolderModel.prototype.parse = function (oData, sPublicHash)
@@ -44,6 +46,11 @@ CFolderModel.prototype.parse = function (oData, sPublicHash)
 	this.storageType(Types.pString(oData.Type));
 	this.displayName(this.fileName());
 	this.id(Types.pString(oData.Id));
+	
+	if (oData.MainAction)
+	{
+		this.sMainAction = Types.pString(oData.MainAction);
+	}
 };
 
 CFolderModel.prototype.eventDragStart = CAbstractFileModel.prototype.eventDragStart;

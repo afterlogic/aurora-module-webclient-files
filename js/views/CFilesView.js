@@ -620,30 +620,34 @@ CFilesView.prototype.onItemDblClick = function (oItem)
 {
 	if (oItem)
 	{
-		if (oItem instanceof CFolderModel)
+		switch (oItem.sMainAction)
 		{
-			this.getFiles(this.storageType(), oItem);
-		}
-		else
-		{
-			if (oItem.isViewable())
-			{
-				oItem.viewFile();
-			}
-			else
-			{
-				if (this.isPopup)
+			case 'view':
+				if (oItem instanceof CFileModel)
 				{
-					if (this.onSelectClickPopupBinded)
+					if (oItem.isViewable())
 					{
-						this.onSelectClickPopupBinded();
+						oItem.viewFile();
+					}
+					else
+					{
+						if (this.isPopup)
+						{
+							if (this.onSelectClickPopupBinded)
+							{
+								this.onSelectClickPopupBinded();
+							}
+						}
+						else
+						{
+							oItem.downloadFile();
+						}
 					}
 				}
-				else
-				{
-					oItem.downloadFile();
-				}
-			}
+				break;
+			case 'list':
+				this.getFiles(this.storageType(), oItem);
+				break;
 		}
 	}
 };
