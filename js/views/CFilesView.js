@@ -667,7 +667,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 	{
 		this.onGetQuotaResponse(oResponse, oRequest);
 		
-		if (this.isPublic || oParameters.Type === this.storageType())
+		if (true/*this.isPublic || oParameters.Type === this.storageType()*/)
 		{
 			var 
 				aFolderList = [],
@@ -1015,8 +1015,8 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	}
 	
 	Ajax.send('GetFiles', {
-			'Type': sType,
-			'Path': (oPath instanceof CFolderModel) ? oPath.fullPath() : this.path(),
+			'Type': (oPath !== undefined) ? oPath.storageType() : sType,
+			'Path': (oPath !== undefined) ? oPath.fullPath() : this.path(),
 			'Pattern': Types.pString(sPattern)
 		}, this.onGetFilesResponse, this
 	);
