@@ -487,6 +487,7 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 		var
 			self = this,
 			sFromPath = '',
+			sFromStorageType = '',
 			bFolderIntoItself = false,
 			sToPath = oFolder instanceof CFolderModel ? oFolder.fullPath() : '',
 			aChecked = [],
@@ -508,6 +509,7 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 			aChecked = this.selector.listCheckedAndSelected();
 			_.each(aChecked, function (oItem) {
 				sFromPath = oItem.path();
+				sFromStorageType = oItem.storageType();
 				bFolderIntoItself = oItem instanceof CFolderModel && sToPath === sFromPath + '/' + oItem.id();
 				if (!bFolderIntoItself)
 				{
@@ -532,7 +534,7 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 			if (aItems.length > 0)
 			{
 				Ajax.send(oEvent.ctrlKey ? 'Copy' : 'Move', {
-					'FromType': this.storageType(),
+					'FromType': sFromStorageType,
 					'ToType': sStorageType,
 					'FromPath': sFromPath,
 					'ToPath': sToPath,
@@ -775,7 +777,7 @@ CFilesView.prototype.renameItem = function (sName)
 	else
 	{
 		Ajax.send('Rename', {
-				'Type': this.storageType(),
+				'Type': oItem.storageType(),
 				'Path': oItem.path(),
 				'Name': oItem.id(),
 				'NewName': sName,
@@ -1064,11 +1066,17 @@ CFilesView.prototype.getPublicFiles = function (oPath)
  */
 CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 {
+	var 
+		sStorageType = this.storageType(),
+		sPath =this.path()
+	;
 	if (bOkAnswer && 0 < aChecked.length)
 	{
 		var
 			aItems = _.map(aChecked, function (oItem) {
 				oItem.deleted(true);
+				sStorageType = oItem.storageType();
+				sPath = oItem.path();
 				return {
 					'Path': oItem.path(),  
 					'Name': oItem.id()
@@ -1076,8 +1084,8 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 			});
 		
 		Ajax.send('Delete', {
-				'Type': this.storageType(),
-				'Path': this.path(),
+				'Type': sStorageType,
+				'Path': sPath,
 				'Items': aItems
 			}, this.onDeleteResponse, this
 		);
