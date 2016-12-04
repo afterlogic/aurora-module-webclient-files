@@ -206,7 +206,6 @@ CFileModel.prototype.parse = function (oData, bPopup)
 		}
 	}
 	
-	this.content(Types.pString(oData.Content));
 	this.contentType(Types.pString(oData.ContentType));
 
 	if (oData.MainAction)
