@@ -119,6 +119,37 @@ function CFileModel()
 	this.contentType = ko.observable('');
 	
 	this.sMainAction = 'view';
+	
+	this.cssClasses = ko.computed(function () {
+		var aClasses = this.getCommonClasses();
+		
+		if (this.allowDrag())
+		{
+			aClasses.push('dragHandle');
+		}
+		if (this.selected())
+		{
+			aClasses.push('selected');
+		}
+		if (this.checked())
+		{
+			aClasses.push('checked');
+		}
+		if (this.deleted())
+		{
+			aClasses.push('deleted');
+		}
+		if (this.allowSharing() && this.shared())
+		{
+			aClasses.push('shared');
+		}
+		if (this.isLink())
+		{
+			aClasses.push('aslink');
+		}
+		
+		return aClasses.join(' ');
+	}, this);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
@@ -158,10 +189,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 {
 	var oDateModel = new CDateModel();
 	
-	this.allowSelect(true);
 	this.allowDrag(true);
-	this.allowCheck(true);
-	this.allowDelete(true);
 	this.allowUpload(true);
 	this.allowSharing(true);
 	this.allowHeader(true);
