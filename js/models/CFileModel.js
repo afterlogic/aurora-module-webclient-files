@@ -101,16 +101,6 @@ function CFileModel()
 
 	}, this);
 	
-	this.visibleViewLink = ko.computed(function () {
-		return (this.embedType() !== '' || this.linkUrl() === '') && this.isViewable();
-	}, this);
-	this.visibleOpenLink = ko.computed(function () {
-		return this.linkUrl() !== '';
-	}, this);
-	this.visibleDownloadLink = ko.computed(function () {
-		return !this.isPopupItem() && !this.visibleOpenLink();
-	}, this);
-
 	this.canShare = ko.computed(function () {
 		return (this.storageType() === Enums.FileStorageType.Personal || this.storageType() === Enums.FileStorageType.Corporate);
 	}, this);
@@ -150,16 +140,59 @@ function CFileModel()
 		
 		return aClasses.join(' ');
 	}, this);
+	
+	this.actionsSetter.dispose();
+	ko.computed(function () {
+		this.setCommonActions();
+		
+		if ((this.embedType() !== '' || this.linkUrl() === '') && this.isViewable())
+		{
+			this.leftAction('view');
+			this.leftActionText(TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE'));
+		}
+		else
+		{
+			this.leftAction('');
+			this.leftActionText('');
+		}
+		if (this.linkUrl() !== '')
+		{
+			this.rightAction('open');
+			this.rightActionText(TextUtils.i18n('COREWEBCLIENT/ACTION_OPEN_LINK'));
+		}
+		
+		if (this.embedType() !== '')
+		{
+			this.iconAction('view');
+		}
+		else
+		{
+			this.iconAction('');
+		}
+	}, this);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
 
-/**
- * @returns {CFileModel}
- */
-CFileModel.prototype.getInstance = function ()
+CFileModel.prototype.doRightAction = function ()
 {
-	return new CFileModel();
+	this.doCommonRightAction();
+	switch (this.rightAction())
+	{
+		case 'open':
+			this.openLink();
+			break;
+	}
+};
+
+CAbstractFileModel.prototype.doIconAction = function ()
+{
+	switch (this.iconAction())
+	{
+		case 'view':
+			this.viewFile();
+			break;
+	}
 };
 
 /**
@@ -341,18 +374,6 @@ CFileModel.prototype.viewFile = function ()
 CFileModel.prototype.openLink = function ()
 {
 	WindowOpener.openTab(this.viewLink());
-};
-
-/**
- * @param {Object} oViewModel
- * @param {Object} oEvent
- */
-CFileModel.prototype.onIconClick = function (oViewModel, oEvent)
-{
-	if (this.embedType() !== '')
-	{
-		this.viewFile(oViewModel, oEvent);
-	}
 };
 
 module.exports = CFileModel;
