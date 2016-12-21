@@ -401,7 +401,7 @@ CFilesView.prototype.onFileUploadProgress = function (sFileUid, iUploadedSize, i
 /**
  * Finds attachment by uid. Calls it's function to complete upload.
  *
- * @param {string} sFileUid File identificator.
+ * @param {string} sFileUid File identifier.
  * @param {boolean} bResponseReceived Indicates if upload was successfull.
  * @param {Object} oResult Response from the server.
  */
