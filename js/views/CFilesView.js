@@ -334,7 +334,18 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 			TextUtils.i18n('%MODULENAME%/ERROR_SIZE_LIMIT', {'SIZE': Settings.UploadSizeLimitMb})
 		]);
 		return false;
-	}	
+	}
+	
+	if (this.storageType() === Enums.FileStorageType.Personal && Types.isPositiveNumber(this.quota()))
+	{
+		if (this.quota() > 0 && this.used() + oFileData.Size > this.quota())
+		{
+			Popups.showPopup(AlertPopup, [
+				TextUtils.i18n('COREWEBCLIENT/ERROR_CANT_UPLOAD_FILE_QUOTA')
+			]);
+			return false;
+		}
+	}
 	
 	if (this.searchPattern() === '')
 	{
