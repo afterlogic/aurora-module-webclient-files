@@ -16,6 +16,9 @@
 	<!-- /ko -->
 </div>
 <div class="panel_center unselectable" data-bind="customScrollbar: {x: false}, css: {dragover: dragover()}">
+	<div class="uploader_mask" data-bind="initDom: uploaderArea, css: {'active': bDragActiveComp}">
+		<div class="inner"></div>
+	</div>
 	<div class="files_scroll scroll-inner">
 		<div class="items_list">
 			<span class="list_notification" data-bind="visible: fileListInfoText()!==''">
@@ -29,9 +32,6 @@
 					<!-- ko template: {name: 'CoreWebclient_FileView'} --><!-- /ko -->
 				<!-- /ko -->
 				<div class="item helper"></div>
-			</div>
-			<div class="uploader_mask" data-bind="initDom: uploaderArea, css: {'active': bDragActiveComp}">
-				<div class="inner"></div>
 			</div>
 		</div>
 	</div>

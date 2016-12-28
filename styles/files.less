@@ -6,6 +6,36 @@
 		width: 100%;
 	}
 	
+	.uploader_mask {
+		.box-sizing;
+		.transition(opacity 250ms ease 0s);
+
+		color: #d3b910;
+		background: #fffdd6;
+		font-size: 18pt;
+		height: 100%;
+		opacity: 0;
+		padding: 11px;
+		position: absolute;
+		text-align: center;
+		visibility: hidden;
+		width: 100%;
+		z-index: 1000;
+
+		&.active {
+			opacity: 0.5;
+			visibility: visible;
+		}
+
+		.inner {
+			.box-sizing;
+
+			border: 3px dashed #e2da36;
+			border-radius: 5px;
+			height: 100%;
+		}
+	}
+	
 	//.middle_bar {
 		//.resize-compensation-top(31px);
 	//}
@@ -43,37 +73,6 @@
 	}
 	
 	.items_list {
-		.uploader_mask {
-			.box-sizing;
-			.transition(opacity 250ms ease 0s);
-
-			color: #d3b910;
-			background: #fffdd6;
-			font-size: 18pt;
-			height: 100%;
-			left: 0px;
-			opacity: 0;
-			padding: 11px;
-			position: absolute;
-			text-align: center;
-			top: 0px;
-			visibility: hidden;
-			width: 100%;
-
-			&.active {
-				opacity: 0.5;
-				visibility: visible;
-			}
-
-			.inner {
-				.box-sizing;
-
-				border: 3px dashed #e2da36;
-				border-radius: 5px;
-				height: 100%;
-			}
-		}
-		
 		.items_sub_list {
 			font-size: 0px;
 			padding: 10px;
