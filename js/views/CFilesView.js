@@ -331,7 +331,7 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 	if (Settings.UploadSizeLimitMb > 0 && oFileData.Size/(1024*1024) > Settings.UploadSizeLimitMb)
 	{
 		Popups.showPopup(AlertPopup, [
-			TextUtils.i18n('%MODULENAME%/ERROR_SIZE_LIMIT', {'SIZE': Settings.UploadSizeLimitMb})
+			TextUtils.i18n('%MODULENAME%/ERROR_SIZE_LIMIT', {'FILENAME': oFileData.FileName, 'SIZE': Settings.UploadSizeLimitMb})
 		]);
 		return false;
 	}
