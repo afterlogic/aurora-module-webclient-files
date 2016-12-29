@@ -562,7 +562,7 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
  */
 CFilesView.prototype.onMoveResponse = function (oResponse, oRequest)
 {
-	this.getQuota(this.storageType());
+	this.getQuota();
 };
 
 /**
@@ -678,45 +678,41 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 	
 	if (oResult)
 	{
-		this.onGetQuotaResponse(oResponse, oRequest);
-		
-		if (true/*this.isPublic || oParameters.Type === this.storageType()*/)
-		{
-			var 
-				aFolderList = [],
-				aFileList = [],
-				sThumbSessionUid = Date.now().toString()
-			;
+		var
+			aFolderList = [],
+			aFileList = []
+		;
 
-			_.each(oResult.Items, function (oData) {
-				if (oData.IsFolder)
+		_.each(oResult.Items, function (oData) {
+			if (oData.IsFolder)
+			{
+				var oFolder = new CFolderModel();
+				oFolder.parse(oData);
+				aFolderList.push(oFolder);
+			}
+			else
+			{
+				var oFile = new CFileModel();
+				if (this.sPublicHash) 
 				{
-					var oFolder = new CFolderModel();
-					oFolder.parse(oData);
-					aFolderList.push(oFolder);
+					oFile.sPublicHash = this.sPublicHash;
 				}
-				else
-				{
-					var oFile = new CFileModel();
-					if (this.sPublicHash) 
-					{
-						oFile.sPublicHash = this.sPublicHash;
-					}
-					oFile.parse(oData, this.isPopup);
-					aFileList.push(oFile);
-				}
-			}, this);
-			
-			this.folders(aFolderList);
-			this.files(aFileList);
-			
-			this.newSearchPattern(oParameters.Pattern || '');
-			this.searchPattern(oParameters.Pattern || '');
-		}
+				oFile.parse(oData, this.isPopup);
+				aFileList.push(oFile);
+			}
+		}, this);
+		
+		this.folders(aFolderList);
+		this.files(aFileList);
+		
+		this.newSearchPattern(oParameters.Pattern || '');
+		this.searchPattern(oParameters.Pattern || '');
 		
 		this.loading(false);
 		this.loadedFiles(true);
 		clearTimeout(this.timerId);
+		
+		this.parseQuota(oResult.Quota);
 	}
 	else
 	{
@@ -728,16 +724,14 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 /**
  * Runs after getting quota information from the server. Fill quota values.
  * 
- * @param {Object} oResponse Response from the server.
- * @param {Object} oRequest Request parameters to the server.
+ * @param {Object} oQuota
  */
-CFilesView.prototype.onGetQuotaResponse = function (oResponse, oRequest)
+CFilesView.prototype.parseQuota = function (oQuota)
 {
-	var oResult = oResponse.Result;
-	if (oResult && oResult.Quota)
+	if (oQuota)
 	{
-		this.quota(oResult.Quota.Limit);
-		this.used(oResult.Quota.Used);
+		this.quota(oQuota.Limit);
+		this.used(oQuota.Used);
 	}
 };
 
@@ -750,6 +744,7 @@ CFilesView.prototype.onDeleteResponse = function (oResponse, oRequest)
 	if (oResponse.Result)
 	{
 		this.expungeFileItems();
+		this.getQuota();
 	}
 	else
 	{
@@ -895,14 +890,14 @@ CFilesView.prototype.onHide = function ()
 	}
 };
 
-/**
- * @param {number} iType
- */
-CFilesView.prototype.getQuota = function (iType)
+CFilesView.prototype.getQuota = function ()
 {
-	Ajax.send('GetQuota', {
-			'Type': iType
-		}, this.onGetQuotaResponse, this
+	Ajax.send('GetQuota', {}, function (oResponse) {
+			if (oResponse.Result)
+			{
+				this.parseQuota(oResponse.Result);
+			}
+		}, this
 	);
 };
 
