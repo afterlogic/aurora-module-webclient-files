@@ -348,7 +348,7 @@ CFileModel.prototype.downloadFile = function ()
  */
 CFileModel.prototype.viewFile = function (oFileModel, oEvent)
 {
-	if (!oEvent.ctrlKey && !oEvent.shiftKey)
+	if (!oEvent || !oEvent.ctrlKey && !oEvent.shiftKey)
 	{
 		if (this.sHtmlEmbed() !== '')
 		{
