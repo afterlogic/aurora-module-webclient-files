@@ -506,7 +506,10 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 			sStorageType = oFolder instanceof CFolderModel ? oFolder.storageType() : oFolder.type,
 			oToStorage = this.getStorageByType(sStorageType),
 			oFromStorage = this.getStorageByType(this.storageType()),
-			bSameStorage = oToStorage.type === oFromStorage.type
+			bSameStorage = oToStorage.type === oFromStorage.type,
+			iUsed = this.used(),
+			iQuota = this.quota(),
+			bAllowMove = true
 		;
 		
 		if (bSameStorage && this.path() !== sToPath || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal)
@@ -518,6 +521,28 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 			Utils.uiDropHelperAnim(oEvent, oUi);
 
 			aChecked = this.selector.listCheckedAndSelected();
+			
+			if (oToStorage.type === Enums.FileStorageType.Personal)
+			{
+				bAllowMove = _.every(aChecked, function (oItem) {
+					if (oItem instanceof CFileModel)
+					{
+						if (iQuota > 0 && iUsed + oItem.size() > iQuota)
+						{
+							return false;
+						}
+						iUsed = iUsed + oItem.size();
+					}
+					return true;
+				});
+
+				if (!bAllowMove)
+				{
+					Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/ERROR_CANT_MOVE_FILES_QUOTA_PLURAL', {}, '', aChecked.length)]);
+					return;
+				}
+			}
+				
 			_.each(aChecked, function (oItem) {
 				sFromPath = oItem.path();
 				sFromStorageType = oItem.storageType();
@@ -562,7 +587,22 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
  */
 CFilesView.prototype.onMoveResponse = function (oResponse, oRequest)
 {
-	this.getQuota();
+	if (!oResponse.Result)
+	{
+		if (oResponse.ErrorCode === Enums.Errors.CanNotUploadFileQuota)
+		{
+			Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/ERROR_CANT_MOVE_FILES_QUOTA_PLURAL', {}, '', oRequest.Files.length)]);
+		}
+		else
+		{
+			Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILES_MOVE_PLURAL', {}, '', oRequest.Files.length));
+		}
+		this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern());
+	}
+	else
+	{
+		this.getQuota();
+	}
 };
 
 /**
