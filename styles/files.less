@@ -219,11 +219,6 @@
 				}
 			}
 			
-			&.selected .header,
-			&.checked .header {
-				background: #ebf7cb;
-			}
-		
 			.title {
 				font-size: 9pt;
 			}
@@ -237,9 +232,21 @@
 				padding-top: 2px;
 			}
 			
+			&:hover .header {
+				background: white;
+			}
+			&.selected .header,
+			&.checked .header,
+			&.selected:hover .header,
+			&.checked:hover .header {
+				background: #ebf7cb;
+			}
 			&:hover,
 			&.selected,
 			&.checked {
+				.header {
+					opacity: 0.9;
+				}
 				.header,
 				.controls {
 					display: block;
