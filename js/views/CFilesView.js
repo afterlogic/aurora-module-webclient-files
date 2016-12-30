@@ -716,48 +716,51 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		oParameters = oRequest.Parameters
 	;
 	
-	if (oResult)
+	if (oParameters.Type === this.storageType() && oParameters.Path === this.path())
 	{
-		var
-			aFolderList = [],
-			aFileList = []
-		;
+		if (oResult)
+		{
+			var
+				aFolderList = [],
+				aFileList = []
+			;
 
-		_.each(oResult.Items, function (oData) {
-			if (oData.IsFolder)
-			{
-				var oFolder = new CFolderModel();
-				oFolder.parse(oData);
-				aFolderList.push(oFolder);
-			}
-			else
-			{
-				var oFile = new CFileModel();
-				if (this.sPublicHash) 
+			_.each(oResult.Items, function (oData) {
+				if (oData.IsFolder)
 				{
-					oFile.sPublicHash = this.sPublicHash;
+					var oFolder = new CFolderModel();
+					oFolder.parse(oData);
+					aFolderList.push(oFolder);
 				}
-				oFile.parse(oData, this.isPopup);
-				aFileList.push(oFile);
-			}
-		}, this);
-		
-		this.folders(aFolderList);
-		this.files(aFileList);
-		
-		this.newSearchPattern(oParameters.Pattern || '');
-		this.searchPattern(oParameters.Pattern || '');
-		
-		this.loading(false);
-		this.loadedFiles(true);
-		clearTimeout(this.timerId);
-		
-		this.parseQuota(oResult.Quota);
-	}
-	else
-	{
-		this.loading(false);
-		this.error(true);
+				else
+				{
+					var oFile = new CFileModel();
+					if (this.sPublicHash) 
+					{
+						oFile.sPublicHash = this.sPublicHash;
+					}
+					oFile.parse(oData, this.isPopup);
+					aFileList.push(oFile);
+				}
+			}, this);
+
+			this.folders(aFolderList);
+			this.files(aFileList);
+
+			this.newSearchPattern(oParameters.Pattern || '');
+			this.searchPattern(oParameters.Pattern || '');
+
+			this.loading(false);
+			this.loadedFiles(true);
+			clearTimeout(this.timerId);
+
+			this.parseQuota(oResult.Quota);
+		}
+		else
+		{
+			this.loading(false);
+			this.error(true);
+		}
 	}
 };
 
@@ -1063,7 +1066,7 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	}
 	
 	Ajax.send('GetFiles', {
-			'Type': (oPath !== undefined) ? oPath.storageType() : sType,
+			'Type': sType,
 			'Path': (oPath !== undefined) ? oPath.fullPath() : this.path(),
 			'Pattern': Types.pString(sPattern)
 		}, this.onGetFilesResponse, this
