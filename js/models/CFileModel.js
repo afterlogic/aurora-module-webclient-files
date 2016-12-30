@@ -62,19 +62,15 @@ function CFileModel()
 	this.shared = ko.observable(false);
 	this.ownerName = ko.observable('');
 	
-	this.ownerHeaderText = ko.computed(function () {
-		return TextUtils.i18n('%MODULENAME%/LABEL_OWNER_EMAIL', {
-			'OWNER': this.ownerName()
-		});
-	}, this);
+	CAbstractFileModel.call(this, Settings.ServerModuleName);
 	
-	this.lastModifiedHeaderText = ko.computed(function () {
-		return TextUtils.i18n('%MODULENAME%/LABEL_LAST_MODIFIED', {
+	this.headerText = ko.computed(function () {
+		var sLangConstName = this.ownerName() !== '' ? '%MODULENAME%/INFO_OWNER_AND_DATA' : '%MODULENAME%/INFO_DATA';
+		return TextUtils.i18n(sLangConstName, {
+			'OWNER': this.ownerName(),
 			'LASTMODIFIED': this.lastModified()
 		});
 	}, this);
-	
-	CAbstractFileModel.call(this, Settings.ServerModuleName);
 	
 	this.type = this.storageType;
 	this.uploaded = ko.observable(true);
@@ -225,7 +221,6 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.allowDrag(true);
 	this.allowUpload(true);
 	this.allowSharing(true);
-	this.allowHeader(true);
 	this.allowDownload(true);
 	this.isPopupItem(bPopup);
 		
