@@ -30,7 +30,9 @@ var
 	Settings = require('modules/%ModuleName%/js/Settings.js'),
 	
 	CFileModel = require('modules/%ModuleName%/js/models/CFileModel.js'),
-	CFolderModel = require('modules/%ModuleName%/js/models/CFolderModel.js')
+	CFolderModel = require('modules/%ModuleName%/js/models/CFolderModel.js'),
+	
+	Enums = window.Enums
 ;
 
 /**
@@ -236,6 +238,12 @@ function CFilesView(bPopup)
 	}, this);
 	this.timerId = null;
 	
+	App.subscribeEvent('Files::ShowList', _.bind(function (oParams) {
+		if (oParams.Item)
+		{
+			this.getFiles(this.storageType(), oParams.Item);
+		}
+	}, this));
 	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
 }
 
@@ -659,7 +667,7 @@ CFilesView.prototype.onItemDelete = function ()
 };
 
 /**
- * @param {{path:Function,name:Function,isViewable:Function,viewFile:Function,downloadFile:Function}} oItem
+ * @param {CFileModel|CFolderModel} oItem
  */
 CFilesView.prototype.onEnter = function (oItem)
 {
@@ -667,7 +675,8 @@ CFilesView.prototype.onEnter = function (oItem)
 };
 
 /**
- * @param {{path:Function,name:Function,isViewable:Function,viewFile:Function,downloadFile:Function}} oItem
+ * Executes on item double click.
+ * @param {CFileModel|CFolderModel} oItem
  */
 CFilesView.prototype.onItemDblClick = function (oItem)
 {
@@ -678,23 +687,13 @@ CFilesView.prototype.onItemDblClick = function (oItem)
 			case 'view':
 				if (oItem instanceof CFileModel)
 				{
-					if (oItem.isViewable())
+					if (this.onSelectClickPopupBinded)
 					{
-						oItem.viewFile();
+						this.onSelectClickPopupBinded();
 					}
 					else
 					{
-						if (this.isPopup)
-						{
-							if (this.onSelectClickPopupBinded)
-							{
-								this.onSelectClickPopupBinded();
-							}
-						}
-						else
-						{
-							oItem.downloadFile();
-						}
+						oItem.executeAction(oItem.sMainAction);
 					}
 				}
 				break;
@@ -716,7 +715,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		oParameters = oRequest.Parameters
 	;
 	
-	if (oParameters.Type === this.storageType() && oParameters.Path === this.path())
+	if (oParameters.Type === this.storageType() && oParameters.Path.replace('$ZIP:', '/') === this.path())
 	{
 		if (oResult)
 		{

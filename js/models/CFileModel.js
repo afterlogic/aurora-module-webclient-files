@@ -9,6 +9,7 @@ var
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	
+	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	UserSettings = require('%PathToCoreWebclientModule%/js/Settings.js'),
 	WindowOpener = require('%PathToCoreWebclientModule%/js/WindowOpener.js'),
 	
@@ -18,13 +19,14 @@ var
 	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
 	EmbedHtmlPopup = require('%PathToCoreWebclientModule%/js/popups/EmbedHtmlPopup.js'),
 	
-	Ajax = require('modules/%ModuleName%/js/Ajax.js'),
-	Settings = require('modules/%ModuleName%/js/Settings.js')
+	Settings = require('modules/%ModuleName%/js/Settings.js'),
+	
+	Enums = window.Enums
 ;
 
 /**
  * @constructor
- * @extends CCommonFileModel
+ * @extends CAbstractFileModel
  */
 function CFileModel()
 {
@@ -63,6 +65,16 @@ function CFileModel()
 	this.ownerName = ko.observable('');
 	
 	CAbstractFileModel.call(this, Settings.ServerModuleName);
+	
+	this.oActionTexts['list'] = TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE');
+	this.oActionTexts['open'] = TextUtils.i18n('COREWEBCLIENT/ACTION_OPEN_LINK');
+	
+	this.oActionHandlers['list'] = _.bind(function () {
+		App.broadcastEvent('Files::ShowList', {'Item': this});
+	}, this);
+	this.oActionHandlers['open'] = _.bind(this.openLink, this);
+	
+	this.iconAction('');
 	
 	this.headerText = ko.computed(function () {
 		var sLangConstName = this.ownerName() !== '' ? '%MODULENAME%/INFO_OWNER_AND_DATA' : '%MODULENAME%/INFO_DATA';
@@ -136,62 +148,12 @@ function CFileModel()
 		
 		return aClasses.join(' ');
 	}, this);
-	
-	this.actionsSetter.dispose();
-	ko.computed(function () {
-		this.setCommonActions();
-		
-		if ((this.embedType() !== '' || this.linkUrl() === '') && this.isViewable())
-		{
-			this.leftAction('view');
-			this.leftActionText(TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE'));
-		}
-		else
-		{
-			this.leftAction('');
-			this.leftActionText('');
-		}
-		if (this.linkUrl() !== '')
-		{
-			this.rightAction('open');
-			this.rightActionText(TextUtils.i18n('COREWEBCLIENT/ACTION_OPEN_LINK'));
-		}
-		
-		if (this.embedType() !== '')
-		{
-			this.iconAction('view');
-		}
-		else
-		{
-			this.iconAction('');
-		}
-	}, this);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
 
-CFileModel.prototype.doRightAction = function ()
-{
-	this.doCommonRightAction();
-	switch (this.rightAction())
-	{
-		case 'open':
-			this.openLink();
-			break;
-	}
-};
-
-CAbstractFileModel.prototype.doIconAction = function ()
-{
-	switch (this.iconAction())
-	{
-		case 'view':
-			this.viewFile();
-			break;
-	}
-};
-
 /**
+ * Parses link data from server after link checking.
  * @param {object} oData
  * @param {string} sLinkUrl
  */
@@ -211,6 +173,7 @@ CFileModel.prototype.parseLink = function (oData, sLinkUrl)
 };
 
 /**
+ * Parses data from server.
  * @param {object} oData
  * @param {boolean} bPopup
  */
@@ -268,11 +231,33 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	{
 		this.sMainAction = Types.pString(oData.MainAction);
 	}
+	
+	if (this.embedType() !== '')
+	{
+		this.iconAction('view');
+	}
+	
+	this.fillActions();
+};
+
+/**
+ * Temporary function.
+ */
+CFileModel.prototype.fillActions = function ()
+{
+	this.actions.unshift(this.sMainAction);
+	if (this.isLink())
+	{
+		this.actions.push('open');
+	}
+	else
+	{
+		this.actions.push('download');
+	}
 };
 
 /**
  * Fills attachment data for upload.
- * 
  * @param {string} sFileUid
  * @param {Object} oFileData
  * @param {string} sFileName
@@ -299,7 +284,6 @@ CFileModel.prototype.onUploadSelectOwn = function (sFileUid, oFileData, sFileNam
 
 /**
  * Fills form with fields for further file downloading or viewing via post to iframe.
- * 
  * @param {object} oForm Jquery object.
  * @param {string} sMethod Method name.
  */
@@ -340,6 +324,8 @@ CFileModel.prototype.downloadFile = function ()
 
 /**
  * Opens file viewing via post to iframe.
+ * @param {Object} oFileModel
+ * @param {Object} oEvent
  */
 CFileModel.prototype.viewFile = function (oFileModel, oEvent)
 {
@@ -369,6 +355,9 @@ CFileModel.prototype.viewFile = function (oFileModel, oEvent)
 	}
 };
 
+/**
+ * Opens link URL in the new tab.
+ */
 CFileModel.prototype.openLink = function ()
 {
 	WindowOpener.openTab(this.viewLink());
