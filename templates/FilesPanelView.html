@@ -1,13 +1,13 @@
 <div class="panel_top pathway">
 	<!-- ko foreach: pathItems() -->
-		<!-- ko if: $parent.iPathIndex() !== $index() || $index() === 0 || $parent.searchPattern() !== '' -->		
+		<!-- ko if: $parent.pathIndex() !== $index() || $index() === 0 || $parent.searchPattern() !== '' -->		
 		<!-- ko if: $index() > 0 -->&raquo;<!-- /ko --> <a data-bind="
 				   text: displayName(), 
 				   click: function () { $parent.getFiles(storageType(), $parent.getPathItemByIndex($index())); },
 				   droppable: {valueFunc: function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);}}
 				   "></a>
 		<!-- /ko -->
-		<!-- ko if: $parent.iPathIndex() === $index() && $index() > 0 &&  $parent.searchPattern() === '' -->		
+		<!-- ko if: $parent.pathIndex() === $index() && $index() > 0 &&  $parent.searchPattern() === '' -->		
 		&raquo; <b data-bind="text: displayName()"></b>
 		<!-- /ko -->
 	<!-- /ko -->

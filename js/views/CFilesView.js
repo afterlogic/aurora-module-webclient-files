@@ -78,25 +78,18 @@ function CFilesView(bPopup)
 		}
 	}, this);
 	
-	this.iPathIndex = ko.observable(-1);
+	this.pathIndex = ko.observable(-1);
 	this.pathItems = ko.observableArray();
 	this.dropPath = ko.observable('');
-	this.path = ko.computed(function () {
-		var aPath = _.map(this.pathItems(), function (oItem) {
-			return oItem.id();
-		});
-		return aPath.join('/');
+	ko.computed(function () {
+		this.dropPath(this.getCurrentPath());
 	}, this);
-
-	this.path.subscribe(function (value) {
-		this.dropPath(value);
-	}, this);
-
+	
 	this.filesCollection = ko.computed(function () {
 		var aFiles = _.union(this.files(), this.getUploadingFiles());
-
-		aFiles.sort(function(left, right) { 
-			return left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1); 
+		
+		aFiles.sort(function(left, right) {
+			return left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1);
 		});
 		
 		return aFiles;
@@ -216,7 +209,7 @@ function CFilesView(bPopup)
 					}
 					else
 					{
-						if (this.path() !== '' || this.isPopup)
+						if (this.pathItems().length !== 0 || this.isPopup)
 						{
 							sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY');
 						}
@@ -386,7 +379,7 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 			iIndex++;
 		}
 		
-		oFile.onUploadSelectOwn(sFileUid, oFileData, sFileName, App.currentAccountEmail(), this.path(), this.storageType());
+		oFile.onUploadSelectOwn(sFileUid, oFileData, sFileName, App.currentAccountEmail(), this.getCurrentPath(), this.storageType());
 		
 		this.uploadingFiles.push(oFile);
 	}
@@ -469,8 +462,8 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 				}
 			}
 		}
-
-		this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
+		
+		this.getFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
 	}
 };
 
@@ -530,7 +523,7 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 			bAllowMove = true
 		;
 		
-		if (bSameStorage && this.path() !== sToPath || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal)
+		if (bSameStorage && this.getCurrentPath() !== sToPath || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal)
 		{
 			if (oFolder instanceof CFolderModel)
 			{
@@ -609,13 +602,13 @@ CFilesView.prototype.onMoveResponse = function (oResponse, oRequest)
 	{
 		if (oResponse.ErrorCode === Enums.Errors.CanNotUploadFileQuota)
 		{
-			Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/ERROR_CANT_MOVE_FILES_QUOTA_PLURAL', {}, '', oRequest.Files.length)]);
+			Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/ERROR_CANT_MOVE_FILES_QUOTA_PLURAL', {}, '', oRequest.Parameters.Files.length)]);
 		}
 		else
 		{
-			Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILES_MOVE_PLURAL', {}, '', oRequest.Files.length));
+			Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILES_MOVE_PLURAL', {}, '', oRequest.Parameters.Files.length));
 		}
-		this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern());
+		this.getFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern());
 	}
 	else
 	{
@@ -725,7 +718,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		oParameters = oRequest.Parameters
 	;
 	
-	if (oParameters.Type === this.storageType() && oParameters.Path.replace('$ZIP:', '/') === this.path())
+	if (oParameters.Type === this.storageType() && oParameters.Path === this.getCurrentPath())
 	{
 		if (oResult)
 		{
@@ -800,7 +793,7 @@ CFilesView.prototype.onDeleteResponse = function (oResponse, oRequest)
 	}
 	else
 	{
-		this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern());
+		this.getFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern());
 	}
 };
 
@@ -905,7 +898,7 @@ CFilesView.prototype.onRenameResponse = function (oResponse, oRequest)
 	{
 		Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILE_RENAME'));
 	}
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
+	this.getFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
 };
 
 
@@ -973,12 +966,12 @@ CFilesView.prototype.getStorages = function ()
 		}
 		else
 		{
-			this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()));
+			this.getFiles(this.storageType(), this.getCurrentPathItem());
 		}
 	}
 	else
 	{
-		this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()));
+		this.getFiles(this.storageType(), this.getCurrentPathItem());
 	}
 };
 
@@ -1010,10 +1003,10 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 	{
 		this.storageType('personal');
 		this.pathItems([]);
-		this.iPathIndex(-1);
+		this.pathIndex(-1);
 	}
 	
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
+	this.getFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
 };
 
 /**
@@ -1027,7 +1020,7 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	var 
 		self = this,
 		sTypePrev = this.storageType(),
-		iPathIndex = this.iPathIndex(),
+		iPathIndex = this.pathIndex(),
 		oFolder = new CFolderModel().storageType(sType)
 	;
 	if (this.isPublic)
@@ -1064,11 +1057,15 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	{
 		oFolder = oPath;
 	}
-
-	this.pathItems.push(oFolder);
-	this.iPathIndex(this.pathItems().length - 1);
 	
-	if (iPathIndex !== this.iPathIndex() || sTypePrev !== this.storageType())
+	if (this.pathItems().length === 0 || oFolder.fullPath() !== this.getCurrentPath())
+	{
+		this.pathItems.push(oFolder);
+	}
+	
+	this.pathIndex(this.pathItems().length - 1);
+	
+	if (iPathIndex !== this.pathIndex() || sTypePrev !== this.storageType())
 	{
 		this.folders([]);
 		this.files([]);
@@ -1076,7 +1073,7 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 	
 	Ajax.send('GetFiles', {
 			'Type': sType,
-			'Path': (oPath !== undefined) ? oPath.fullPath() : this.path(),
+			'Path': oPath ? oPath.fullPath() : '',
 			'Pattern': Types.pString(sPattern)
 		}, this.onGetFilesResponse, this
 	);
@@ -1088,7 +1085,7 @@ CFilesView.prototype.getFiles = function (sType, oPath, sPattern, bNotLoading)
 CFilesView.prototype.getPublicFiles = function (oPath)
 {
 	var 
-		iPathIndex = this.iPathIndex(),
+		iPathIndex = this.pathIndex(),
 		oFolder = new CFolderModel()
 	;
 	if (oPath === undefined || oPath.id() === '')
@@ -1103,9 +1100,9 @@ CFilesView.prototype.getPublicFiles = function (oPath)
 	
 	this.pathItems.push(oFolder);
 	
-	this.iPathIndex(this.pathItems().length - 1);
+	this.pathIndex(this.pathItems().length - 1);
 	
-	if (iPathIndex !== this.iPathIndex())
+	if (iPathIndex !== this.pathIndex())
 	{
 		this.folders([]);
 		this.files([]);
@@ -1113,7 +1110,7 @@ CFilesView.prototype.getPublicFiles = function (oPath)
 	
 	Ajax.send('GetPublicFiles', {
 			'Hash': this.sPublicHash,
-			'Path': this.path()
+			'Path': this.getCurrentPath()
 		}, this.onGetFilesResponse, this
 	);
 };
@@ -1126,7 +1123,7 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 {
 	var 
 		sStorageType = this.storageType(),
-		sPath =this.path()
+		sPath = this.getCurrentPath()
 	;
 	if (bOkAnswer && 0 < aChecked.length)
 	{
@@ -1148,6 +1145,17 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 			}, this.onDeleteResponse, this
 		);
 	}		
+};
+
+CFilesView.prototype.getCurrentPathItem = function ()
+{
+	return this.pathItems()[this.pathIndex()];
+};
+
+CFilesView.prototype.getCurrentPath = function ()
+{
+	var oCurrentPathItem = this.getCurrentPathItem();
+	return oCurrentPathItem ? oCurrentPathItem.fullPath() : '';
 };
 
 /**
@@ -1252,7 +1260,7 @@ CFilesView.prototype.deleteUploadFileByUid = function (sFileUid)
 CFilesView.prototype.getUploadingFiles = function ()
 {
 	return _.filter(this.uploadingFiles(), _.bind(function (oItem) {
-		return oItem.path() === this.path() && oItem.storageType() === this.storageType();
+		return oItem.path() === this.getCurrentPath() && oItem.storageType() === this.storageType();
 	}, this));	
 };
 
@@ -1274,7 +1282,7 @@ CFilesView.prototype.onCancelUpload = function (sFileUid)
  */
 CFilesView.prototype.onCreateFolderResponse = function (oResponse, oRequest)
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
+	this.getFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
 };
 
 /**
@@ -1291,7 +1299,7 @@ CFilesView.prototype.createFolder = function (sFolderName)
 	{
 		Ajax.send('CreateFolder', {
 				'Type': this.storageType(),
-				'Path': this.path(),
+				'Path': this.getCurrentPath(),
 				'FolderName': sFolderName
 			}, this.onCreateFolderResponse, this
 		);
@@ -1311,7 +1319,7 @@ CFilesView.prototype.onCreateFolderClick = function ()
  */
 CFilesView.prototype.onCreateLinkResponse = function (oResponse, oRequest)
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.searchPattern(), true);
+	this.getFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
 };
 
 /**
@@ -1321,7 +1329,7 @@ CFilesView.prototype.createLink = function (oFileItem)
 {
 	Ajax.send('CreateLink', {
 		'Type': this.storageType(),
-		'Path': this.path(),
+		'Path': this.getCurrentPath(),
 		'Link': oFileItem.linkUrl(),
 		'Name': oFileItem.fileName()
 	}, this.onCreateLinkResponse, this);
@@ -1338,12 +1346,12 @@ CFilesView.prototype.onCreateLinkClick = function ()
 
 CFilesView.prototype.onSearch = function ()
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()), this.newSearchPattern());
+	this.getFiles(this.storageType(), this.getCurrentPathItem(), this.newSearchPattern());
 };
 
 CFilesView.prototype.clearSearch = function ()
 {
-	this.getFiles(this.storageType(), this.getPathItemByIndex(this.iPathIndex()));
+	this.getFiles(this.storageType(), this.getCurrentPathItem());
 };
 
 module.exports = CFilesView;
