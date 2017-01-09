@@ -24,15 +24,7 @@
 			<span class="list_notification" data-bind="visible: fileListInfoText()!==''">
 				<span class="description" data-bind="text: fileListInfoText()"></span>
 			</span>
-			<div class="items_sub_list large attachments" data-bind="columnCalc: {'prop': columnCount, 'itemSelector': '.item.helper'}">
-				<!-- ko foreach: folders -->
-					<!-- ko template: {name: '%ModuleName%_FolderView'} --><!-- /ko -->
-				<!-- /ko -->
-				<!-- ko foreach: filesCollection -->
-					<!-- ko template: {name: 'CoreWebclient_FileView'} --><!-- /ko -->
-				<!-- /ko -->
-				<div class="item helper"></div>
-			</div>
+			<!-- ko template: {name: sItemsViewTemplate} --><!-- /ko -->
 		</div>
 	</div>
 </div>

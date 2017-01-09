@@ -111,6 +111,12 @@ function CFilesView(bPopup)
 	this.selector = new CSelector(this.collection, null,
 		_.bind(this.onItemDelete, this), _.bind(this.onItemDblClick, this), _.bind(this.onEnter, this), this.columnCount, true, true, true);
 		
+	this.firstSelectedFile = ko.computed(function () {
+		return _.find(this.selector.listCheckedAndSelected(), function (oItem) {
+			return oItem instanceof CFileModel;
+		});
+	}, this);
+	
 	this.searchPattern = ko.observable('');
 	this.newSearchPattern = ko.observable('');
 	this.isSearchFocused = ko.observable(false);
@@ -237,6 +243,10 @@ function CFilesView(bPopup)
 		return (oStorage && oStorage.isExternal);
 	}, this);
 	this.timerId = null;
+	
+	var oParams = {'ViewName': '%ModuleName%_ItemsView'};
+	App.broadcastEvent('Files::ChangeItemsView', oParams);
+	this.sItemsViewTemplate = oParams.ViewName;
 	
 	App.subscribeEvent('Files::ShowList', _.bind(function (oParams) {
 		if (oParams.Item)
