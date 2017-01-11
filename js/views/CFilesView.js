@@ -53,8 +53,6 @@ function CFilesView(bPopup)
 	this.loaded = ko.observable(false);
 	this.isPublic = App.isPublic();
 	
-	this.sPublicHash = Settings.PublicHash;
-	
 	this.storages = ko.observableArray();
 	this.folders = ko.observableArray();
 	this.files = ko.observableArray();
@@ -718,7 +716,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		oParameters = oRequest.Parameters
 	;
 	
-	if (oParameters.Type === this.storageType() && oParameters.Path === this.getCurrentPath())
+	if ((oParameters.Type === this.storageType() || oParameters.Hash === Settings.PublicHash) && oParameters.Path === this.getCurrentPath())
 	{
 		if (oResult)
 		{
@@ -737,10 +735,6 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				else
 				{
 					var oFile = new CFileModel();
-					if (this.sPublicHash) 
-					{
-						oFile.sPublicHash = this.sPublicHash;
-					}
 					oFile.parse(oData, this.isPopup);
 					aFileList.push(oFile);
 				}
@@ -1109,7 +1103,7 @@ CFilesView.prototype.getPublicFiles = function (oPath)
 	}
 	
 	Ajax.send('GetPublicFiles', {
-			'Hash': this.sPublicHash,
+			'Hash': Settings.PublicHash,
 			'Path': this.getCurrentPath()
 		}, this.onGetFilesResponse, this
 	);

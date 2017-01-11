@@ -41,8 +41,6 @@ function CFileModel()
 	this.selected = ko.observable(false);
 	this.checked = ko.observable(false);
 	
-	this.sPublicHash = '';
-
 	this.isExternal = ko.observable(false);
 	this.isLink = ko.observable(false);
 	this.linkType = ko.observable('');
@@ -87,9 +85,9 @@ function CFileModel()
 	this.type = this.storageType;
 	this.uploaded = ko.observable(true);
 
-	this.viewLink = ko.computed(function () {
-		return this.isLink() ? this.linkUrl() : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash(), this.sPublicHash);
-	}, this);
+	this.getViewLink = function () {
+		return this.isLink() ? this.linkUrl() : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash(), Settings.PublicHash);
+	};
 
 	this.isViewable = ko.computed(function () {
 		
@@ -360,7 +358,7 @@ CFileModel.prototype.viewFile = function (oFileModel, oEvent)
  */
 CFileModel.prototype.openLink = function ()
 {
-	WindowOpener.openTab(this.viewLink());
+	WindowOpener.openTab(this.getViewLink());
 };
 
 module.exports = CFileModel;

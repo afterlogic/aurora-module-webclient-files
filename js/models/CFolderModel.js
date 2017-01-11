@@ -37,7 +37,7 @@ function CFolderModel()
 	this.sMainAction = 'list';
 }
 
-CFolderModel.prototype.parse = function (oData, sPublicHash)
+CFolderModel.prototype.parse = function (oData)
 {
 	this.shared(!!oData.Shared);
 	this.fileName(Types.pString(oData.Name));
