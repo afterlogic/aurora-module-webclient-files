@@ -112,7 +112,6 @@ function CFileModel()
 	}, this);
 	
 	this.sHtmlEmbed = ko.observable('');
-	this.contentType = ko.observable('');
 	
 	this.sMainAction = 'view';
 	
@@ -223,7 +222,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 		}
 	}
 	
-	this.contentType(Types.pString(oData.ContentType));
+	this.mimeType(Types.pString(oData.ContentType));
 
 	if (oData.MainAction)
 	{
@@ -251,6 +250,11 @@ CFileModel.prototype.fillActions = function ()
 	else
 	{
 		this.actions.push('download');
+	}
+	
+	if (!this.isViewSupported())
+	{
+		this.actions(_.without(this.actions(), 'view'));
 	}
 };
 
