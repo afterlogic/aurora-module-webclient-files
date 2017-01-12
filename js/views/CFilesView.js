@@ -195,26 +195,19 @@ function CFilesView(bPopup)
 		{
 			if (this.collection().length === 0)
 			{
-				if (this.bPublic)
+				if (this.searchPattern() !== '')
 				{
-					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_PUBLIC_FOLDER_NOT_EXIST');
+					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_NOTHING_FOUND');
 				}
 				else
 				{
-					if (this.searchPattern() !== '' || this.bPublic)
+					if (this.pathItems().length !== 0 || this.bInPopup || this.bPublic)
 					{
-						sInfoText = TextUtils.i18n('%MODULENAME%/INFO_NOTHING_FOUND');
+						sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY');
 					}
-					else
+					else if (this.bAllowDragNDrop)
 					{
-						if (this.pathItems().length !== 0 || this.bInPopup)
-						{
-							sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY');
-						}
-						else if (this.bAllowDragNDrop)
-						{
-							sInfoText = TextUtils.i18n('%MODULENAME%/INFO_DRAGNDROP_FILES_OR_CREATE_FOLDER');
-						}
+						sInfoText = TextUtils.i18n('%MODULENAME%/INFO_DRAGNDROP_FILES_OR_CREATE_FOLDER');
 					}
 				}
 			}
