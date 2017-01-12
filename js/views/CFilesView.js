@@ -755,7 +755,10 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		else
 		{
 			this.loading(false);
-			this.error(true);
+			if (oResponse.ErrorCode !== Enums.Errors.NotDisplayedError)
+			{
+				this.error(true);
+			}
 		}
 	}
 };
