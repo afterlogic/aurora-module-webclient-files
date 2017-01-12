@@ -3,7 +3,7 @@
 		<!-- ko if: $parent.pathIndex() !== $index() || $index() === 0 || $parent.searchPattern() !== '' -->		
 		<!-- ko if: $index() > 0 -->&raquo;<!-- /ko --> <a data-bind="
 				   text: displayName(), 
-				   click: function () { $parent.getFiles(storageType(), $parent.getPathItemByIndex($index())); },
+				   click: function () { $parent.requestFiles(storageType(), $parent.getPathItemByIndex($index())); },
 				   droppable: {valueFunc: function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);}}
 				   "></a>
 		<!-- /ko -->

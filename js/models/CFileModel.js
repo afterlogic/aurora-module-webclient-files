@@ -30,8 +30,6 @@ var
  */
 function CFileModel()
 {
-	this.id = ko.observable('');
-	this.fileName = ko.observable('');
 	this.storageType = ko.observable(Enums.FileStorageType.Personal);
 	this.lastModified = ko.observable('');
 	
@@ -64,13 +62,14 @@ function CFileModel()
 	
 	CAbstractFileModel.call(this, Settings.ServerModuleName);
 	
-	this.oActionTexts['list'] = TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE');
-	this.oActionTexts['open'] = TextUtils.i18n('COREWEBCLIENT/ACTION_OPEN_LINK');
-	
-	this.oActionHandlers['list'] = _.bind(function () {
-		App.broadcastEvent('Files::ShowList', {'Item': this});
-	}, this);
-	this.oActionHandlers['open'] = _.bind(this.openLink, this);
+	this.oActionsData['list'] = {
+		'Text': TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE'),
+		'Handler': _.bind(function () { App.broadcastEvent('Files::ShowList', {'Item': this}); }, this)
+	};
+	this.oActionsData['open'] = {
+		'Text': TextUtils.i18n('COREWEBCLIENT/ACTION_OPEN_LINK'),
+		'Handler': _.bind(this.openLink, this)
+	};
 	
 	this.iconAction('');
 	
@@ -89,24 +88,6 @@ function CFileModel()
 		return this.isLink() ? this.linkUrl() : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash(), Settings.PublicHash);
 	};
 
-	this.isViewable = ko.computed(function () {
-		
-		var 
-			bResult = false,
-			aViewableArray = [
-				'JPEG', 'JPG', 'PNG', 'GIF', 'HTM', 'HTML', 'TXT', 'CSS', 'ASC', 'JS', 'PDF', 'BMP'
-			]
-		;
-		
-		if (_.indexOf(aViewableArray, this.extension().toUpperCase()) >= 0)
-		{
-			bResult = true;
-		}
-
-		return (this.iframedView() || bResult || (this.isLink())) && !this.isPopupItem();
-
-	}, this);
-	
 	this.canShare = ko.computed(function () {
 		return (this.storageType() === Enums.FileStorageType.Personal || this.storageType() === Enums.FileStorageType.Corporate);
 	}, this);
@@ -156,7 +137,7 @@ _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
  */
 CFileModel.prototype.parseLink = function (oData, sLinkUrl)
 {
-	this.isPopupItem(true);
+	this.allowActions(false);
 	this.linkUrl(sLinkUrl);
 	this.fileName(Types.pString(oData.Name));
 	this.size(Types.pInt(oData.Size));
@@ -178,11 +159,11 @@ CFileModel.prototype.parse = function (oData, bPopup)
 {
 	var oDateModel = new CDateModel();
 	
-	this.allowDrag(true);
+	this.allowDrag(!bPopup);
 	this.allowUpload(true);
 	this.allowSharing(true);
 	this.allowDownload(true);
-	this.isPopupItem(bPopup);
+	this.allowActions(!bPopup);
 		
 	this.isLink(!!oData.IsLink);
 	this.fileName(Types.pString(oData.Name));
@@ -252,7 +233,7 @@ CFileModel.prototype.fillActions = function ()
 		this.actions.push('download');
 	}
 	
-	if (!this.isViewSupported())
+	if (!this.isViewSupported() && this.embedType() === '')
 	{
 		this.actions(_.without(this.actions(), 'view'));
 	}

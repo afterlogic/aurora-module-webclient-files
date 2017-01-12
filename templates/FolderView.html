@@ -1,8 +1,8 @@
 <div class="item folder" 
 	data-bind="
-		draggablePlace: !$parent.isPopup ? $parent.dragAndDropHelperBinded : null,
-		draggableDragStartCallback: function() {if (!$parent.isPopup) $root.dragover(true);},
-		draggableDragStopCallback: function() {if (!$parent.isPopup) $root.dragover(false);},
+		draggablePlace: !$parent.bInPopup ? $parent.dragAndDropHelperBinded : null,
+		draggableDragStartCallback: function() {if (!$parent.bInPopup) $root.dragover(true);},
+		draggableDragStopCallback: function() {if (!$parent.bInPopup) $root.dragover(false);},
 		css: {'selected': selected, 'checked': checked, 'deleted': deleted, 'shared': shared}"
 >
 	<div class="item_content ui-droppable dragHandle" data-bind="css: {'recivedAnim': recivedAnim()}, droppable: {valueFunc: function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);}}">
