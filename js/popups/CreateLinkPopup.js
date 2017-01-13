@@ -66,14 +66,12 @@ CCreateLinkPopup.prototype.onCheckUrlResponse = function (oResponse, oRequest)
 {
 	if (oResponse.Result)
 	{
-		var oFile = new CFileModel();
-		oFile.parseLink(oResponse.Result, this.link());
+		var
+			oData = CFileModel.prepareLinkData(oResponse.Result, this.link()),
+			oFile = new CFileModel(oData)
+		;
 		this.fileItem(oFile);
 		this.urlChecked(true);
-	}
-	else
-	{
-		this.urlChecked(false);
 	}
 };
 

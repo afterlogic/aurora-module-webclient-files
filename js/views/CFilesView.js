@@ -126,7 +126,7 @@ function CFilesView(bPopup)
 	});
 	this.shareCommand = Utils.createCommand(this, this.executeShare, function () {
 		var items = this.selector.listCheckedAndSelected();
-		return (1 === items.length && (!items[0].isLink || !items[0].isLink()));
+		return (1 === items.length && (!items[0].bIsLink));
 	});
 	this.sendCommand = Utils.createCommand(this, this.executeSend, function () {
 		var
@@ -352,26 +352,10 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 	if (this.searchPattern() === '')
 	{
 		var 
-			oFile = new CFileModel(),
-			sFileName = oFileData.FileName,
-			sFileNameExt = Utils.getFileExtension(sFileName),
-			sFileNameWoExt = Utils.getFileNameWithoutExtension(sFileName),
-			iIndex = 0
+			oData = CFileModel.prepareUploadFileData(oFileData, this.getCurrentPath(), this.storageType(), _.bind(this.getFileByName, this)),
+			oFile = new CFileModel(oData)
 		;
-		
-		if (sFileNameExt !== '')
-		{
-			sFileNameExt = '.' + sFileNameExt;
-		}
-
-		while (this.getFileByName(sFileName))
-		{
-			sFileName = sFileNameWoExt + '_' + iIndex + sFileNameExt;
-			iIndex++;
-		}
-		
-		oFile.onUploadSelectOwn(sFileUid, oFileData, sFileName, App.currentAccountEmail(), this.getCurrentPath(), this.storageType());
-		
+		oFile.onUploadSelect(sFileUid, oFileData, true);
 		this.uploadingFiles.push(oFile);
 	}
 };
@@ -727,8 +711,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				}
 				else
 				{
-					var oFile = new CFileModel();
-					oFile.parse(oData, this.bInPopup);
+					var oFile = new CFileModel(oData, this.bInPopup);
 					aFileList.push(oFile);
 				}
 			}, this);
@@ -816,7 +799,7 @@ CFilesView.prototype.renameItem = function (sName)
 				'Path': oItem.path(),
 				'Name': oItem.id(),
 				'NewName': sName,
-				'IsLink': oItem.isLink && oItem.isLink() ? 1 : 0
+				'IsLink': oItem.bIsLink ? 1 : 0
 			}, this.onRenameResponse, this
 		);
 	}
@@ -1325,7 +1308,7 @@ CFilesView.prototype.createLink = function (oFileItem)
 	Ajax.send('CreateLink', {
 		'Type': this.storageType(),
 		'Path': this.getCurrentPath(),
-		'Link': oFileItem.linkUrl(),
+		'Link': oFileItem.sLinkUrl,
 		'Name': oFileItem.fileName()
 	}, this.onCreateLinkResponse, this);
 };

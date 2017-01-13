@@ -4,10 +4,12 @@ var
 	_ = require('underscore'),
 	$ = require('jquery'),
 	ko = require('knockout'),
+	moment = require('moment'),
 	
 	FilesUtils = require('%PathToCoreWebclientModule%/js/utils/Files.js'),
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
+	Utils = require('%PathToCoreWebclientModule%/js/utils/Common.js'),
 	
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	UserSettings = require('%PathToCoreWebclientModule%/js/Settings.js'),
@@ -26,39 +28,30 @@ var
 
 /**
  * @constructor
+ * @param {Object} oData
+ * @param {bool} bPopup
  * @extends CAbstractFileModel
  */
-function CFileModel()
+function CFileModel(oData, bPopup)
 {
-	this.storageType = ko.observable(Enums.FileStorageType.Personal);
-	this.lastModified = ko.observable('');
+	this.storageType = ko.observable(Types.pString(oData.Type));
+	this.sLastModified = CFileModel.parseLastModified(oData.LastModified);
 	
-	this.path = ko.observable('');
-	this.fullPath = ko.observable('');
+	this.path = ko.observable(Types.pString(oData.Path));
+	this.fullPath = ko.observable(Types.pString(oData.FullPath));
 	
 	this.selected = ko.observable(false);
 	this.checked = ko.observable(false);
 	
-	this.isExternal = ko.observable(false);
-	this.isLink = ko.observable(false);
-	this.linkType = ko.observable('');
-	this.linkUrl = ko.observable('');
-	this.thumbnailExternalLink = ko.observable('');
-	this.embedType = ko.observable('');
-	this.linkType.subscribe(function (sLinkType) {
-		var sEmbedType = '';
-		if (sLinkType === 'oembeded')
-		{
-			sEmbedType = 'oembeded';
-		}
-		this.hasHtmlEmbed(sEmbedType !== '');
-		this.embedType(sEmbedType);
-	}, this);
+	this.bIsLink = !!oData.IsLink;
+	this.sLinkType = this.bIsLink ? Types.pString(oData.LinkType) : '';
+	this.sLinkUrl = this.bIsLink ? Types.pString(oData.LinkUrl) : '';
+	this.sThumbnailExternalLink = Types.pString(oData.ThumbnailLink);
 	
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	this.shared = ko.observable(false);
-	this.ownerName = ko.observable('');
+	this.sOwnerName = Types.pString(oData.Owner);
 	
 	CAbstractFileModel.call(this, Settings.ServerModuleName);
 	
@@ -73,28 +66,31 @@ function CFileModel()
 	
 	this.iconAction('');
 	
-	this.headerText = ko.computed(function () {
-		var sLangConstName = this.ownerName() !== '' ? '%MODULENAME%/INFO_OWNER_AND_DATA' : '%MODULENAME%/INFO_DATA';
-		return TextUtils.i18n(sLangConstName, {
-			'OWNER': this.ownerName(),
-			'LASTMODIFIED': this.lastModified()
-		});
-	}, this);
+	this.sHeaderText = _.bind(function () {
+		if (this.sLastModified)
+		{
+			var sLangConstName = this.sOwnerName !== '' ? '%MODULENAME%/INFO_OWNER_AND_DATA' : '%MODULENAME%/INFO_DATA';
+			return TextUtils.i18n(sLangConstName, {
+				'OWNER': this.sOwnerName,
+				'LASTMODIFIED': this.sLastModified
+			});
+		}
+		return '';
+	}, this)();
 	
 	this.type = this.storageType;
-	this.uploaded = ko.observable(true);
 
 	this.getViewLink = function () {
-		return this.isLink() ? this.linkUrl() : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash(), Settings.PublicHash);
+		return this.bIsLink ? this.sLinkUrl : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash(), Settings.PublicHash);
 	};
 
 	this.canShare = ko.computed(function () {
 		return (this.storageType() === Enums.FileStorageType.Personal || this.storageType() === Enums.FileStorageType.Corporate);
 	}, this);
 	
-	this.sHtmlEmbed = ko.observable('');
+	this.sHtmlEmbed = Types.pString(oData.OembedHtml);
 	
-	this.sMainAction = 'view';
+	this.sMainAction = Types.pString(oData.MainAction) || 'view';
 	
 	this.cssClasses = ko.computed(function () {
 		var aClasses = this.getCommonClasses();
@@ -119,35 +115,52 @@ function CFileModel()
 		{
 			aClasses.push('shared');
 		}
-		if (this.isLink())
+		if (this.bIsLink)
 		{
 			aClasses.push('aslink');
 		}
 		
 		return aClasses.join(' ');
 	}, this);
+	
+	this.parse(oData, bPopup);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
 
 /**
- * Parses link data from server after link checking.
- * @param {object} oData
- * @param {string} sLinkUrl
+ * Parses date of last file modification.
+ * @param {number} iLastModified Date in unix fomat
+ * @returns {String}
  */
-CFileModel.prototype.parseLink = function (oData, sLinkUrl)
+CFileModel.parseLastModified = function (iLastModified)
 {
-	this.allowActions(false);
-	this.linkUrl(sLinkUrl);
-	this.fileName(Types.pString(oData.Name));
-	this.size(Types.pInt(oData.Size));
-	this.linkType(Enums.has('FileStorageLinkType', Types.pString(oData.LinkType)) ? Types.pString(oData.LinkType) : '');
-	this.allowDownload(false);
-	if (oData.Thumb)
+	var oDateModel = new CDateModel();
+	if (iLastModified)
 	{
-		this.thumb(true);
-		this.thumbnailSrc(Types.pString(oData.Thumb));
+		oDateModel.parse(iLastModified);
+		return oDateModel.getShortDate();
 	}
+	return '';
+};
+
+/**
+ * Prepares data of link for its further parsing.
+ * @param {Object} oData Data received from the server after URL checking.
+ * @param {string} sLinkUrl Link URL.
+ * @returns {Object}
+ */
+CFileModel.prepareLinkData = function (oData, sLinkUrl)
+{
+	return {
+		IsLink: true,
+		LinkType: oData.LinkType,
+		LinkUrl: sLinkUrl,
+		Name: oData.Name,
+		Size: oData.Size,
+		Thumb: Types.isNonEmptyString(oData.Thumb),
+		ThumbnailLink: oData.Thumb
+	};
 };
 
 /**
@@ -157,60 +170,39 @@ CFileModel.prototype.parseLink = function (oData, sLinkUrl)
  */
 CFileModel.prototype.parse = function (oData, bPopup)
 {
-	var oDateModel = new CDateModel();
-	
+	this.uploaded(true);
 	this.allowDrag(!bPopup);
 	this.allowUpload(true);
 	this.allowSharing(true);
-	this.allowDownload(true);
-	this.allowActions(!bPopup);
+	this.allowDownload(this.fullPath() !== '');
+	this.allowActions(!bPopup && this.fullPath() !== '');
 		
-	this.isLink(!!oData.IsLink);
 	this.fileName(Types.pString(oData.Name));
 	this.id(Types.pString(oData.Id));
-	this.path(Types.pString(oData.Path));
-	this.fullPath(Types.pString(oData.FullPath));
-	this.storageType(Types.pString(oData.Type));
 	this.shared(!!oData.Shared);
-	this.isExternal(!!oData.IsExternal);
 
 	this.iframedView(!!oData.Iframed);
 	
-	if (this.isLink())
-	{
-		this.linkUrl(Types.pString(oData.LinkUrl));
-		this.linkType(Types.pString(oData.LinkType));
-	}
-	
 	this.size(Types.pInt(oData.Size));
-	oDateModel.parse(oData['LastModified']);
-	this.lastModified(oDateModel.getShortDate());
-	this.ownerName(Types.pString(oData.Owner));
 	this.thumb(!!oData.Thumb);
-	this.thumbnailExternalLink(Types.pString(oData.ThumbnailLink));
 	this.hash(Types.pString(oData.Hash));
-	this.sHtmlEmbed(oData.OembedHtml ? oData.OembedHtml : '');
 	
 	if (this.thumb())
 	{
-		if (this.thumbnailExternalLink() === '')
+		if (this.sThumbnailExternalLink === '')
 		{
 			FilesUtils.thumbBase64Queue(this);
 		}
 		else
 		{
-			this.thumbnailSrc(this.thumbnailExternalLink());
+			this.thumbnailSrc(this.sThumbnailExternalLink);
 		}
 	}
 	
 	this.mimeType(Types.pString(oData.ContentType));
 
-	if (oData.MainAction)
-	{
-		this.sMainAction = Types.pString(oData.MainAction);
-	}
-	
-	if (this.embedType() !== '')
+	this.bHasHtmlEmbed = !bPopup && this.fullPath() !== '' && this.sLinkType === 'oembeded';
+	if (this.bHasHtmlEmbed)
 	{
 		this.iconAction('view');
 	}
@@ -224,7 +216,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 CFileModel.prototype.fillActions = function ()
 {
 	this.actions.unshift(this.sMainAction);
-	if (this.isLink())
+	if (this.bIsLink)
 	{
 		this.actions.push('open');
 	}
@@ -233,36 +225,49 @@ CFileModel.prototype.fillActions = function ()
 		this.actions.push('download');
 	}
 	
-	if (!this.isViewSupported() && this.embedType() === '')
+	if (!this.isViewSupported() && !this.bHasHtmlEmbed)
 	{
 		this.actions(_.without(this.actions(), 'view'));
 	}
 };
 
 /**
- * Fills attachment data for upload.
- * @param {string} sFileUid
+ * Prepares data of upload file for its further parsing.
  * @param {Object} oFileData
- * @param {string} sFileName
- * @param {string} sOwner
  * @param {string} sPath
  * @param {string} sStorageType
+ * @param {Function} fGetFileByName
+ * @returns {Object}
  */
-CFileModel.prototype.onUploadSelectOwn = function (sFileUid, oFileData, sFileName, sOwner, sPath, sStorageType)
+CFileModel.prepareUploadFileData = function (oFileData, sPath, sStorageType, fGetFileByName)
 {
 	var
-		oDateModel = new CDateModel(),
-		oDate = new Date()
+		sFileName = oFileData.FileName,
+		sFileNameExt = Utils.getFileExtension(sFileName),
+		sFileNameWoExt = Utils.getFileNameWithoutExtension(sFileName),
+		iIndex = 0
 	;
 	
-	this.onUploadSelect(sFileUid, oFileData);
+	if (sFileNameExt !== '')
+	{
+		sFileNameExt = '.' + sFileNameExt;
+	}
 	
-	oDateModel.parse(oDate.getTime() /1000);
-	this.fileName(sFileName);
-	this.lastModified(oDateModel.getShortDate());
-	this.ownerName(sOwner);
-	this.path(sPath);
-	this.storageType(sStorageType);
+	while (fGetFileByName(sFileName))
+	{
+		sFileName = sFileNameWoExt + '_' + iIndex + sFileNameExt;
+		iIndex++;
+	}
+	
+	return {
+		Name: sFileName,
+		LastModified: moment().unix(),
+		Owner: App.userPublicId(),
+		Path: sPath,
+		Type: sStorageType,
+		ContentType: oFileData.Type,
+		Size: oFileData.Size
+	};
 };
 
 /**
@@ -314,13 +319,13 @@ CFileModel.prototype.viewFile = function (oFileModel, oEvent)
 {
 	if (!oEvent || !oEvent.ctrlKey && !oEvent.shiftKey)
 	{
-		if (this.sHtmlEmbed() !== '')
+		if (this.sHtmlEmbed !== '')
 		{
-			Popups.showPopup(EmbedHtmlPopup, [this.sHtmlEmbed()]);
+			Popups.showPopup(EmbedHtmlPopup, [this.sHtmlEmbed]);
 		}
-		else if (this.isLink())
+		else if (this.bIsLink)
 		{
-			this.viewCommonFile(this.linkUrl());
+			this.viewCommonFile(this.sLinkUrl);
 		}
 		else
 		{
