@@ -208,6 +208,25 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	}
 	
 	this.fillActions();
+	
+	App.broadcastEvent('%ModuleName%::ParseFile::after', this);
+};
+
+CFileModel.prototype.addAction = function (sAction, bMain, oActionData)
+{
+	if (bMain)
+	{
+		this.actions.unshift(sAction);
+	}
+	else
+	{
+		this.actions.push(sAction);
+	}
+	this.actions(_.compact(this.actions()));
+	if (oActionData)
+	{
+		this.oActionsData[sAction] = oActionData;
+	}
 };
 
 /**
