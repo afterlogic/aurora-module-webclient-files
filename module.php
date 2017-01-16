@@ -104,7 +104,7 @@ class FilesWebclientModule extends AApiModule
 				}
 				else if ($mData && isset($mData['__hash__'], $mData['Name'], $mData['Size']))
 				{
-					$sUrl = (bool) \CApi::GetConf('labs.server-use-url-rewrite', false) ? '/download/' : '?/pub/files/';
+					$sUrl = (bool) \CApi::GetConf('labs.server-use-url-rewrite', false) ? '/download/' : '?/files-pub/';
 
 					$sUrlRewriteBase = (string) \CApi::GetConf('labs.server-url-rewrite-base', '');
 					if (!empty($sUrlRewriteBase))
