@@ -404,10 +404,12 @@ CFilesView.prototype.onFileUploadProgress = function (sFileUid, iUploadedSize, i
  */
 CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceived, oResult)
 {
+	var bRequestFiles = false;
 	if (this.searchPattern() === '')
 	{
 		var
-			oFile = this.getUploadFileByUid(sFileUid)
+			oFile = this.getUploadFileByUid(sFileUid),
+			bRequestFiles = false
 		;
 		
 		if (oFile)
@@ -434,11 +436,19 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 				if (this.uploadingFiles().length === 0)
 				{
 					Screens.showReport(TextUtils.i18n('COREWEBCLIENT/REPORT_UPLOAD_COMPLETE'));
+					bRequestFiles = true;
 				}
 			}
 		}
+		else
+		{
+			bRequestFiles = true;
+		}
 		
-		this.requestFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
+		if (bRequestFiles)
+		{
+			this.requestFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
+		}
 	}
 };
 
@@ -1008,6 +1018,7 @@ CFilesView.prototype.requestUserFiles = function (sType, oPath, sPattern, bNotLo
 	this.error(false);
 	this.storageType(sType);
 	self.loadedFiles(false);
+	this.uploadingFiles([]);
 	if (bNotLoading && (this.files().length > 0 || this.folders().length > 0))
 	{
 		this.timerId = setTimeout(function() {
