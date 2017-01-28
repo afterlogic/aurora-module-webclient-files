@@ -90,7 +90,16 @@ function CFileModel(oData, bPopup)
 	
 	this.sHtmlEmbed = Types.pString(oData.OembedHtml);
 	
-	this.sMainAction = Types.pString(oData.MainAction) || 'view';
+	if (Types.isNonEmptyArray(oData.Actions))
+	{
+		this.actions(oData.Actions);
+		this.sMainAction = Types.pString(oData.Actions[0]);
+	}
+	else
+	{
+		this.actions(['view']);
+		this.sMainAction = 'view';
+	}
 	
 	this.cssClasses = ko.computed(function () {
 		var aClasses = this.getCommonClasses();
@@ -206,8 +215,10 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	{
 		this.iconAction('view');
 	}
-	
-	this.fillActions();
+	if (!this.isViewSupported() && !this.bHasHtmlEmbed)
+	{
+		this.actions(_.without(this.actions(), 'view'));
+	}
 	
 	App.broadcastEvent('%ModuleName%::ParseFile::after', this);
 };
@@ -226,27 +237,6 @@ CFileModel.prototype.addAction = function (sAction, bMain, oActionData)
 	if (oActionData)
 	{
 		this.oActionsData[sAction] = oActionData;
-	}
-};
-
-/**
- * Temporary function.
- */
-CFileModel.prototype.fillActions = function ()
-{
-	this.actions.unshift(this.sMainAction);
-	if (this.bIsLink)
-	{
-		this.actions.push('open');
-	}
-	else
-	{
-		this.actions.push('download');
-	}
-	
-	if (!this.isViewSupported() && !this.bHasHtmlEmbed)
-	{
-		this.actions(_.without(this.actions(), 'view'));
 	}
 };
 
