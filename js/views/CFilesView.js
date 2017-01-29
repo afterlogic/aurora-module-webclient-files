@@ -232,6 +232,8 @@ function CFilesView(bPopup)
 	App.broadcastEvent('Files::ChangeItemsView', oParams);
 	this.sItemsViewTemplate = oParams.ViewName;
 	
+	this.addToolbarButtons = ko.observableArray([]);
+	
 	App.subscribeEvent('Files::ShowList', _.bind(function (oParams) {
 		if (oParams.Item)
 		{
@@ -484,97 +486,115 @@ CFilesView.prototype.onDrop = function (oFile, oEvent)
  */
 CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 {
-	if (this.bPublic)
-	{
-		return;
-	}
-	
 	if (oFolder && oEvent)
 	{
 		var
-			self = this,
-			sFromPath = '',
-			sFromStorageType = '',
-			bFolderIntoItself = false,
-			sToPath = oFolder instanceof CFolderModel ? oFolder.fullPath() : '',
-			aChecked = [],
-			aItems = [],
-			sStorageType = oFolder instanceof CFolderModel ? oFolder.storageType() : oFolder.type,
-			oToStorage = this.getStorageByType(sStorageType),
-			oFromStorage = this.getStorageByType(this.storageType()),
-			bSameStorage = oToStorage.type === oFromStorage.type,
-			iUsed = this.used(),
-			iQuota = this.quota(),
-			bAllowMove = true
+			aChecked = this.selector.listCheckedAndSelected(),
+			sMethod = oEvent.ctrlKey ? 'Copy' : 'Move'
 		;
 		
-		if (bSameStorage && this.getCurrentPath() !== sToPath || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal)
+		if (this.moveItems(sMethod, oFolder, aChecked))
 		{
+			Utils.uiDropHelperAnim(oEvent, oUi);
+		}
+	}
+};
+
+/**
+ * @param {string} sMethod
+ * @param {object} oFolder
+ * @param {array} aChecked
+ * @returns {boolean}
+ */
+CFilesView.prototype.moveItems = function (sMethod, oFolder, aChecked)
+{
+	if (this.bPublic)
+	{
+		return false;
+	}
+	
+	var
+		sFromPath = '',
+		sFromStorageType = '',
+		bFolderIntoItself = false,
+		sToPath = oFolder instanceof CFolderModel ? oFolder.fullPath() : '',
+		aItems = [],
+		sStorageType = oFolder instanceof CFolderModel ? oFolder.storageType() : oFolder.type,
+		oToStorage = this.getStorageByType(sStorageType),
+		oFromStorage = this.getStorageByType(this.storageType()),
+		bSameStorage = oToStorage.type === oFromStorage.type,
+		iUsed = this.used(),
+		iQuota = this.quota(),
+		bAllowMove = true
+	;
+	
+	if (bSameStorage || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal)
+	{
+		if (oToStorage.type === Enums.FileStorageType.Personal)
+		{
+			bAllowMove = _.every(aChecked, function (oItem) {
+				if (oItem instanceof CFileModel)
+				{
+					if (iQuota > 0 && iUsed + oItem.size() > iQuota)
+					{
+						return false;
+					}
+					iUsed = iUsed + oItem.size();
+				}
+				return true;
+			});
+
+			if (!bAllowMove)
+			{
+				Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/ERROR_CANT_MOVE_FILES_QUOTA_PLURAL', {}, '', aChecked.length)]);
+				return false;
+			}
+		}
+		
+		_.each(aChecked, _.bind(function (oItem) {
+			sFromPath = oItem.path();
+			sFromStorageType = oItem.storageType();
+			bFolderIntoItself = oItem instanceof CFolderModel && sToPath === sFromPath + '/' + oItem.id();
+			if (!bFolderIntoItself)
+			{
+				if (sMethod === 'Move')
+				{
+					if (oItem instanceof CFileModel)
+					{
+						this.deleteFileByName(oItem.id());
+					}
+					else
+					{
+						this.deleteFolderByName(oItem.fileName());
+					}
+				}
+				aItems.push({
+					'Name':  oItem.id(),
+					'IsFolder': oItem instanceof CFolderModel
+				});
+			}
+		}, this));
+		
+		if (aItems.length > 0)
+		{
+			Ajax.send(sMethod, {
+				'FromType': sFromStorageType,
+				'ToType': sStorageType,
+				'FromPath': sFromPath,
+				'ToPath': sToPath,
+				'Files': aItems
+			}, this.onMoveResponse, this);
+
 			if (oFolder instanceof CFolderModel)
 			{
 				oFolder.recivedAnim(true);
 			}
-			Utils.uiDropHelperAnim(oEvent, oUi);
 
-			aChecked = this.selector.listCheckedAndSelected();
-			
-			if (oToStorage.type === Enums.FileStorageType.Personal)
-			{
-				bAllowMove = _.every(aChecked, function (oItem) {
-					if (oItem instanceof CFileModel)
-					{
-						if (iQuota > 0 && iUsed + oItem.size() > iQuota)
-						{
-							return false;
-						}
-						iUsed = iUsed + oItem.size();
-					}
-					return true;
-				});
-
-				if (!bAllowMove)
-				{
-					Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/ERROR_CANT_MOVE_FILES_QUOTA_PLURAL', {}, '', aChecked.length)]);
-					return;
-				}
-			}
-				
-			_.each(aChecked, function (oItem) {
-				sFromPath = oItem.path();
-				sFromStorageType = oItem.storageType();
-				bFolderIntoItself = oItem instanceof CFolderModel && sToPath === sFromPath + '/' + oItem.id();
-				if (!bFolderIntoItself)
-				{
-					if (!oEvent.ctrlKey)
-					{
-						if (oItem instanceof CFileModel)
-						{
-							self.deleteFileByName(oItem.id());
-						}
-						else
-						{
-							self.deleteFolderByName(oItem.fileName());
-						}
-					}
-					aItems.push({
-						'Name':  oItem.id(),
-						'IsFolder': oItem instanceof CFolderModel
-					});
-				}
-			});
-			
-			if (aItems.length > 0)
-			{
-				Ajax.send(oEvent.ctrlKey ? 'Copy' : 'Move', {
-					'FromType': sFromStorageType,
-					'ToType': sStorageType,
-					'FromPath': sFromPath,
-					'ToPath': sToPath,
-					'Files': aItems
-				}, this.onMoveResponse, this);
-			}
+			return true;
 		}
 	}
+
+	return false;
 };
 
 /**
@@ -597,7 +617,14 @@ CFilesView.prototype.onMoveResponse = function (oResponse, oRequest)
 	}
 	else
 	{
-		this.getQuota();
+		if (this.storageType() === oRequest.Parameters.ToType && this.getCurrentPath() === oRequest.Parameters.ToPath)
+		{
+			this.requestFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern());
+		}
+		else
+		{
+			this.getQuota();
+		}
 	}
 };
 
@@ -1341,6 +1368,29 @@ CFilesView.prototype.onSearch = function ()
 CFilesView.prototype.clearSearch = function ()
 {
 	this.requestFiles(this.storageType(), this.getCurrentPathItem());
+};
+
+CFilesView.prototype.getCurrentFolder = function ()
+{
+	var oFolder = new CFolderModel();
+	oFolder.fullPath(this.getCurrentPath());
+	oFolder.storageType(this.storageType());
+	console.log('oFolder.fullPath', oFolder.fullPath(), 'oFolder.storageType', oFolder.storageType());
+	return oFolder;
+};
+
+CFilesView.prototype.registerToolbarButtons = function (aToolbarButtons)
+{
+	if (Types.isNonEmptyArray(aToolbarButtons))
+	{
+		_.each(aToolbarButtons, _.bind(function (oToolbarButtons) {
+			if (_.isFunction(oToolbarButtons.useFilesViewData))
+			{
+				oToolbarButtons.useFilesViewData(this);
+			}
+		}, this));
+		this.addToolbarButtons(_.union(this.addToolbarButtons(), aToolbarButtons));
+	}
 };
 
 module.exports = CFilesView;

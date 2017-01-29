@@ -30,4 +30,7 @@
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
 	</span>
+	<!-- ko foreach: addToolbarButtons -->
+		<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->
+	<!-- /ko -->
 </span>

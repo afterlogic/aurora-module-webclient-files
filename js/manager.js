@@ -17,7 +17,10 @@ module.exports = function (oAppData) {
 		HeaderItemView = null,
 		
 		bAdminUser = App.getUserRole() === Enums.UserRole.SuperAdmin,
-		bNormalUser = App.getUserRole() === Enums.UserRole.NormalUser
+		bNormalUser = App.getUserRole() === Enums.UserRole.NormalUser,
+		
+		aToolbarButtons = [],
+		oFilesView = null
 	;
 
 	Settings.init(oSettings);
@@ -72,7 +75,10 @@ module.exports = function (oAppData) {
 					var oScreens = {};
 					oScreens[Settings.HashModuleName] = function () {
 						var CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js');
-						return new CFilesView();
+						oFilesView = new CFilesView();
+						oFilesView.registerToolbarButtons(aToolbarButtons);
+						aToolbarButtons = [];
+						return oFilesView;
 					};
 					return oScreens;
 				},
@@ -101,6 +107,16 @@ module.exports = function (oAppData) {
 						HeaderItemView.recivedAnim(true);
 					}
 					Ajax.send('SaveFilesByHashes', { 'Hashes': aHashes }, this.onSaveAttachmentsToFilesResponse, this);
+				},
+				registerToolbarButtons: function (oToolbarButtons) {
+					if (oFilesView)
+					{
+						oFilesView.registerToolbarButtons([oToolbarButtons]);
+					}
+					else
+					{
+						aToolbarButtons.push(oToolbarButtons);
+					}
 				}
 			};
 		}
