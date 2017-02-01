@@ -1375,7 +1375,6 @@ CFilesView.prototype.getCurrentFolder = function ()
 	var oFolder = new CFolderModel();
 	oFolder.fullPath(this.getCurrentPath());
 	oFolder.storageType(this.storageType());
-	console.log('oFolder.fullPath', oFolder.fullPath(), 'oFolder.storageType', oFolder.storageType());
 	return oFolder;
 };
 
