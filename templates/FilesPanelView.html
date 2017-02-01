@@ -15,16 +15,22 @@
 	&raquo; <b data-bind="i18n: {'key': '%MODULENAME%/LABEL_SEARCH_RESULTS'}"></b> (<a class="text" data-bind="i18n: {'key': '%MODULENAME%/LABEL_SEARCH_CLEAR'}, click: clearSearch"></a>)
 	<!-- /ko -->
 </div>
-<div class="panel_center unselectable" data-bind="customScrollbar: {x: false}, css: {dragover: dragover()}">
-	<div class="uploader_mask" data-bind="initDom: uploaderArea, css: {'active': bDragActiveComp}">
-		<div class="inner"></div>
-	</div>
-	<div class="files_scroll scroll-inner">
-		<div class="items_list">
-			<span class="list_notification" data-bind="visible: fileListInfoText()!==''">
-				<span class="description" data-bind="text: fileListInfoText()"></span>
-			</span>
-			<!-- ko template: {name: sItemsViewTemplate} --><!-- /ko -->
+<div class="panel_center unselectable" style="display: flex;" data-bind="css: {dragover: dragover()}">
+	<div style="height: 100%; width: 100%;" data-bind="customScrollbar: {x: false}">
+		<div class="uploader_mask" data-bind="initDom: uploaderArea, css: {'active': bDragActiveComp}">
+			<div class="inner"></div>
+		</div>
+		<div class="files_scroll scroll-inner">
+			<div class="items_list">
+				<span class="list_notification" data-bind="visible: fileListInfoText()!==''">
+					<span class="description" data-bind="text: fileListInfoText()"></span>
+				</span>
+				<!-- ko template: {name: sItemsViewTemplate} --><!-- /ko -->
+			</div>
 		</div>
 	</div>
+	<div class="" style="width: 320px; border-left: 1px solid #eee;">
+	</div>
 </div>
+
+
