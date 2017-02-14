@@ -228,9 +228,12 @@ function CFilesView(bPopup)
 	}, this);
 	this.timerId = null;
 	
-	var oParams = {'ViewName': '%ModuleName%_ItemsView'};
+	var oParams = {
+		'View': this,
+		'TemplateName': '%ModuleName%_ItemsView'
+	};
+	this.itemsViewTemplate = ko.observable(oParams.TemplateName);
 	App.broadcastEvent('Files::ChangeItemsView', oParams);
-	this.sItemsViewTemplate = oParams.ViewName;
 	
 	this.addToolbarButtons = ko.observableArray([]);
 	
