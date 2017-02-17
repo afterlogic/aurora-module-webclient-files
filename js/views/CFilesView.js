@@ -46,7 +46,7 @@ function CFilesView(bPopup)
 	this.browserTitle = ko.observable(TextUtils.i18n('%MODULENAME%/HEADING_BROWSER_TAB'));
 	
 	this.allowSendEmails = ko.computed(function () {
-		return false;//!!(AppData.App && AppData.App.AllowWebMail && AppData.Accounts && AppData.Accounts.isCurrentAllowsMail());
+		return false;//!!(AppData.App && AppData.App.AllowWebMail && AppData.Accounts);
 	}, this);
 	
 	this.error = ko.observable(false);
