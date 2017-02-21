@@ -2,7 +2,6 @@
 
 var
 	_ = require('underscore'),
-	$ = require('jquery'),
 	ko = require('knockout'),
 	moment = require('moment'),
 	
@@ -12,7 +11,6 @@ var
 	Utils = require('%PathToCoreWebclientModule%/js/utils/Common.js'),
 	
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
-	UserSettings = require('%PathToCoreWebclientModule%/js/Settings.js'),
 	WindowOpener = require('%PathToCoreWebclientModule%/js/WindowOpener.js'),
 	
 	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js'),
@@ -20,8 +18,6 @@ var
 	
 	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
 	EmbedHtmlPopup = require('%PathToCoreWebclientModule%/js/popups/EmbedHtmlPopup.js'),
-	
-	Settings = require('modules/%ModuleName%/js/Settings.js'),
 	
 	Enums = window.Enums
 ;
@@ -199,7 +195,8 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	{
 		if (this.sThumbnailExternalLink === '')
 		{
-			FilesUtils.thumbBase64Queue(this);
+			var sThumbSessionUid = Date.now().toString();
+			this.getInThumbQueue(sThumbSessionUid);
 		}
 		else
 		{
@@ -279,84 +276,38 @@ CFileModel.prepareUploadFileData = function (oFileData, sPath, sStorageType, fGe
 };
 
 /**
- * Fills form with fields for further file downloading or viewing via post to iframe.
- * @param {object} oForm Jquery object.
- * @param {string} sMethod Method name.
- */
-CFileModel.prototype.createFormFields = function (oForm, sMethod)
-{
-	$('<input type="hidden" name="Module" />').val('Files').appendTo(oForm);
-	$('<input type="hidden" name="Method" />').val(sMethod).appendTo(oForm);
-	$('<input type="hidden" name="AuthToken" />').val($.cookie('AuthToken')).appendTo(oForm);
-	$('<input type="hidden" name="TenantName" />').val(UserSettings.TenantName).appendTo(oForm);
-	$('<input type="hidden" name="Parameters" />').val(JSON.stringify({
-		'Type': this.type(),
-		'Name': encodeURIComponent(this.id()),
-		'Path': encodeURIComponent(this.path())
-	})).appendTo(oForm);
-};
-
-/**
- * Downloads file via post to iframe.
- */
-//CFileModel.prototype.downloadFile = function ()
-//{
-//	if (this.allowDownload())
-//	{
-//		var
-//			sIframeName = 'download_iframe_' + Math.random(),
-//			oForm = $('<form action="?/Api/" method="post" target="' + sIframeName + '"></form>').hide().appendTo(document.body),
-//			oIframe = $('<iframe name="' + sIframeName + '"></iframe>').hide().appendTo(document.body)
-//		;
-//		this.createFormFields(oForm, 'DownloadFile');
-//		$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
-//		oForm.submit();
-//		setTimeout(function () {
-//			oForm.remove();
-//			oIframe.remove();
-//		}, 200000);
-//	}
-//};
-
-/**
  * Opens file viewing via post to iframe.
  * @param {Object} oFileModel
  * @param {Object} oEvent
  */
-//CFileModel.prototype.viewFile = function (oFileModel, oEvent)
-//{
-//	if (!oEvent || !oEvent.ctrlKey && !oEvent.shiftKey)
-//	{
-//		if (this.sHtmlEmbed !== '')
-//		{
-//			Popups.showPopup(EmbedHtmlPopup, [this.sHtmlEmbed]);
-//		}
-//		else if (this.bIsLink)
-//		{
-//			this.viewCommonFile(this.sLinkUrl);
-//		}
-//		else
-//		{
-//			var oWin = WindowOpener.open('', this.fileName(), true);
-//			oWin.document.write('<form action="?/Api/" method="post" id="view_form" target="view_iframe" style="display: none;"></form>');
-//			oWin.document.write('<iframe name="view_iframe" style="width: 100%; height: 100%; border: none;"></iframe>');
-//			$(oWin.document.body).css({'margin': '0', 'padding': '0'});
-//			$('<title>' + this.fileName() + '</title>').appendTo($(oWin.document).find('head'));
-//			var oForm = $(oWin.document).find('#view_form');
-//			this.createFormFields(oForm, 'ViewFile');
-//			$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
-//			$('<input type="submit" />').val('submit').appendTo(oForm);
-//			oForm.submit();
-//		}
-//	}
-//};
+CFileModel.prototype.viewFile = function (oFileModel, oEvent)
+{
+	if (!oEvent || !oEvent.ctrlKey && !oEvent.shiftKey)
+	{
+		if (this.sHtmlEmbed !== '')
+		{
+			Popups.showPopup(EmbedHtmlPopup, [this.sHtmlEmbed]);
+		}
+		else if (this.bIsLink)
+		{
+			this.viewCommonFile(this.sLinkUrl);
+		}
+		else
+		{
+			this.viewCommonFile();
+		}
+	}
+};
 
 /**
  * Opens link URL in the new tab.
  */
 CFileModel.prototype.openLink = function ()
 {
-	WindowOpener.openTab(this.sViewUrl);
+	if (this.bIsLink)
+	{
+		WindowOpener.openTab(this.sLinkUrl);
+	}
 };
 
 module.exports = CFileModel;
