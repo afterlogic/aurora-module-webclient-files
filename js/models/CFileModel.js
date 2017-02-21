@@ -80,10 +80,6 @@ function CFileModel(oData, bPopup)
 	
 	this.type = this.storageType;
 
-	this.getViewLink = function () {
-		return this.bIsLink ? this.sLinkUrl : FilesUtils.getViewLink(Settings.ServerModuleName, this.hash(), Settings.PublicHash);
-	};
-
 	this.canShare = ko.computed(function () {
 		return (this.storageType() === Enums.FileStorageType.Personal || this.storageType() === Enums.FileStorageType.Corporate);
 	}, this);
@@ -193,10 +189,9 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.iframedView(!!oData.Iframed);
 	
 	this.size(Types.pInt(oData.Size));
-	this.thumb(!!oData.Thumb);
 	this.hash(Types.pString(oData.Hash));
 	
-	if (this.thumb())
+	if (this.sThumbUrl !== '')
 	{
 		if (this.sThumbnailExternalLink === '')
 		{
@@ -357,7 +352,7 @@ CFileModel.prototype.viewFile = function (oFileModel, oEvent)
  */
 CFileModel.prototype.openLink = function ()
 {
-	WindowOpener.openTab(this.getViewLink());
+	WindowOpener.openTab(this.sViewUrl);
 };
 
 module.exports = CFileModel;
