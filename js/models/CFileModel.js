@@ -53,7 +53,7 @@ function CFileModel(oData, bPopup)
 	this.shared = ko.observable(false);
 	this.sOwnerName = Types.pString(oData.Owner);
 	
-	CAbstractFileModel.call(this, Settings.ServerModuleName);
+	CAbstractFileModel.call(this);
 	
 	this.oActionsData['list'] = {
 		'Text': TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE'),
@@ -191,6 +191,10 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.size(Types.pInt(oData.Size));
 	this.hash(Types.pString(oData.Hash));
 	
+	this.sViewUrl = Types.pString(oData.ViewUrl);
+	this.sDownloadUrl = Types.pString(oData.DownloadUrl);
+	this.sThumbUrl = Types.pString(oData.ThumbnailUrl);
+	
 	if (this.sThumbUrl !== '')
 	{
 		if (this.sThumbnailExternalLink === '')
@@ -295,57 +299,57 @@ CFileModel.prototype.createFormFields = function (oForm, sMethod)
 /**
  * Downloads file via post to iframe.
  */
-CFileModel.prototype.downloadFile = function ()
-{
-	if (this.allowDownload())
-	{
-		var
-			sIframeName = 'download_iframe_' + Math.random(),
-			oForm = $('<form action="?/Api/" method="post" target="' + sIframeName + '"></form>').hide().appendTo(document.body),
-			oIframe = $('<iframe name="' + sIframeName + '"></iframe>').hide().appendTo(document.body)
-		;
-		this.createFormFields(oForm, 'DownloadFile');
-		$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
-		oForm.submit();
-		setTimeout(function () {
-			oForm.remove();
-			oIframe.remove();
-		}, 200000);
-	}
-};
+//CFileModel.prototype.downloadFile = function ()
+//{
+//	if (this.allowDownload())
+//	{
+//		var
+//			sIframeName = 'download_iframe_' + Math.random(),
+//			oForm = $('<form action="?/Api/" method="post" target="' + sIframeName + '"></form>').hide().appendTo(document.body),
+//			oIframe = $('<iframe name="' + sIframeName + '"></iframe>').hide().appendTo(document.body)
+//		;
+//		this.createFormFields(oForm, 'DownloadFile');
+//		$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
+//		oForm.submit();
+//		setTimeout(function () {
+//			oForm.remove();
+//			oIframe.remove();
+//		}, 200000);
+//	}
+//};
 
 /**
  * Opens file viewing via post to iframe.
  * @param {Object} oFileModel
  * @param {Object} oEvent
  */
-CFileModel.prototype.viewFile = function (oFileModel, oEvent)
-{
-	if (!oEvent || !oEvent.ctrlKey && !oEvent.shiftKey)
-	{
-		if (this.sHtmlEmbed !== '')
-		{
-			Popups.showPopup(EmbedHtmlPopup, [this.sHtmlEmbed]);
-		}
-		else if (this.bIsLink)
-		{
-			this.viewCommonFile(this.sLinkUrl);
-		}
-		else
-		{
-			var oWin = WindowOpener.open('', this.fileName(), true);
-			oWin.document.write('<form action="?/Api/" method="post" id="view_form" target="view_iframe" style="display: none;"></form>');
-			oWin.document.write('<iframe name="view_iframe" style="width: 100%; height: 100%; border: none;"></iframe>');
-			$(oWin.document.body).css({'margin': '0', 'padding': '0'});
-			$('<title>' + this.fileName() + '</title>').appendTo($(oWin.document).find('head'));
-			var oForm = $(oWin.document).find('#view_form');
-			this.createFormFields(oForm, 'ViewFile');
-			$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
-			$('<input type="submit" />').val('submit').appendTo(oForm);
-			oForm.submit();
-		}
-	}
-};
+//CFileModel.prototype.viewFile = function (oFileModel, oEvent)
+//{
+//	if (!oEvent || !oEvent.ctrlKey && !oEvent.shiftKey)
+//	{
+//		if (this.sHtmlEmbed !== '')
+//		{
+//			Popups.showPopup(EmbedHtmlPopup, [this.sHtmlEmbed]);
+//		}
+//		else if (this.bIsLink)
+//		{
+//			this.viewCommonFile(this.sLinkUrl);
+//		}
+//		else
+//		{
+//			var oWin = WindowOpener.open('', this.fileName(), true);
+//			oWin.document.write('<form action="?/Api/" method="post" id="view_form" target="view_iframe" style="display: none;"></form>');
+//			oWin.document.write('<iframe name="view_iframe" style="width: 100%; height: 100%; border: none;"></iframe>');
+//			$(oWin.document.body).css({'margin': '0', 'padding': '0'});
+//			$('<title>' + this.fileName() + '</title>').appendTo($(oWin.document).find('head'));
+//			var oForm = $(oWin.document).find('#view_form');
+//			this.createFormFields(oForm, 'ViewFile');
+//			$('<input type="hidden" name="Format" />').val('Raw').appendTo(oForm);
+//			$('<input type="submit" />').val('submit').appendTo(oForm);
+//			oForm.submit();
+//		}
+//	}
+//};
 
 /**
  * Opens link URL in the new tab.
