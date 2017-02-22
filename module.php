@@ -18,7 +18,9 @@
  * @package Modules
  */
 
-class FilesWebclientModule extends AApiModule
+namespace Aurora\Modules;
+
+class FilesWebclientModule extends \AApiModule
 {
 	/**
 	 *
@@ -68,7 +70,7 @@ class FilesWebclientModule extends AApiModule
 			{
 				$mData = $this->oMinModuleDecorator->GetMinByHash($sHash);
 
-				if (is_array($mData) && isset($mData['IsFolder']) && $mData['IsFolder'])
+				if (\is_array($mData) && isset($mData['IsFolder']) && $mData['IsFolder'])
 				{
 					$oApiIntegrator = \CApi::GetSystemManager('integrator');
 
@@ -77,8 +79,8 @@ class FilesWebclientModule extends AApiModule
 						$oCoreClientModule = \CApi::GetModule('CoreWebclient');
 						if ($oCoreClientModule instanceof \AApiModule) 
 						{
-							$sResult = file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
-							if (is_string($sResult)) 
+							$sResult = \file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
+							if (\is_string($sResult)) 
 							{
 								$sFrameOptions = \CApi::GetConf('labs.x-frame-options', '');
 								if (0 < \strlen($sFrameOptions)) 
@@ -91,7 +93,7 @@ class FilesWebclientModule extends AApiModule
 									'modules_list' => array("FilesWebclient")
 								);
 
-								$sResult = strtr($sResult, array(
+								$sResult = \strtr($sResult, array(
 									'{{AppVersion}}' => AURORA_APP_VERSION,
 									'{{IntegratorDir}}' => $oApiIntegrator->isRtl() ? 'rtl' : 'ltr',
 									'{{IntegratorLinks}}' => $oApiIntegrator->buildHeadersLink(),
@@ -112,10 +114,10 @@ class FilesWebclientModule extends AApiModule
 						$sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
 					}
 
-					$sResult = file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/FilesPub.html');
-					if (is_string($sResult))
+					$sResult = \file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/FilesPub.html');
+					if (\is_string($sResult))
 					{
-						$sResult = strtr($sResult, array(
+						$sResult = \strtr($sResult, array(
 							'{{Url}}' => $sUrl.$mData['__hash__'], 
 							'{{FileName}}' => $mData['Name'],
 							'{{FileSize}}' => \api_Utils::GetFriendlySize($mData['Size']),
@@ -130,8 +132,8 @@ class FilesWebclientModule extends AApiModule
 				}
 				else 
 				{
-					$sResult = file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/NotFound.html');
-					$sResult = strtr($sResult, array(
+					$sResult = \file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/NotFound.html');
+					$sResult = \strtr($sResult, array(
 						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
 					));
 				}
@@ -158,8 +160,8 @@ class FilesWebclientModule extends AApiModule
 				}
 				else 
 				{
-					$sResult = file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/NotFound.html');
-					$sResult = strtr($sResult, array(
+					$sResult = \file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/NotFound.html');
+					$sResult = \strtr($sResult, array(
 						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
 					));
 
