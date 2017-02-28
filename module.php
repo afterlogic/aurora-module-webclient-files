@@ -20,7 +20,7 @@
 
 namespace Aurora\Modules;
 
-class FilesWebclientModule extends \AApiModule
+class FilesWebclientModule extends \Aurora\System\AbstractModule
 {
 	/**
 	 *
@@ -42,8 +42,8 @@ class FilesWebclientModule extends \AApiModule
 	 */
 	public function init() 
 	{
-		$this->oFilesModuleDecorator = \CApi::GetModuleDecorator('Files');
-		$this->oMinModuleDecorator = \CApi::GetModuleDecorator('Min');
+		$this->oFilesModuleDecorator = \Aurora\System\Api::GetModuleDecorator('Files');
+		$this->oMinModuleDecorator = \Aurora\System\Api::GetModuleDecorator('Min');
 		
 		$this->AddEntry('files-pub', 'EntryPub');
 	}
@@ -56,7 +56,7 @@ class FilesWebclientModule extends \AApiModule
 	 */
 	public function EntryPub()
 	{
-		\CApi::checkUserRoleIsAtLeast(\EUserRole::Anonymous);
+		\Aurora\System\Api::checkUserRoleIsAtLeast(\EUserRole::Anonymous);
 		
 		$aPaths = \System\Service::GetPaths();
 		$sHash = empty($aPaths[1]) ? '' : $aPaths[1];
@@ -72,17 +72,17 @@ class FilesWebclientModule extends \AApiModule
 
 				if (\is_array($mData) && isset($mData['IsFolder']) && $mData['IsFolder'])
 				{
-					$oApiIntegrator = \CApi::GetSystemManager('integrator');
+					$oApiIntegrator = \Aurora\System\Api::GetSystemManager('integrator');
 
 					if ($oApiIntegrator)
 					{
-						$oCoreClientModule = \CApi::GetModule('CoreWebclient');
-						if ($oCoreClientModule instanceof \AApiModule) 
+						$oCoreClientModule = \Aurora\System\Api::GetModule('CoreWebclient');
+						if ($oCoreClientModule instanceof \Aurora\System\AbstractModule) 
 						{
 							$sResult = \file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
 							if (\is_string($sResult)) 
 							{
-								$sFrameOptions = \CApi::GetConf('labs.x-frame-options', '');
+								$sFrameOptions = \Aurora\System\Api::GetConf('labs.x-frame-options', '');
 								if (0 < \strlen($sFrameOptions)) 
 								{
 									@\header('X-Frame-Options: '.$sFrameOptions);
@@ -106,9 +106,9 @@ class FilesWebclientModule extends \AApiModule
 				}
 				else if ($mData && isset($mData['__hash__'], $mData['Name'], $mData['Size']))
 				{
-					$sUrl = (bool) \CApi::GetConf('labs.server-use-url-rewrite', false) ? '/download/' : '?/files-pub/';
+					$sUrl = (bool) \Aurora\System\Api::GetConf('labs.server-use-url-rewrite', false) ? '/download/' : '?/files-pub/';
 
-					$sUrlRewriteBase = (string) \CApi::GetConf('labs.server-url-rewrite-base', '');
+					$sUrlRewriteBase = (string) \Aurora\System\Api::GetConf('labs.server-url-rewrite-base', '');
 					if (!empty($sUrlRewriteBase))
 					{
 						$sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
@@ -120,14 +120,14 @@ class FilesWebclientModule extends \AApiModule
 						$sResult = \strtr($sResult, array(
 							'{{Url}}' => $sUrl.$mData['__hash__'], 
 							'{{FileName}}' => $mData['Name'],
-							'{{FileSize}}' => \api_Utils::GetFriendlySize($mData['Size']),
-							'{{FileType}}' => \api_Utils::GetFileExtension($mData['Name']),
+							'{{FileSize}}' => \Aurora\System\Utils::GetFriendlySize($mData['Size']),
+							'{{FileType}}' => \Aurora\System\Utils::GetFileExtension($mData['Name']),
 							'{{BaseUrl}}' => $sUrlRewriteBase 
 						));
 					}
 					else
 					{
-						\CApi::Log('Empty template.', \ELogLevel::Error);
+						\Aurora\System\Api::Log('Empty template.', \ELogLevel::Error);
 					}
 				}
 				else 
