@@ -87,11 +87,6 @@ function CFileModel(oData, bPopup)
 		this.actions(oData.Actions);
 		this.sMainAction = Types.pString(oData.Actions[0]);
 	}
-	else
-	{
-		this.actions(['view']);
-		this.sMainAction = 'view';
-	}
 	
 	this.cssClasses = ko.computed(function () {
 		var aClasses = this.getCommonClasses();
