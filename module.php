@@ -20,7 +20,7 @@
 
 namespace Aurora\Modules;
 
-class FilesWebclientModule extends \Aurora\System\AbstractModule
+class FilesWebclientModule extends \Aurora\System\Module\AbstractModule
 {
 	/**
 	 *
@@ -77,7 +77,7 @@ class FilesWebclientModule extends \Aurora\System\AbstractModule
 					if ($oApiIntegrator)
 					{
 						$oCoreClientModule = \Aurora\System\Api::GetModule('CoreWebclient');
-						if ($oCoreClientModule instanceof \Aurora\System\AbstractModule) 
+						if ($oCoreClientModule instanceof \Aurora\System\Module\AbstractModule) 
 						{
 							$sResult = \file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
 							if (\is_string($sResult)) 
