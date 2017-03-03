@@ -58,7 +58,7 @@ class FilesWebclientModule extends \Aurora\System\Module\AbstractModule
 	{
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\EUserRole::Anonymous);
 		
-		$aPaths = \Aurora\System\Service::GetPaths();
+		$aPaths = \Aurora\System\Application::GetPaths();
 		$sHash = empty($aPaths[1]) ? '' : $aPaths[1];
 		$bDownload = !(!empty($aPaths[2]) && $aPaths[2] === 'view');
 		$bList = (!empty($aPaths[2]) && $aPaths[2] === 'list');
