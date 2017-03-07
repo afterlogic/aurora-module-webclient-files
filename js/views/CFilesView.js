@@ -220,7 +220,7 @@ function CFilesView(bPopup)
 		return sInfoText;
 	}, this);
 	
-	this.dragAndDropHelperBinded = _.bind(this.dragAndDropHelper, this);
+	this.dragAndDropHelperBound = _.bind(this.dragAndDropHelper, this);
 	this.bInPopup = !!bPopup;
 	this.isCurrentStorageExternal = ko.computed(function () {
 		var oStorage = this.getStorageByType(this.storageType());
@@ -705,9 +705,9 @@ CFilesView.prototype.onItemDblClick = function (oItem)
 			case 'view':
 				if (oItem instanceof CFileModel)
 				{
-					if (this.onSelectClickPopupBinded)
+					if (this.onSelectClickPopupBound)
 					{
-						this.onSelectClickPopupBinded();
+						this.onSelectClickPopupBound();
 					}
 					else
 					{

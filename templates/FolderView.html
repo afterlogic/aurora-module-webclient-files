@@ -1,6 +1,6 @@
 <div class="item folder" 
 	data-bind="
-		draggablePlace: !$parent.bInPopup ? $parent.dragAndDropHelperBinded : null,
+		draggablePlace: !$parent.bInPopup ? $parent.dragAndDropHelperBound : null,
 		draggableDragStartCallback: function() {if (!$parent.bInPopup) $root.dragover(true);},
 		draggableDragStopCallback: function() {if (!$parent.bInPopup) $root.dragover(false);},
 		css: {'selected': selected, 'checked': checked, 'deleted': deleted, 'shared': shared}"

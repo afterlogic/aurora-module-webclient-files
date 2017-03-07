@@ -18,7 +18,7 @@ function CSelectFilesPopup()
 	CAbstractPopup.call(this);
 	
 	this.oFilesView = new CFilesView(true);
-	this.oFilesView.onSelectClickPopupBinded = _.bind(this.onSelectClick, this);
+	this.oFilesView.onSelectClickPopupBound = _.bind(this.onSelectClick, this);
 	this.fCallback = null;
 }
 
