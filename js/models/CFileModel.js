@@ -82,11 +82,14 @@ function CFileModel(oData, bPopup)
 	
 	this.sHtmlEmbed = Types.pString(oData.OembedHtml);
 	
-	if (Types.isNonEmptyArray(oData.Actions))
-	{
-		this.actions(oData.Actions);
-		this.sMainAction = Types.pString(oData.Actions[0]);
-	}
+	_.each (oData.Actions, function (oData, sAction) {
+		if (!this.oActionsData[sAction])
+		{
+			this.oActionsData[sAction] = {};
+		}
+		this.oActionsData[sAction].Url = Types.pString(oData.url);
+		this.actions.push(sAction);
+	}, this);
 	
 	this.cssClasses = ko.computed(function () {
 		var aClasses = this.getCommonClasses();
@@ -170,7 +173,6 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.allowDrag(!bPopup);
 	this.allowUpload(true);
 	this.allowSharing(true);
-	this.allowDownload(this.fullPath() !== '');
 	this.allowActions(!bPopup && this.fullPath() !== '');
 		
 	this.fileName(Types.pString(oData.Name));
@@ -182,8 +184,6 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.size(Types.pInt(oData.Size));
 	this.hash(Types.pString(oData.Hash));
 	
-	this.sViewUrl = Types.pString(oData.ViewUrl);
-	this.sDownloadUrl = Types.pString(oData.DownloadUrl);
 	this.sThumbUrl = Types.pString(oData.ThumbnailUrl);
 	
 	if (this.sThumbUrl !== '')

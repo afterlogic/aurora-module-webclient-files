@@ -53,6 +53,11 @@ CFolderModel.prototype.parse = function (oData)
 	}
 };
 
+CFolderModel.prototype.getMainAction = function ()
+{
+	return this.sMainAction;
+};
+
 CFolderModel.prototype.eventDragStart = CAbstractFileModel.prototype.eventDragStart;
 
 module.exports = CFolderModel;

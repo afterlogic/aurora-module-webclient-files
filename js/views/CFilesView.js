@@ -121,8 +121,8 @@ function CFilesView(bPopup)
 		return (0 < items.length);
 	});
 	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
-		var items = this.selector.listCheckedAndSelected();
-		return (1 === items.length && items[0] instanceof CFileModel);
+		var oFile = this.getFileIfOnlyOneSelected();
+		return !!oFile && oFile.hasAction('download');
 	});
 	this.shareCommand = Utils.createCommand(this, this.executeShare, function () {
 		var items = this.selector.listCheckedAndSelected();
@@ -700,7 +700,8 @@ CFilesView.prototype.onItemDblClick = function (oItem)
 {
 	if (oItem)
 	{
-		switch (oItem.sMainAction)
+		var sMainAction = oItem.getMainAction();
+		switch (sMainAction)
 		{
 			case 'view':
 				if (oItem instanceof CFileModel)
@@ -711,7 +712,7 @@ CFilesView.prototype.onItemDblClick = function (oItem)
 					}
 					else
 					{
-						oItem.executeAction(oItem.sMainAction);
+						oItem.executeAction(sMainAction);
 					}
 				}
 				break;
@@ -847,13 +848,18 @@ CFilesView.prototype.renameItem = function (sName)
 	return '';
 };
 
+CFilesView.prototype.getFileIfOnlyOneSelected = function ()
+{
+	var aItems = this.selector.listCheckedAndSelected();
+	return (1 === aItems.length && aItems[0] instanceof CFileModel) ? aItems[0] : null;
+};
+
 CFilesView.prototype.executeDownload = function ()
 {
-	var oItem = _.first(this.selector.listCheckedAndSelected());
-	
-	if (oItem && oItem instanceof CFileModel)
+	var oFile = this.getFileIfOnlyOneSelected();
+	if (oFile)
 	{
-		oItem.downloadFile();
+		oFile.executeAction('download');
 	}
 };
 
