@@ -58,10 +58,11 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	{
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\EUserRole::Anonymous);
 		
-		$aPaths = \Aurora\System\Application::GetPaths();
-		$sHash = empty($aPaths[1]) ? '' : $aPaths[1];
-		$bDownload = !(!empty($aPaths[2]) && $aPaths[2] === 'view');
-		$bList = (!empty($aPaths[2]) && $aPaths[2] === 'list');
+		$sHash = (string) \Aurora\System\Application::GetPathItemByIndex(1, '');
+		$sAction = (string) \Aurora\System\Application::GetPathItemByIndex(2, '');
+		
+		$bDownload = !(!empty($sAction) && $sAction === 'view');
+		$bList = (!empty($sAction) && $sAction === 'list');
 		
 		if ($bList)
 		{
