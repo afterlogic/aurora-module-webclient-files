@@ -83,7 +83,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 							$sResult = \file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
 							if (\is_string($sResult)) 
 							{
-								$sFrameOptions = \Aurora\System\Api::GetConf('labs.x-frame-options', '');
+								$oSettings =& \Aurora\System\Api::GetSettings();
+								$sFrameOptions = $oSettings->GetConf('XFrameOptions', '');
 								if (0 < \strlen($sFrameOptions)) 
 								{
 									@\header('X-Frame-Options: '.$sFrameOptions);
@@ -107,9 +108,9 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				}
 				else if ($mData && isset($mData['__hash__'], $mData['Name'], $mData['Size']))
 				{
-					$sUrl = (bool) \Aurora\System\Api::GetConf('labs.server-use-url-rewrite', false) ? '/download/' : '?/files-pub/';
+					$sUrl = (bool) $this->getConfig('ServerUseUrlRewrite', false) ? '/download/' : '?/files-pub/';
 
-					$sUrlRewriteBase = (string) \Aurora\System\Api::GetConf('labs.server-url-rewrite-base', '');
+					$sUrlRewriteBase = (string) $this->getConfig('ServerUrlRewriteBase', '');
 					if (!empty($sUrlRewriteBase))
 					{
 						$sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';

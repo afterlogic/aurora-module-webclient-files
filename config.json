@@ -2,5 +2,13 @@
     "Disabled": [
 		false,
 		"bool"
+	],
+    "ServerUrlRewriteBase": [
+		false,
+		"bool"
+	],
+    "ServerUseUrlRewrite": [
+		false,
+		"bool"
 	]
 }
