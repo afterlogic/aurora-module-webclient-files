@@ -101,13 +101,6 @@ module.exports = function (oAppData) {
 				getMobileSyncSettingsView: function () {
 					return require('modules/%ModuleName%/js/views/MobileSyncSettingsView.js');
 				},
-				saveFilesByHashes: function (aHashes) {
-					if (HeaderItemView)
-					{
-						HeaderItemView.recivedAnim(true);
-					}
-					Ajax.send('SaveFilesByHashes', { 'Hashes': aHashes }, this.onSaveAttachmentsToFilesResponse, this);
-				},
 				registerToolbarButtons: function (oToolbarButtons) {
 					if (oFilesView)
 					{
