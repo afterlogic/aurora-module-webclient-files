@@ -1152,8 +1152,9 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 	;
 	if (bOkAnswer && 0 < aChecked.length)
 	{
-		var
-			aItems = _.map(aChecked, function (oItem) {
+		var aItems = _.compact(_.map(aChecked, function (oItem) {
+			if (oItem.id() !== '')
+			{
 				oItem.deleted(true);
 				sStorageType = oItem.storageType();
 				sPath = oItem.path();
@@ -1161,14 +1162,18 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 					'Path': oItem.path(),  
 					'Name': oItem.id()
 				};
-			});
-		
-		Ajax.send('Delete', {
-				'Type': sStorageType,
-				'Path': sPath,
-				'Items': aItems
-			}, this.onDeleteResponse, this
-		);
+			}
+			return null;
+		}));
+		if (aItems.length)
+		{
+			Ajax.send('Delete', {
+					'Type': sStorageType,
+					'Path': sPath,
+					'Items': aItems
+				}, this.onDeleteResponse, this
+			);
+		}
 	}		
 };
 
