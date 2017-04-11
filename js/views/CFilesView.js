@@ -409,7 +409,6 @@ CFilesView.prototype.onFileUploadProgress = function (sFileUid, iUploadedSize, i
  */
 CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceived, oResult)
 {
-	var bRequestFiles = false;
 	if (this.searchPattern() === '')
 	{
 		var
