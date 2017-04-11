@@ -260,6 +260,8 @@ CFileModel.prepareUploadFileData = function (oFileData, sPath, sStorageType, fGe
 		iIndex++;
 	}
 	
+	oFileData.FileName = sFileName;
+	
 	return {
 		Name: sFileName,
 		LastModified: moment().unix(),
