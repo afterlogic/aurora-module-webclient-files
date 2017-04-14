@@ -1419,4 +1419,32 @@ CFilesView.prototype.registerToolbarButtons = function (aToolbarButtons)
 	}
 };
 
+CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
+{
+	var 
+		fOnUploadCancelCallback = _.bind(function(sFileUploadUid, sFileName) {
+			var aItems = [];
+			aItems.push({
+				'Path': this.getCurrentPath(),  
+				'Name': sFileName
+			});
+			Ajax.send('Delete', {
+					'Type': this.storageType(),
+					'Path': this.getCurrentPath(),
+					'Items': aItems
+				}
+			);
+			this.deleteUploadFileByUid(sFileUploadUid);
+		}, this)
+	;
+	if (oFile.downloading())
+	{
+		App.broadcastEvent('CFilseView::FileDownloadCancel', {oFile: oFile});
+	}
+	else if (!oFile.uploaded() && sFileUploadUid)
+	{
+		App.broadcastEvent('CFilseView::FileUploadCancel', {sFileUploadUid: sFileUploadUid, fOnUploadCancelCallback: fOnUploadCancelCallback});	
+	}
+};
+
 module.exports = CFilesView;
