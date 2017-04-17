@@ -5,7 +5,6 @@ var
 	ko = require('knockout'),
 	moment = require('moment'),
 	
-	FilesUtils = require('%PathToCoreWebclientModule%/js/utils/Files.js'),
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	Utils = require('%PathToCoreWebclientModule%/js/utils/Common.js'),
@@ -51,6 +50,18 @@ function CFileModel(oData, bPopup)
 	this.sOwnerName = Types.pString(oData.Owner);
 	
 	CAbstractFileModel.call(this);
+	
+	this.thumbUrlInQueueSubscribtion.dispose();
+	this.thumbUrlInQueue.subscribe(function () {
+		if (this.sThumbnailExternalLink !== '')
+		{
+			this.thumbnailSrc(this.sThumbnailExternalLink);
+		}
+		else
+		{
+			this.getInThumbQueue();
+		}
+	}, this);
 	
 	this.oActionsData['list'] = {
 		'Text': TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE'),
@@ -185,20 +196,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.size(Types.pInt(oData.Size));
 	this.hash(Types.pString(oData.Hash));
 	
-	this.sThumbUrl = Types.pString(oData.ThumbnailUrl);
-	
-	if (this.sThumbUrl !== '')
-	{
-		if (this.sThumbnailExternalLink === '')
-		{
-			var sThumbSessionUid = Date.now().toString();
-			this.getInThumbQueue(sThumbSessionUid);
-		}
-		else
-		{
-			this.thumbnailSrc(this.sThumbnailExternalLink);
-		}
-	}
+	this.thumbUrlInQueue(Types.pString(oData.ThumbnailUrl));
 	
 	this.mimeType(Types.pString(oData.ContentType));
 
@@ -213,23 +211,6 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	}
 	
 	App.broadcastEvent('%ModuleName%::ParseFile::after', this);
-};
-
-CFileModel.prototype.addAction = function (sAction, bMain, oActionData)
-{
-	if (bMain)
-	{
-		this.actions.unshift(sAction);
-	}
-	else
-	{
-		this.actions.push(sAction);
-	}
-	this.actions(_.compact(this.actions()));
-	if (oActionData)
-	{
-		this.oActionsData[sAction] = oActionData;
-	}
 };
 
 /**
