@@ -191,8 +191,6 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.id(Types.pString(oData.Id));
 	this.shared(!!oData.Shared);
 
-	this.iframedView(!!oData.Iframed);
-	
 	this.size(Types.pInt(oData.Size));
 	this.hash(Types.pString(oData.Hash));
 	
