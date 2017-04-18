@@ -879,12 +879,19 @@ CFilesView.prototype.executeSend = function ()
 		aItems = this.selector.listCheckedAndSelected(),
 		aFileItems = _.filter(aItems, function (oItem) {
 			return oItem instanceof CFileModel;
-		}, this)
+		}, this),
+		aFilesData = _.map(aFileItems, function (oItem) {
+			return {
+				'Storage': oItem.storageType(),
+				'Path': oItem.path(),
+				'Name': oItem.fileName()
+			};
+		})
 	;
 	
 	if (aFileItems.length > 0)
 	{
-		Ajax.send('SaveFilesAsTempFiles', { 'Files': aFileItems }, function (oResponse) {
+		Ajax.send('SaveFilesAsTempFiles', { 'Files': aFilesData }, function (oResponse) {
 			if (_.isFunction(ComposeMessageWithAttachments) && oResponse.Result)
 			{
 				ComposeMessageWithAttachments([oResponse.Result]);
