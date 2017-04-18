@@ -14,7 +14,7 @@
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_CREATE_SHORTCUT'}"></span>
 	</span>
 	<!-- ko template: { name: '%ModuleName%_DownloadButtonView'} --><!-- /ko -->
-	<span class="item send_files command" data-bind="visible: allowSendEmails(), command: sendCommand, customTooltip: '%MODULENAME%/ACTION_SEND_FILES'">
+	<span class="item send_files command" data-bind="visible: bAllowSendEmails, command: sendCommand, customTooltip: '%MODULENAME%/ACTION_SEND_FILES'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_SEND_FILES'}"></span>
 	</span>

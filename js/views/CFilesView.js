@@ -26,6 +26,9 @@ var
 	RenamePopup = require('modules/%ModuleName%/js/popups/RenamePopup.js'),
 	SharePopup = require('modules/%ModuleName%/js/popups/SharePopup.js'),
 	
+	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
+	ComposeMessageWithAttachments = ModulesManager.run('MailWebclient', 'getComposeMessageWithAttachments'),
+	
 	Ajax = require('modules/%ModuleName%/js/Ajax.js'),
 	Settings = require('modules/%ModuleName%/js/Settings.js'),
 	
@@ -45,9 +48,7 @@ function CFilesView(bPopup)
 	
 	this.browserTitle = ko.observable(TextUtils.i18n('%MODULENAME%/HEADING_BROWSER_TAB'));
 	
-	this.allowSendEmails = ko.computed(function () {
-		return false;//!!(AppData.App && AppData.App.AllowWebMail && AppData.Accounts);
-	}, this);
+	this.bAllowSendEmails = _.isFunction(ComposeMessageWithAttachments);
 	
 	this.error = ko.observable(false);
 	this.loaded = ko.observable(false);
@@ -883,7 +884,12 @@ CFilesView.prototype.executeSend = function ()
 	
 	if (aFileItems.length > 0)
 	{
-//		App.Api.composeMessageWithFiles(aFileItems);
+		Ajax.send('SaveFilesAsTempFiles', { 'Files': aFileItems }, function (oResponse) {
+			if (_.isFunction(ComposeMessageWithAttachments) && oResponse.Result)
+			{
+				ComposeMessageWithAttachments([oResponse.Result]);
+			}
+		}, this);
 	}
 };
 
