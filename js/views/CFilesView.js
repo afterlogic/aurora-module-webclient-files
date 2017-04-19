@@ -889,12 +889,12 @@ CFilesView.prototype.executeSend = function ()
 		})
 	;
 	
-	if (aFileItems.length > 0)
+	if (this.bAllowSendEmails && aFileItems.length > 0)
 	{
 		Ajax.send('SaveFilesAsTempFiles', { 'Files': aFilesData }, function (oResponse) {
-			if (_.isFunction(ComposeMessageWithAttachments) && oResponse.Result)
+			if (oResponse.Result)
 			{
-				ComposeMessageWithAttachments([oResponse.Result]);
+				ComposeMessageWithAttachments(oResponse.Result);
 			}
 		}, this);
 	}
