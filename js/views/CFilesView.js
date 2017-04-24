@@ -753,6 +753,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				else
 				{
 					var oFile = new CFileModel(oData, this.bInPopup);
+					oFile.index(aFileList.length);
 					aFileList.push(oFile);
 				}
 			}, this);
