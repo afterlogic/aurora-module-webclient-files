@@ -114,20 +114,25 @@ function CFilesView(bPopup)
 	this.isSearchFocused = ko.observable(false);
 
 	this.renameCommand = Utils.createCommand(this, this.executeRename, function () {
-		var items = this.selector.listCheckedAndSelected();
-		return (1 === items.length);
+		var aItems = this.selector.listCheckedAndSelected();
+		return (1 === aItems.length);
 	});
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
-		var items = this.selector.listCheckedAndSelected();
-		return (0 < items.length);
+		var 
+			aItems = this.selector.listCheckedAndSelected(),
+			bAllow = aItems.every(function (oItem)  {
+				return oItem.uploaded() === true && oItem.downloading() === false;
+			})
+		;
+		return (0 < aItems.length && bAllow);
 	});
 	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
 		var oFile = this.getFileIfOnlyOneSelected();
 		return !!oFile && oFile.hasAction('download');
 	});
 	this.shareCommand = Utils.createCommand(this, this.executeShare, function () {
-		var items = this.selector.listCheckedAndSelected();
-		return (1 === items.length && (!items[0].bIsLink));
+		var aItems = this.selector.listCheckedAndSelected();
+		return (1 === aItems.length && (!aItems[0].bIsLink));
 	});
 	this.sendCommand = Utils.createCommand(this, this.executeSend, function () {
 		var
@@ -430,6 +435,16 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 				{
 					Popups.showPopup(AlertPopup, [TextUtils.i18n('COREWEBCLIENT/ERROR_CANT_UPLOAD_FILE_QUOTA')]);
 				}
+				else if (oResult && oResult.ErrorCode === Enums.Errors.FileAlreadyExists)
+				{
+					bRequestFiles = true;
+					Screens.showError(TextUtils.i18n('COREWEBCLIENT/ERROR_FILE_ALREADY_EXISTS'));
+				}
+				else if (oResult && oResult.ErrorCode === Enums.Errors.FileNotFound)
+				{
+					bRequestFiles = true;
+					Screens.showError(TextUtils.i18n('COREWEBCLIENT/ERROR_FILE_NOT_FOUND'));
+				}
 				else
 				{
 					Screens.showError(oFile.statusText());
@@ -681,7 +696,16 @@ CFilesView.prototype.dragAndDropHelper = function (oFile)
 
 CFilesView.prototype.onItemDelete = function ()
 {
-	this.executeDelete();
+	var 
+		aItems = this.selector.listCheckedAndSelected(),
+		bAllow = aItems.every(function (oItem)  {
+			return oItem.uploaded() === true && oItem.downloading() === false;
+		})
+	;
+	if (0 < aItems.length && bAllow)
+	{
+		this.executeDelete();
+	}
 };
 
 /**
@@ -733,14 +757,14 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		oResult = oResponse.Result,
 		oParameters = oRequest.Parameters
 	;
-	
+
 	if ((oParameters.Type === this.storageType() || oParameters.Hash === Settings.PublicHash) && oParameters.Path === this.getCurrentPath())
 	{
 		if (oResult)
 		{
 			var
-				aFolderList = [],
-				aFileList = []
+				aNewFolderList = [],
+				aNewFileList = []
 			;
 
 			_.each(oResult.Items, function (oData) {
@@ -748,18 +772,38 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				{
 					var oFolder = new CFolderModel();
 					oFolder.parse(oData);
-					aFolderList.push(oFolder);
+					aNewFolderList.push(oFolder);
 				}
 				else
 				{
 					var oFile = new CFileModel(oData, this.bInPopup);
+
+					if (oFile.oExtendedProps.Loading)
+					{ // if file still loading - show warning in status
+						oFile.uploadError(true);
+						oFile.statusText(TextUtils.i18n('COREWEBCLIENT/LABEL_FILE_LOADING'));
+					}
 					oFile.index(aFileList.length);
-					aFileList.push(oFile);
+					aNewFileList.push(oFile);
 				}
 			}, this);
+			
+			// save status of files that are being loaded
+			_.each(this.files(), function (oTmpFile, iFileIndex, aFiles) {
+				if (oTmpFile.downloading())
+				{
+					var iNewIndex = _.findIndex(aNewFileList, function (oNewTmpFile) {
+						return oTmpFile.fileName() === oNewTmpFile.fileName();
+					});
+					if (iNewIndex !== -1)
+					{
+						aNewFileList[iNewIndex] = aFiles[iFileIndex];
+					}
+				}
+			});
 
-			this.folders(aFolderList);
-			this.files(aFileList);
+			this.folders(aNewFolderList);
+			this.files(aNewFileList);
 
 			this.newSearchPattern(oParameters.Pattern || '');
 			this.searchPattern(oParameters.Pattern || '');
@@ -1067,7 +1111,7 @@ CFilesView.prototype.requestUserFiles = function (sType, oPath, sPattern, bNotLo
 	this.error(false);
 	this.storageType(sType);
 	self.loadedFiles(false);
-	this.uploadingFiles([]);
+//	this.uploadingFiles([]);
 	if (bNotLoading && (this.files().length > 0 || this.folders().length > 0))
 	{
 		this.timerId = setTimeout(function() {
@@ -1422,7 +1466,12 @@ CFilesView.prototype.registerToolbarButtons = function (aToolbarButtons)
 CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 {
 	var 
-		fOnUploadCancelCallback = _.bind(function(sFileUploadUid, sFileName) {
+		/**
+		 * Send request for deleting file with sFileName
+		 * @param {String} sFileUploadUid
+		 * @param {String} sFileName
+		 */
+		fOnUploadCancelCallback = _.bind(function (sFileUploadUid, sFileName) {
 			var aItems = [];
 			aItems.push({
 				'Path': this.getCurrentPath(),  
