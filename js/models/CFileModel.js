@@ -57,7 +57,7 @@ function CFileModel(oData, bPopup)
 		{
 			this.thumbnailSrc(this.sThumbnailExternalLink);
 		}
-		else
+		else if (!this.bIsLink)
 		{
 			this.getInThumbQueue();
 		}
