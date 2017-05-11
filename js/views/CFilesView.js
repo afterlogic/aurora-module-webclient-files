@@ -783,7 +783,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 						oFile.uploadError(true);
 						oFile.statusText(TextUtils.i18n('COREWEBCLIENT/LABEL_FILE_LOADING'));
 					}
-					oFile.index(aFileList.length);
+					oFile.index(aNewFileList.length);
 					aNewFileList.push(oFile);
 				}
 			}, this);
@@ -797,6 +797,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 					});
 					if (iNewIndex !== -1)
 					{
+						aFiles[iFileIndex].index(aNewFileList[iNewIndex].index());
 						aNewFileList[iNewIndex] = aFiles[iFileIndex];
 					}
 				}
