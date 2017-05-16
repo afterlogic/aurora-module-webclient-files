@@ -42,7 +42,7 @@ function CFileModel(oData, bPopup)
 	this.oExtendedProps = oData.ExtendedProps;
 	this.sLinkType = this.bIsLink ? Types.pString(oData.LinkType) : '';
 	this.sLinkUrl = this.bIsLink ? Types.pString(oData.LinkUrl) : '';
-	this.sThumbnailExternalLink = Types.pString(oData.ThumbnailLink);
+	this.sThumbnailExternalLink = this.bIsLink ? Types.pString(oData.ThumbnailUrl) : '';
 	
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
@@ -169,8 +169,7 @@ CFileModel.prepareLinkData = function (oData, sLinkUrl)
 		LinkUrl: sLinkUrl,
 		Name: oData.Name,
 		Size: oData.Size,
-		Thumb: Types.isNonEmptyString(oData.Thumb),
-		ThumbnailLink: oData.Thumb
+		ThumbnailUrl: oData.Thumb
 	};
 };
 
