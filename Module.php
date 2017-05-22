@@ -49,7 +49,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	 */
 	public function EntryPub()
 	{
-		\Aurora\System\Api::checkUserRoleIsAtLeast(\EUserRole::Anonymous);
+		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
 		
 		$sHash = (string) \Aurora\System\Application::GetPathItemByIndex(1, '');
 		$sAction = (string) \Aurora\System\Application::GetPathItemByIndex(2, '');
