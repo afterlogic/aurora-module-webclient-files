@@ -121,7 +121,7 @@ function CFilesView(bPopup)
 		var 
 			aItems = this.selector.listCheckedAndSelected(),
 			bAllow = aItems.every(function (oItem)  {
-				return oItem.uploaded() === true && oItem.downloading() === false;
+				return !(oItem.uploaded !== undefined && oItem.uploaded() === false || oItem.downloading !== undefined && oItem.downloading() === true);
 			})
 		;
 		return (0 < aItems.length && bAllow);
@@ -327,6 +327,7 @@ CFilesView.prototype.initUploader = function ()
 			.on('onComplete', _.bind(this.onFileUploadComplete, this))
 			.on('onBodyDragEnter', _.bind(this.bDragActive, this, true))
 			.on('onBodyDragLeave', _.bind(this.bDragActive, this, false))
+			.on('onCancel', _.bind(this.onCancelUpload, this))
 		;
 		
 		this.bAllowDragNDrop = this.oJua.isDragAndDropSupported();
@@ -699,7 +700,7 @@ CFilesView.prototype.onItemDelete = function ()
 	var 
 		aItems = this.selector.listCheckedAndSelected(),
 		bAllow = aItems.every(function (oItem)  {
-			return oItem.uploaded() === true && oItem.downloading() === false;
+			return !(oItem.uploaded !== undefined && oItem.uploaded() === false || oItem.downloading !== undefined && oItem.downloading() === true);
 		})
 	;
 	if (0 < aItems.length && bAllow)
