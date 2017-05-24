@@ -122,7 +122,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 					}
 					else
 					{
-						\Aurora\System\Api::Log('Empty template.', \ELogLevel::Error);
+						\Aurora\System\Api::Log('Empty template.', \Aurora\System\Enums\LogLevel::Error);
 					}
 				}
 				else 
