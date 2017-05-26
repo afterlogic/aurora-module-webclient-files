@@ -35,8 +35,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	 */
 	public function init() 
 	{
-		$this->oFilesModuleDecorator = \Aurora\System\Api::GetModuleDecorator('Files');
-		$this->oMinModuleDecorator = \Aurora\System\Api::GetModuleDecorator('Min');
+		$this->oFilesModuleDecorator = \Aurora\Modules\Files\Module::Decorator();
+		$this->oMinModuleDecorator = \Aurora\Modules\Min\Module::Decorator();
 		
 		$this->AddEntry('files-pub', 'EntryPub');
 	}
