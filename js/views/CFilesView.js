@@ -364,7 +364,18 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 	if (this.searchPattern() === '')
 	{
 		var 
-			oData = CFileModel.prepareUploadFileData(oFileData, this.getCurrentPath(), this.storageType(), _.bind(this.getFileByName, this)),
+			oData = CFileModel.prepareUploadFileData(oFileData, this.getCurrentPath(), this.storageType(), _.bind(function (sFileName) {
+				if (this.getFileByName(sFileName))
+				{
+					return true;
+				}
+				else
+				{
+					return !!_.find(this.getUploadingFiles(), function (oItem) {
+						return oItem.fileName() === sFileName;
+					});
+				}
+			}, this)),
 			oFile = new CFileModel(oData)
 		;
 		oFile.onUploadSelect(sFileUid, oFileData, true);
@@ -1277,7 +1288,7 @@ CFilesView.prototype.getPathItemByIndex = function (iIndex)
 CFilesView.prototype.getFileByName = function (sName)
 {
 	return _.find(this.files(), function (oItem) {
-		return oItem.id() === sName;
+		return oItem.fileName() === sName;
 	});	
 };
 
