@@ -41,7 +41,7 @@ CSharePopup.prototype.onShow = function (oItem)
 			'Path': oItem.path(),
 			'Name': oItem.fileName(),
 			'Size': oItem instanceof CFolderModel ? 0 : oItem.size(),
-			'IsFolder': oItem instanceof CFolderModel ? '1' : '0'
+			'IsFolder': oItem instanceof CFolderModel
 		}, this.onCreatePublicLinkResponse, this
 	);
 };
