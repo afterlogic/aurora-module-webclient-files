@@ -4,7 +4,7 @@ var
 	_ = require('underscore'),
 	ko = require('knockout'),
 	
-	App = require('%PathToCoreWebclientModule%/js/App.js'),
+	UrlUtils = require('%PathToCoreWebclientModule%/js/utils/Url.js'),
 	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js'),
 	
 	Ajax = require('modules/%ModuleName%/js/Ajax.js'),
@@ -54,7 +54,7 @@ CSharePopup.prototype.onCreatePublicLinkResponse = function (oResponse, oRequest
 {
 	if (oResponse.Result)
 	{
-		this.pub(oResponse.Result);
+		this.pub(UrlUtils.getAppPath() + oResponse.Result);
 		this.pubFocus(true);
 		this.item.shared(true);
 	}
