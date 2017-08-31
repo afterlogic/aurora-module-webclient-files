@@ -38,7 +38,7 @@ LinksUtils.getFiles = function (sStorage, sPath, sSearch)
 	
 	if (sPath && sPath !== '')
 	{
-		aParams.push('path' + encodeURIComponent(sPath));
+		aParams.push('path' + sPath);
 	}
 	
 	if (sSearch && sSearch !== '')
@@ -79,7 +79,7 @@ LinksUtils.parseFiles = function (aParam)
 		
 		if (aParam.length > iIndex && IsPathParam(aParam[iIndex]))
 		{
-			sPath = decodeURIComponent(Types.pString(aParam[iIndex].substr(4)));
+			sPath = Types.pString(aParam[iIndex].substr(4));
 			iIndex++;
 		}
 		
