@@ -553,6 +553,7 @@ CFilesView.prototype.moveItems = function (sMethod, oFolder, aChecked)
 	var
 		sFromPath = '',
 		sFromStorageType = '',
+		bFromAllSame = true,
 		bFolderIntoItself = false,
 		sToPath = oFolder instanceof CFolderModel ? oFolder.fullPath() : '',
 		aItems = [],
@@ -589,6 +590,10 @@ CFilesView.prototype.moveItems = function (sMethod, oFolder, aChecked)
 		}
 		
 		_.each(aChecked, _.bind(function (oItem) {
+			if (sFromPath !== '' && sFromPath !== oItem.path() || sFromStorageType !== '' && sFromStorageType !== oItem.storageType())
+			{
+				bFromAllSame = false;
+			}
 			sFromPath = oItem.path();
 			sFromStorageType = oItem.storageType();
 			bFolderIntoItself = oItem instanceof CFolderModel && sToPath === sFromPath + '/' + oItem.id();
@@ -606,6 +611,8 @@ CFilesView.prototype.moveItems = function (sMethod, oFolder, aChecked)
 					}
 				}
 				aItems.push({
+					'FromType': sFromStorageType,
+					'FromPath': sFromPath,
 					'Name':  oItem.id(),
 					'IsFolder': oItem instanceof CFolderModel
 				});
@@ -614,6 +621,11 @@ CFilesView.prototype.moveItems = function (sMethod, oFolder, aChecked)
 		
 		if (aItems.length > 0)
 		{
+			if (!bFromAllSame)
+			{
+				sFromStorageType = '';
+				sFromPath = '';
+			}
 			Ajax.send(sMethod, {
 				'FromType': sFromStorageType,
 				'ToType': sStorageType,
