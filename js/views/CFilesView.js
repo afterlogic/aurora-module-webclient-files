@@ -1130,6 +1130,7 @@ CFilesView.prototype.routeFiles = function (sStorage, oPath, sSearch, bNotLoadin
 		sFullPath = oPath ? oPath.fullPath() : '',
 		bSame = false
 	;
+	
 	if (this.bPublic)
 	{
 		bSame = Routing.setHash(LinksUtils.getFiles('', sFullPath, ''));
@@ -1168,6 +1169,8 @@ CFilesView.prototype.routeFiles = function (sStorage, oPath, sSearch, bNotLoadin
  */
 CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
 {
+	console.log(sName);
+	
 	var oFolder = new CFolderModel();
 	oFolder.storageType(sStorage);
 	oFolder.displayName(sName);
@@ -1183,7 +1186,9 @@ CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
  */
 CFilesView.prototype.onRoute = function (aParams)
 {
+	console.log(aParams);
 	var oParams = LinksUtils.parseFiles(aParams);
+
 	if (App.isPublic())
 	{
 		this.onPublicRoute(oParams);
@@ -1206,6 +1211,7 @@ CFilesView.prototype.onUserRoute = function (oParams)
 	;
 	
 	this.error(false);
+	
 	this.storageType(oParams.Storage);
 	this.loadedFiles(false);
 	
@@ -1216,6 +1222,7 @@ CFilesView.prototype.onUserRoute = function (oParams)
 		sPath = sPath.substr(0, iItemPos);
 	}, this));
 	this.addPathItems(oParams.Storage, '', this.rootPath());
+	
 	this.pathIndex(this.pathItems().length - 1);
 	
 	if (this.bNotLoading && (this.files().length > 0 || this.folders().length > 0))

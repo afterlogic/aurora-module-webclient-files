@@ -71,10 +71,6 @@ LinksUtils.parseFiles = function (aParam)
 		{
 			sStorage = Types.pString(aParam[iIndex]);
 			iIndex++;
-			if (-1 === $.inArray(sStorage, ['personal', 'corporate']))
-			{
-				sStorage = 'personal';
-			}
 		}
 		
 		if (aParam.length > iIndex && IsPathParam(aParam[iIndex]))
@@ -85,7 +81,7 @@ LinksUtils.parseFiles = function (aParam)
 		
 		if (sPath !== '')
 		{
-			aPath = _.without(sPath.split(/[\/|($ZIP:)]/g), '');
+			aPath = _.without(sPath.split(/(?:\/|\$ZIP\:)/g), '');
 			sName = aPath[aPath.length - 1];
 		}
 		
