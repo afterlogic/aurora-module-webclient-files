@@ -84,7 +84,6 @@ function CFilesView(bPopup)
 		}
 	}, this);
 	
-	this.pathIndex = ko.observable(-1);
 	this.pathItems = ko.observableArray();
 	this.dropPath = ko.observable('');
 	ko.computed(function () {
@@ -845,6 +844,16 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			clearTimeout(this.timerId);
 
 			this.parseQuota(oResult.Quota);
+			
+			if (_.isArray(oResult.Path))
+			{
+				this.pathItems(this.pathItems().slice(0, 1));
+				_.each(oResult.Path.reverse(), _.bind(function (oPathItem) {
+					var oFolder = new CFolderModel();
+					oFolder.parse(oPathItem);
+					this.pathItems.push(oFolder);
+				}, this));
+			}
 		}
 		else
 		{
@@ -1101,7 +1110,6 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 	{
 		this.storageType(Enums.FileStorageType.Personal);
 		this.pathItems([]);
-		this.pathIndex(-1);
 	}
 	
 	this.routeFiles(this.storageType(), this.getCurrentPathItem(), this.searchPattern(), true);
@@ -1169,8 +1177,6 @@ CFilesView.prototype.routeFiles = function (sStorage, oPath, sSearch, bNotLoadin
  */
 CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
 {
-	console.log(sName);
-	
 	var oFolder = new CFolderModel();
 	oFolder.storageType(sStorage);
 	oFolder.displayName(sName);
@@ -1186,7 +1192,6 @@ CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
  */
 CFilesView.prototype.onRoute = function (aParams)
 {
-	console.log(aParams);
 	var oParams = LinksUtils.parseFiles(aParams);
 
 	if (App.isPublic())
@@ -1222,8 +1227,6 @@ CFilesView.prototype.onUserRoute = function (oParams)
 		sPath = sPath.substr(0, iItemPos);
 	}, this));
 	this.addPathItems(oParams.Storage, '', this.rootPath());
-	
-	this.pathIndex(this.pathItems().length - 1);
 	
 	if (this.bNotLoading && (this.files().length > 0 || this.folders().length > 0))
 	{
@@ -1270,7 +1273,6 @@ CFilesView.prototype.onPublicRoute = function (oParams)
 	{
 		this.addPathItems(oParams.Storage, '', this.rootPath());
 	}
-	this.pathIndex(this.pathItems().length - 1);
 	
 	this.showLoading();
 	
@@ -1320,7 +1322,7 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 
 CFilesView.prototype.getCurrentPathItem = function ()
 {
-	return this.pathItems()[this.pathIndex()];
+	return this.pathItems()[this.pathItems().length - 1];
 };
 
 CFilesView.prototype.getCurrentPath = function ()
