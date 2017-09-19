@@ -257,7 +257,7 @@ function CFilesView(bPopup)
 	App.subscribeEvent('Files::ShowList', _.bind(function (oParams) {
 		if (oParams.Item)
 		{
-			this.routeFiles(this.storageType(), oParams.Item.fullPath());
+			this.routeFiles(oParams.Item.storageType(), oParams.Item.fullPath());
 		}
 	}, this));
 	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
@@ -776,7 +776,7 @@ CFilesView.prototype.onItemDblClick = function (oItem)
 				}
 				break;
 			case 'list':
-				this.routeFiles(this.storageType(), oItem.fullPath());
+				this.routeFiles(oItem.storageType(), oItem.fullPath());
 				break;
 		}
 	}
