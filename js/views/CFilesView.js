@@ -1548,11 +1548,11 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 	;
 	if (oFile.downloading())
 	{
-		App.broadcastEvent('CFilseView::FileDownloadCancel', {oFile: oFile});
+		App.broadcastEvent('CFilesView::FileDownloadCancel', {oFile: oFile});
 	}
 	else if (!oFile.uploaded() && sFileUploadUid)
 	{
-		App.broadcastEvent('CFilseView::FileUploadCancel', {sFileUploadUid: sFileUploadUid, fOnUploadCancelCallback: fOnUploadCancelCallback});	
+		App.broadcastEvent('CFilesView::FileUploadCancel', {sFileUploadUid: sFileUploadUid, fOnUploadCancelCallback: fOnUploadCancelCallback});	
 	}
 };
 
