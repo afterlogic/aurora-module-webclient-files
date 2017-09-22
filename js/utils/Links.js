@@ -2,11 +2,13 @@
 
 var
 	_ = require('underscore'),
-	$ = require('jquery'),
 	
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	
 	Settings = require('modules/%ModuleName%/js/Settings.js'),
+	
+	sSrchPref = 's.',
+	sPthPref = 'p.',
 	
 	LinksUtils = {}
 ;
@@ -18,7 +20,17 @@ var
  */
 function IsPathParam(sTemp)
 {
-	return ('path' === sTemp.substr(0, 4));
+	return (sPthPref === sTemp.substr(0, sPthPref.length));
+};
+
+/**
+ * Returns true if parameter contains search value.
+ * @param {string} sTemp
+ * @return {boolean}
+ */
+function IsSearchParam(sTemp)
+{
+	return (sSrchPref === sTemp.substr(0, sSrchPref.length));
 };
 
 /**
@@ -38,12 +50,12 @@ LinksUtils.getFiles = function (sStorage, sPath, sSearch)
 	
 	if (sPath && sPath !== '')
 	{
-		aParams.push('path' + sPath);
+		aParams.push(sPthPref + sPath);
 	}
 	
 	if (sSearch && sSearch !== '')
 	{
-		aParams.push(sSearch);
+		aParams.push(sSrchPref + sSearch);
 	}
 	
 	return aParams;
@@ -75,7 +87,7 @@ LinksUtils.parseFiles = function (aParam)
 		
 		if (aParam.length > iIndex && IsPathParam(aParam[iIndex]))
 		{
-			sPath = Types.pString(aParam[iIndex].substr(4));
+			sPath = Types.pString(aParam[iIndex].substr(sPthPref.length));
 			iIndex++;
 		}
 		
@@ -85,9 +97,9 @@ LinksUtils.parseFiles = function (aParam)
 			sName = aPath[aPath.length - 1];
 		}
 		
-		if (aParam.length > iIndex)
+		if (aParam.length > iIndex && IsSearchParam(aParam[iIndex]))
 		{
-			sSearch = Types.pString(aParam[iIndex]);
+			sSearch = Types.pString(aParam[iIndex].substr(sSrchPref.length));
 		}
 	}
 	
