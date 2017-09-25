@@ -33,7 +33,7 @@ CRenamePopup.prototype.PopupTemplate = '%ModuleName%_RenamePopup';
  * @param {string} sName
  * @param {function} fCallback
  */
-CRenamePopup.prototype.onShow = function (sName, fCallback)
+CRenamePopup.prototype.onOpen = function (sName, fCallback)
 {
 	this.fCallback = fCallback;
 	

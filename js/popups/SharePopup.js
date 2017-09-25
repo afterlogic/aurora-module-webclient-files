@@ -30,7 +30,7 @@ CSharePopup.prototype.PopupTemplate = '%ModuleName%_SharePopup';
 /**
  * @param {Object} oItem
  */
-CSharePopup.prototype.onShow = function (oItem)
+CSharePopup.prototype.onOpen = function (oItem)
 {
 	this.item = oItem;
 	

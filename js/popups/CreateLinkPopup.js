@@ -38,7 +38,7 @@ CCreateLinkPopup.prototype.PopupTemplate = '%ModuleName%_CreateLinkPopup';
 /**
  * @param {Function} fCallback
  */
-CCreateLinkPopup.prototype.onShow = function (fCallback)
+CCreateLinkPopup.prototype.onOpen = function (fCallback)
 {
 	this.link('');
 	this.linkFocus(true);

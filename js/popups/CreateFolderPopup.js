@@ -32,7 +32,7 @@ CCreateFolderPopup.prototype.PopupTemplate = '%ModuleName%_CreateFolderPopup';
 /**
  * @param {Function} fCallback
  */
-CCreateFolderPopup.prototype.onShow = function (fCallback)
+CCreateFolderPopup.prototype.onOpen = function (fCallback)
 {
 	this.folderName('');
 	this.folderName.focus(true);

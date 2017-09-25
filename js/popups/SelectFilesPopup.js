@@ -29,7 +29,7 @@ CSelectFilesPopup.prototype.PopupTemplate = '%ModuleName%_SelectFilesPopup';
 /**
  * @param {Function} fCallback
  */
-CSelectFilesPopup.prototype.onShow = function (fCallback)
+CSelectFilesPopup.prototype.onOpen = function (fCallback)
 {
 	if ($.isFunction(fCallback))
 	{
