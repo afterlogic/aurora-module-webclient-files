@@ -85,14 +85,13 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 								
 								$aConfig = array(
 									'public_app' => true,
-									'modules_list' => array("FilesWebclient")
+									'modules_list' => $oApiIntegrator->GetModulesForEntry('FilesWebclient')
 								);
 
 								$sResult = \strtr($sResult, array(
 									'{{AppVersion}}' => AU_APP_VERSION,
 									'{{IntegratorDir}}' => $oApiIntegrator->isRtl() ? 'rtl' : 'ltr',
 									'{{IntegratorLinks}}' => $oApiIntegrator->buildHeadersLink(),
-//									'{{IntegratorBody}}' => $oApiIntegrator->buildBody('-files-pub')
 									'{{IntegratorBody}}' => $oApiIntegrator->buildBody($aConfig)
 								));
 							}
