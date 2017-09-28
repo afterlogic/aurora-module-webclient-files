@@ -1031,7 +1031,7 @@ CFilesView.prototype.onShow = function ()
 {
 	this.loaded(true);
 	
-	if (this.bPublic || this.bInPopup)
+	if (this.bPublic)
 	{
 		this.routeFiles(this.storageType(), this.currentPath());
 	}
@@ -1157,16 +1157,23 @@ CFilesView.prototype.routeFiles = function (sStorage, sFullPath, sSearch, bNotLo
 	else
 	{
 		this.bNotLoading = bNotLoading;
-		bSame = Routing.setHash(LinksUtils.getFiles(sStorage, sFullPath, sSearch));
-		if (bSame)
+		if (this.bInPopup)
 		{
-			this.showLoading();
-			Ajax.send('GetFiles', {
-					'Type': this.storageType(),
-					'Path': this.currentPath(),
-					'Pattern': this.searchPattern()
-				}, this.onGetFilesResponse, this
-			);
+			this.onUserRoute(LinksUtils.getParsedParams(sStorage, sFullPath, sSearch));
+		}
+		else
+		{
+			bSame = Routing.setHash(LinksUtils.getFiles(sStorage, sFullPath, sSearch));
+			if (bSame)
+			{
+				this.showLoading();
+				Ajax.send('GetFiles', {
+						'Type': this.storageType(),
+						'Path': this.currentPath(),
+						'Pattern': this.searchPattern()
+					}, this.onGetFilesResponse, this
+				);
+			}
 		}
 	}
 };

@@ -72,8 +72,8 @@ LinksUtils.parseFiles = function (aParam)
 		iIndex = 0,
 		sStorage = 'personal',
 		sPath = '',
-		aPath = [],
-		sName = '',
+//		aPath = [],
+//		sName = '',
 		sSearch = ''
 	;
 
@@ -91,16 +91,39 @@ LinksUtils.parseFiles = function (aParam)
 			iIndex++;
 		}
 		
-		if (sPath !== '')
-		{
-			aPath = _.without(sPath.split(/(?:\/|\$ZIP\:)/g), '');
-			sName = aPath[aPath.length - 1];
-		}
+//		if (sPath !== '')
+//		{
+//			aPath = _.without(sPath.split(/(?:\/|\$ZIP\:)/g), '');
+//			sName = aPath[aPath.length - 1];
+//		}
 		
 		if (aParam.length > iIndex && IsSearchParam(aParam[iIndex]))
 		{
 			sSearch = Types.pString(aParam[iIndex].substr(sSrchPref.length));
 		}
+	}
+	
+	return LinksUtils.getParsedParams(sStorage, sPath, sSearch);
+//	return {
+//		'Storage': sStorage,
+//		'Path': sPath,
+//		'PathParts': aPath,
+//		'Name': sName,
+//		'Search': sSearch
+//	};
+};
+
+LinksUtils.getParsedParams = function (sStorage, sPath, sSearch)
+{
+	var
+		aPath = [],
+		sName = ''
+	;
+	
+	if (sPath !== '')
+	{
+		aPath = _.without(sPath.split(/(?:\/|\$ZIP\:)/g), '');
+		sName = aPath[aPath.length - 1];
 	}
 	
 	return {
