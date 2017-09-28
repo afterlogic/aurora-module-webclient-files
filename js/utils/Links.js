@@ -72,8 +72,6 @@ LinksUtils.parseFiles = function (aParam)
 		iIndex = 0,
 		sStorage = 'personal',
 		sPath = '',
-//		aPath = [],
-//		sName = '',
 		sSearch = ''
 	;
 
@@ -91,12 +89,6 @@ LinksUtils.parseFiles = function (aParam)
 			iIndex++;
 		}
 		
-//		if (sPath !== '')
-//		{
-//			aPath = _.without(sPath.split(/(?:\/|\$ZIP\:)/g), '');
-//			sName = aPath[aPath.length - 1];
-//		}
-		
 		if (aParam.length > iIndex && IsSearchParam(aParam[iIndex]))
 		{
 			sSearch = Types.pString(aParam[iIndex].substr(sSrchPref.length));
@@ -104,13 +96,6 @@ LinksUtils.parseFiles = function (aParam)
 	}
 	
 	return LinksUtils.getParsedParams(sStorage, sPath, sSearch);
-//	return {
-//		'Storage': sStorage,
-//		'Path': sPath,
-//		'PathParts': aPath,
-//		'Name': sName,
-//		'Search': sSearch
-//	};
 };
 
 LinksUtils.getParsedParams = function (sStorage, sPath, sSearch)
@@ -120,10 +105,14 @@ LinksUtils.getParsedParams = function (sStorage, sPath, sSearch)
 		sName = ''
 	;
 	
-	if (sPath !== '')
+	if (Types.isNonEmptyString(sPath))
 	{
 		aPath = _.without(sPath.split(/(?:\/|\$ZIP\:)/g), '');
 		sName = aPath[aPath.length - 1];
+	}
+	else
+	{
+		sPath = '';
 	}
 	
 	return {
