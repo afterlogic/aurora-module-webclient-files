@@ -792,7 +792,9 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 		oResult = oResponse.Result,
 		oParameters = oRequest.Parameters
 	;
-
+	
+	this.bNotLoading = false;
+	
 	if ((oParameters.Type === this.storageType() || oParameters.Hash === Settings.PublicHash) && oParameters.Path === this.currentPath())
 	{
 		if (oResult)
@@ -1139,7 +1141,10 @@ CFilesView.prototype.showLoading = function ()
  */
 CFilesView.prototype.routeFiles = function (sStorage, sFullPath, sSearch, bNotLoading)
 {
-	var bSame = false;
+	var
+		bSame = false,
+		bPathRequired = false
+	;
 	
 	if (this.bPublic)
 	{
@@ -1167,12 +1172,18 @@ CFilesView.prototype.routeFiles = function (sStorage, sFullPath, sSearch, bNotLo
 			if (bSame)
 			{
 				this.showLoading();
+				bPathRequired = this.currentPath() !== '' && this.pathItems().length === 0;
 				Ajax.send('GetFiles', {
 						'Type': this.storageType(),
 						'Path': this.currentPath(),
-						'Pattern': this.searchPattern()
+						'Pattern': this.searchPattern(),
+						'PathRequired': bPathRequired
 					}, this.onGetFilesResponse, this
 				);
+				if (bPathRequired)
+				{
+					this.showLoading();
+				}
 			}
 		}
 	}
@@ -1221,7 +1232,15 @@ CFilesView.prototype.onUserRoute = function (oParams)
 {
 	var
 		sPath = oParams.Path,
-		aPath = oParams.PathParts.reverse()
+		aPath = oParams.PathParts.reverse(),
+		oFolder = _.find(this.folders(), function (oFld) {
+			return oFld.fullPath() === sPath;
+		}),
+		iPathItemIndex = _.findIndex(this.pathItems(), function (oItem) {
+			return oItem.fullPath() === sPath;
+		}),
+		aNewPathItems = [],
+		bPathRequired = false
 	;
 	
 	this.error(false);
@@ -1230,7 +1249,22 @@ CFilesView.prototype.onUserRoute = function (oParams)
 	this.currentPath(sPath);
 	this.loadedFiles(false);
 	
-	if (oParams.Storage !== 'google' || sPath === '')
+	if (iPathItemIndex !== -1)
+	{
+		_.each(this.pathItems(), function (oItem, iIndex) {
+			if (iIndex <= iPathItemIndex)
+			{
+				aNewPathItems.push(oItem);
+			}
+		});
+		this.pathItems.removeAll();
+		this.pathItems(aNewPathItems);
+	}
+	else if (oFolder)
+	{
+		this.pathItems.push(oFolder);
+	}
+	else if (oParams.Storage !== 'google' || sPath === '')
 	{
 		this.pathItems.removeAll();
 		_.each(aPath, _.bind(function (sPathItem) {
@@ -1238,6 +1272,10 @@ CFilesView.prototype.onUserRoute = function (oParams)
 			this.addPathItems(oParams.Storage, sPath, sPathItem);
 			sPath = sPath.substr(0, iItemPos);
 		}, this));
+	}
+	else
+	{
+		bPathRequired = true;
 	}
 	
 	if (this.bNotLoading && (this.files().length > 0 || this.folders().length > 0))
@@ -1257,7 +1295,8 @@ CFilesView.prototype.onUserRoute = function (oParams)
 	Ajax.send('GetFiles', {
 			'Type': oParams.Storage,
 			'Path': oParams.Path,
-			'Pattern': Types.pString(oParams.Search)
+			'Pattern': Types.pString(oParams.Search),
+			'PathRequired': bPathRequired
 		}, this.onGetFilesResponse, this
 	);
 };
