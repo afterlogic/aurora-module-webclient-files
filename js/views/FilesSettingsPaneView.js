@@ -5,6 +5,7 @@ var
 	ko = require('knockout'),
 	
 	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
+	UrlUtils = require('%PathToCoreWebclientModule%/js/utils/Url.js'),
 	CAbstractSettingsFormView = ModulesManager.run('SettingsWebclient', 'getAbstractSettingsFormViewClass'),
 	
 	Settings = require('modules/%ModuleName%/js/Settings.js')
@@ -18,6 +19,10 @@ function CFilesSettingsPaneView()
 	CAbstractSettingsFormView.call(this, Settings.ServerModuleName);
 
 	this.enableFiles = ko.observable(Settings.enableModule());
+	
+	this.bShowCommonSettings = Settings.bShowCommonSettings;
+	this.bShowFilesApps = Settings.bShowFilesApps;
+	this.appPath = UrlUtils.getAppPath();
 }
 
 _.extendOwn(CFilesSettingsPaneView.prototype, CAbstractSettingsFormView.prototype);

@@ -2,9 +2,8 @@
 	<h2 class="settings_heading" data-bind="i18n: {'key': '%MODULENAME%/HEADING_SETTINGS_TAB'}"></h2>
 </div>
 <div class="panel_center">
-	<div class="fields">
+	<div class="fields" data-bind="visible: bShowCommonSettings">
 		<div class="fieldset">
-			<h2 class="subheading" data-bind="i18n: {'key': '%MODULENAME%/HEADING_FILES'}"></h2>
 			<div class="row"> 
 				<div> 
 					<label class="custom_checkbox" data-bind="css: {'checked': enableFiles}"> 
@@ -23,5 +22,22 @@
 				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE_IN_PROGRESS'}, visible: isSaving()"></span>
 			</span>
 		</div>
+	</div>
+		
+	<div class="fields" data-bind="visible: bShowFilesApps">
+		<div class="fieldset">
+			<h2 data-bind="i18n: {'key': '%MODULENAME%/MOBILE_DAVSYNC_APPS_TITLE'}"></h2>
+			<div class="hint" data-bind="i18n: {'key': '%MODULENAME%/SERVICES_FILES_ALL_APPSYNC_HINT_SPECIFY'}"></div>
+			<div class="fieldgroup">
+				<div class="row">
+					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/SERVICES_FILES_APPSYNC_SERVER'}"></span>
+					<span class="value" data-bind="text: appPath"></span>
+				</div>
+			</div>
+			<div class="hint" data-bind="i18n: {'key': '%MODULENAME%/SERVICES_FILES_APPSYNC_HINT_CREDENTIALS'}"></div>
+			<a href="https://afterlogic.com/download/AuroraFileSync.msi" target="_blank"><img src="/static/styles/images/modules/FilesWebclient/desktop-client.png" style="width: 197px;"></a>
+			<a href="https://itunes.apple.com/app/aurorafiles/id1030108751?mt=8" target="_blank"><img src="/static/styles/images/modules/FilesWebclient/appstore.png" style="width: 197px;"></a>
+			<a href="https://play.google.com/store/apps/details?id=com.afterlogic.aurora.files" target="_blank"><img src="static/styles/images/modules/FilesWebclient/playmarket.png" style="width: 197px;"></a> 
+		</div> 
 	</div>
 </div>

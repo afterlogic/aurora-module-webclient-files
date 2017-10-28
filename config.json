@@ -3,12 +3,20 @@
 		false,
 		"bool"
 	],
+	"ShowCommonSettings": [
+		true,
+		"bool"
+	],
     "ServerUrlRewriteBase": [
 		false,
 		"bool"
 	],
     "ServerUseUrlRewrite": [
 		false,
+		"bool"
+	],
+	"ShowFilesApps": [
+		true,
 		"bool"
 	]
 }
