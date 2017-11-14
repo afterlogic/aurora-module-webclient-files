@@ -32,9 +32,8 @@ module.exports = {
 			this.EnableCorporate = !!oAppDataSection.EnableCorporate;
 			this.UserSpaceLimitMb = Types.pInt(oAppDataSection.UserSpaceLimitMb);
 			this.CustomTabTitle = Types.pString(oAppDataSection.CustomTabTitle);
-			//currently there's no such parameter in settings data because we get settings from Files module, not from the FilesWebclient
-			// this.bShowCommonSettings = !!oAppDataSection.ShowCommonSettings;
-			// this.bShowFilesApps = !!oAppDataSection.ShowFilesApps;
+			this.bShowCommonSettings = !!oAppDataSection.ShowCommonSettings;
+			this.bShowFilesApps = !!oAppDataSection.ShowFilesApps;
 		}
 	},
 	

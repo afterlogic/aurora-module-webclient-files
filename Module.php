@@ -164,4 +164,18 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			}
 		}
 	}
+	
+	public function GetSettings()
+	{
+		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
+		
+		$aModuleSettings = array(
+			'ShowCommonSettings' => $this->getConfig('ShowCommonSettings', true),
+			'ServerUrlRewriteBase' => $this->getConfig('ServerUrlRewriteBase', false),
+			'ServerUseUrlRewrite' => $this->getConfig('ServerUseUrlRewrite', false),
+			'ShowFilesApps' => $this->getConfig('ShowFilesApps', true)
+		);
+		
+		return $aModuleSettings;
+	}
 }
