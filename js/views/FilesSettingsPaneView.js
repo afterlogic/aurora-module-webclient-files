@@ -16,7 +16,7 @@ var
  */
 function CFilesSettingsPaneView()
 {
-	CAbstractSettingsFormView.call(this, Settings.ServerModuleName);
+	CAbstractSettingsFormView.call(this, 'FilesWebclient');
 
 	this.enableFiles = ko.observable(Settings.enableModule());
 	

@@ -170,7 +170,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
 		
 		$aModuleSettings = array(
-			'ShowCommonSettings' => $this->getConfig('ShowCommonSettings', true),
+			'ShowCommonSettings' => $this->getConfig('ShowCommonSettings', false),
 			'ServerUrlRewriteBase' => $this->getConfig('ServerUrlRewriteBase', false),
 			'ServerUseUrlRewrite' => $this->getConfig('ServerUseUrlRewrite', false),
 			'ShowFilesApps' => $this->getConfig('ShowFilesApps', true)
