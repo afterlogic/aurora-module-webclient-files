@@ -14,7 +14,7 @@ var
 /**
  * @constructor
  */
-function CFilesSettingsPaneView()
+function CFilesSettingsFormView()
 {
 	CAbstractSettingsFormView.call(this, 'FilesWebclient');
 
@@ -25,32 +25,32 @@ function CFilesSettingsPaneView()
 	this.appPath = UrlUtils.getAppPath();
 }
 
-_.extendOwn(CFilesSettingsPaneView.prototype, CAbstractSettingsFormView.prototype);
+_.extendOwn(CFilesSettingsFormView.prototype, CAbstractSettingsFormView.prototype);
 
-CFilesSettingsPaneView.prototype.ViewTemplate = '%ModuleName%_FilesSettingsPaneView';
+CFilesSettingsFormView.prototype.ViewTemplate = '%ModuleName%_FilesSettingsFormView';
 
-CFilesSettingsPaneView.prototype.getCurrentValues = function ()
+CFilesSettingsFormView.prototype.getCurrentValues = function ()
 {
 	return [
 		this.enableFiles()
 	];
 };
 
-CFilesSettingsPaneView.prototype.revertGlobalValues = function ()
+CFilesSettingsFormView.prototype.revertGlobalValues = function ()
 {
 	this.enableFiles(Settings.enableModule());
 };
 
-CFilesSettingsPaneView.prototype.getParametersForSave = function ()
+CFilesSettingsFormView.prototype.getParametersForSave = function ()
 {
 	return {
 		'FilesEnable': this.enableFiles() ? '1' : '0'
 	};
 };
 
-CFilesSettingsPaneView.prototype.applySavedValues = function (oParameters)
+CFilesSettingsFormView.prototype.applySavedValues = function (oParameters)
 {
 	Settings.update(oParameters.FilesEnable);
 };
 
-module.exports = new CFilesSettingsPaneView();
+module.exports = new CFilesSettingsFormView();

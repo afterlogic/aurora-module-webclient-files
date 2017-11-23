@@ -67,7 +67,7 @@ module.exports = function (oAppData) {
 					if (Settings.bShowCommonSettings || Settings.bShowFilesApps)
 					{
 						ModulesManager.run('SettingsWebclient', 'registerSettingsTab', [
-							function () { return require('modules/%ModuleName%/js/views/FilesSettingsPaneView.js'); },
+							function () { return require('modules/%ModuleName%/js/views/FilesSettingsFormView.js'); },
 							Settings.HashModuleName,
 							TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
 						]);
