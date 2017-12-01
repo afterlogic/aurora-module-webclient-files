@@ -4,14 +4,11 @@ module.exports = function (oAppData) {
 	require('modules/%ModuleName%/js/enums.js');
 
 	var
-		_ = require('underscore'),
-				
 		App = require('%PathToCoreWebclientModule%/js/App.js'),
 
 		TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 
 		Settings = require('modules/%ModuleName%/js/Settings.js'),
-		oSettings = _.extend({}, oAppData[Settings.ServerModuleName] || {}, oAppData['%ModuleName%'] || {}),
 
 		HeaderItemView = null,
 		
@@ -22,7 +19,7 @@ module.exports = function (oAppData) {
 		oFilesView = null
 	;
 	
-	Settings.init(oSettings);
+	Settings.init(oAppData);
 
 	if (App.isPublic())
 	{

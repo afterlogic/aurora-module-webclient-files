@@ -2,6 +2,7 @@
 
 var
 	ko = require('knockout'),
+	_ = require('underscore'),
 	
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js')
 ;
@@ -10,34 +11,56 @@ module.exports = {
 	ServerModuleName: 'Files',
 	HashModuleName: 'files',
 	
-	enableModule: ko.observable(true),
-	PublicHash: '',
-	PublicFolderName: '',
-	EnableUploadSizeLimit: false,
-	UploadSizeLimitMb: 0,
-	EnableCorporate: false,
-	UserSpaceLimitMb: 0,
 	CustomTabTitle: '',
+	EnableCorporate: false,
+	enableModule: ko.observable(true),
+	EnableUploadSizeLimit: false,
+	PublicFolderName: '',
+	PublicHash: '',
+	UploadSizeLimitMb: 0,
+	UserSpaceLimitMb: 0,
+	
 	bShowCommonSettings: true,
 	bShowFilesApps: true,
 	
-	init: function (oAppDataSection) {
-		if (oAppDataSection)
+	/**
+	 * Initializes settings from AppData object sections.
+	 * 
+	 * @param {Object} oAppData Object contained modules settings.
+	 */
+	init: function (oAppData)
+	{
+		var
+			oAppDataFilesSection = oAppData[this.ServerModuleName],
+			oAppDataFilesWebclientSection = oAppData['%ModuleName%']
+		;
+		
+		if (!_.isEmpty(oAppDataFilesSection))
 		{
-			this.enableModule =  ko.observable(!!oAppDataSection.EnableModule);
-			this.PublicHash = Types.pString(oAppDataSection.PublicHash);
-			this.PublicFolderName = Types.pString(oAppDataSection.PublicFolderName);
-			this.EnableUploadSizeLimit = !!oAppDataSection.EnableUploadSizeLimit;
-			this.UploadSizeLimitMb = Types.pInt(oAppDataSection.UploadSizeLimitMb);
-			this.EnableCorporate = !!oAppDataSection.EnableCorporate;
-			this.UserSpaceLimitMb = Types.pInt(oAppDataSection.UserSpaceLimitMb);
-			this.CustomTabTitle = Types.pString(oAppDataSection.CustomTabTitle);
-			this.bShowCommonSettings = !!oAppDataSection.ShowCommonSettings;
-			this.bShowFilesApps = !!oAppDataSection.ShowFilesApps;
+			this.CustomTabTitle = Types.pString(oAppDataFilesSection.CustomTabTitle, this.CustomTabTitle);
+			this.EnableCorporate = Types.pBool(oAppDataFilesSection.EnableCorporate, this.EnableCorporate);
+			this.enableModule =  ko.observable(Types.pBool(oAppDataFilesSection.EnableModule, this.enableModule()));
+			this.EnableUploadSizeLimit = Types.pBool(oAppDataFilesSection.EnableUploadSizeLimit, this.EnableUploadSizeLimit);
+			this.PublicFolderName = Types.pString(oAppDataFilesSection.PublicFolderName, this.PublicFolderName);
+			this.PublicHash = Types.pString(oAppDataFilesSection.PublicHash, this.PublicHash);
+			this.UploadSizeLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UploadSizeLimitMb, this.UploadSizeLimitMb);
+			this.UserSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UserSpaceLimitMb, this.UserSpaceLimitMb);
+		}
+			
+		if (!_.isEmpty(oAppDataFilesWebclientSection))
+		{
+			this.bShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.bShowCommonSettings);
+			this.bShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.bShowFilesApps);
 		}
 	},
 	
-	update: function (sEnableModule) {
+	/**
+	 * Updates new settings values after saving on server.
+	 * 
+	 * @param {string} sEnableModule
+	 */
+	update: function (sEnableModule)
+	{
 		this.enableModule(sEnableModule === '1');
 	},
 	
@@ -51,9 +74,9 @@ module.exports = {
 	 */
 	updateAdmin: function (bEnableUploadSizeLimit, iUploadSizeLimitMb, bEnableCorporate, iUserSpaceLimitMb)
 	{
+		this.EnableCorporate = bEnableCorporate;
 		this.EnableUploadSizeLimit = bEnableUploadSizeLimit;
 		this.UploadSizeLimitMb = iUploadSizeLimitMb;
-		this.EnableCorporate = bEnableCorporate;
 		this.UserSpaceLimitMb = iUserSpaceLimitMb;
 	}
 };
