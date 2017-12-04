@@ -12,7 +12,6 @@ module.exports = {
 	HashModuleName: 'files',
 	
 	CustomTabTitle: '',
-	EnableCorporate: false,
 	enableModule: ko.observable(true),
 	EnableUploadSizeLimit: false,
 	PublicFolderName: '',
@@ -38,7 +37,6 @@ module.exports = {
 		if (!_.isEmpty(oAppDataFilesSection))
 		{
 			this.CustomTabTitle = Types.pString(oAppDataFilesSection.CustomTabTitle, this.CustomTabTitle);
-			this.EnableCorporate = Types.pBool(oAppDataFilesSection.EnableCorporate, this.EnableCorporate);
 			this.enableModule =  ko.observable(Types.pBool(oAppDataFilesSection.EnableModule, this.enableModule()));
 			this.EnableUploadSizeLimit = Types.pBool(oAppDataFilesSection.EnableUploadSizeLimit, this.EnableUploadSizeLimit);
 			this.PublicFolderName = Types.pString(oAppDataFilesSection.PublicFolderName, this.PublicFolderName);
@@ -69,12 +67,10 @@ module.exports = {
 	 * 
 	 * @param {boolean} bEnableUploadSizeLimit Indicates if upload size limit is enabled.
 	 * @param {number} iUploadSizeLimitMb Value of upload size limit in Mb.
-	 * @param {boolean} bEnableCorporate Indicates if corporate storage is enabled.
 	 * @param {number} iUserSpaceLimitMb Value of user space limit in Mb.
 	 */
-	updateAdmin: function (bEnableUploadSizeLimit, iUploadSizeLimitMb, bEnableCorporate, iUserSpaceLimitMb)
+	updateAdmin: function (bEnableUploadSizeLimit, iUploadSizeLimitMb, iUserSpaceLimitMb)
 	{
-		this.EnableCorporate = bEnableCorporate;
 		this.EnableUploadSizeLimit = bEnableUploadSizeLimit;
 		this.UploadSizeLimitMb = iUploadSizeLimitMb;
 		this.UserSpaceLimitMb = iUserSpaceLimitMb;
