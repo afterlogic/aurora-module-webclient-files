@@ -3,6 +3,10 @@
 		false,
 		"bool"
 	],
+	"EditFileNameWithoutExtention": [
+		false,
+		"bool"
+	],
 	"ShowCommonSettings": [
 		false,
 		"bool"

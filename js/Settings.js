@@ -19,6 +19,7 @@ module.exports = {
 	UploadSizeLimitMb: 0,
 	UserSpaceLimitMb: 0,
 	
+	EditFileNameWithoutExtention: false,
 	bShowCommonSettings: true,
 	bShowFilesApps: true,
 	
@@ -47,6 +48,7 @@ module.exports = {
 			
 		if (!_.isEmpty(oAppDataFilesWebclientSection))
 		{
+			this.EditFileNameWithoutExtention = Types.pBool(oAppDataFilesWebclientSection.EditFileNameWithoutExtention, this.EditFileNameWithoutExtention);
 			this.bShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.bShowCommonSettings);
 			this.bShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.bShowFilesApps);
 		}

@@ -906,20 +906,30 @@ CFilesView.prototype.onDeleteResponse = function (oResponse, oRequest)
 
 CFilesView.prototype.executeRename = function ()
 {
-	var oItem = _.first(this.selector.listCheckedAndSelected());
+	var
+		oItem = _.first(this.selector.listCheckedAndSelected()),
+		bSeparateExtention = Settings.EditFileNameWithoutExtention && oItem.constructor.name === 'CFileModel',
+		sName = bSeparateExtention ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
+		sExtension = bSeparateExtention ? Utils.getFileExtension(oItem.fileName()) : ''
+	;
+	
 	if (!this.bPublic && oItem)
 	{
-		Popups.showPopup(RenamePopup, [oItem.fileName(), _.bind(this.renameItem, this)]);
+		Popups.showPopup(RenamePopup, [sName, _.bind(this.renameItem, this, sExtension)]);
 	}
 };
 
 /**
- * @param {string} sName
+ * @param {string} sExtention
+ * @param {string} sNamePart
  * @returns {string}
  */
-CFilesView.prototype.renameItem = function (sName)
+CFilesView.prototype.renameItem = function (sExtention, sNamePart)
 {
-	var oItem = _.first(this.selector.listCheckedAndSelected());
+	var
+		sName = (sExtention === '') ? sNamePart : sNamePart + '.' + sExtention,
+		oItem = _.first(this.selector.listCheckedAndSelected())
+	;
 	
 	if (!Utils.validateFileOrFolderName(sName))
 	{
