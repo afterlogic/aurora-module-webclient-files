@@ -3,8 +3,6 @@
 var
 	ko = require('knockout'),
 	
-	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
-	
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	UserSettings = require('%PathToCoreWebclientModule%/js/Settings.js')
 ;
@@ -15,9 +13,7 @@ var
 function CMobileSyncSettingsView()
 {
 	this.davServer = ko.observable('');
-	this.credentialsHintText = ko.computed(function () {
-		return TextUtils.i18n('COREWEBCLIENT/INFO_MOBILE_CREDENTIALS', {'LOGIN': App.userPublicId()});
-	}, this);
+	this.credentialsHintText = App.mobileCredentialsHintText;
 	this.bDemo = UserSettings.IsDemo;
 }
 
