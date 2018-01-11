@@ -108,7 +108,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 						$sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
 					}
 
-					$sResult = \file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/FilesPub.html');
+					$sResult = \file_get_contents($this->GetPath().'/templates/FilesPub.html');
 					if (\is_string($sResult))
 					{
 						$sResult = \strtr($sResult, array(
@@ -126,7 +126,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				}
 				else 
 				{
-					$sResult = \file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/NotFound.html');
+					$sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
 					$sResult = \strtr($sResult, array(
 						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
 					));
@@ -154,7 +154,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				}
 				else 
 				{
-					$sResult = \file_get_contents($this->oFilesModuleDecorator->GetPath().'/templates/NotFound.html');
+					$sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
 					$sResult = \strtr($sResult, array(
 						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
 					));
