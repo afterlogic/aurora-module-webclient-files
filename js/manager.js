@@ -58,62 +58,73 @@ module.exports = function (oAppData) {
 		}
 		else if (bNormalUser)
 		{
-			return {
-				enableModule: Settings.enableModule,
-				start: function (ModulesManager) {
-					if (Settings.bShowCommonSettings || Settings.bShowFilesApps)
-					{
-						ModulesManager.run('SettingsWebclient', 'registerSettingsTab', [
-							function () { return require('modules/%ModuleName%/js/views/FilesSettingsFormView.js'); },
-							Settings.HashModuleName,
-							TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
-						]);
+			if (App.isNewTab())
+			{
+				return {
+					getSelectFilesPopup: function () {
+						return require('modules/%ModuleName%/js/popups/SelectFilesPopup.js');
 					}
-				},
-				getScreens: function () {
-					var oScreens = {};
-					oScreens[Settings.HashModuleName] = function () {
-						var CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js');
-						oFilesView = new CFilesView();
-						oFilesView.registerToolbarButtons(aToolbarButtons);
-						aToolbarButtons = [];
-						return oFilesView;
-					};
-					return oScreens;
-				},
-				getHeaderItem: function () {
-					if (HeaderItemView === null)
-					{
-						var
-							CHeaderItemView = require('%PathToCoreWebclientModule%/js/views/CHeaderItemView.js'),
-							sTabTitle = Settings.CustomTabTitle !== '' ? Settings.CustomTabTitle : TextUtils.i18n('%MODULENAME%/ACTION_SHOW_FILES')
-						;
+				};
+			}
+			else
+			{
+				return {
+					enableModule: Settings.enableModule,
+					start: function (ModulesManager) {
+						if (Settings.bShowCommonSettings || Settings.bShowFilesApps)
+						{
+							ModulesManager.run('SettingsWebclient', 'registerSettingsTab', [
+								function () { return require('modules/%ModuleName%/js/views/FilesSettingsFormView.js'); },
+								Settings.HashModuleName,
+								TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
+							]);
+						}
+					},
+					getScreens: function () {
+						var oScreens = {};
+						oScreens[Settings.HashModuleName] = function () {
+							var CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js');
+							oFilesView = new CFilesView();
+							oFilesView.registerToolbarButtons(aToolbarButtons);
+							aToolbarButtons = [];
+							return oFilesView;
+						};
+						return oScreens;
+					},
+					getHeaderItem: function () {
+						if (HeaderItemView === null)
+						{
+							var
+								CHeaderItemView = require('%PathToCoreWebclientModule%/js/views/CHeaderItemView.js'),
+								sTabTitle = Settings.CustomTabTitle !== '' ? Settings.CustomTabTitle : TextUtils.i18n('%MODULENAME%/ACTION_SHOW_FILES')
+							;
 
-						HeaderItemView = new CHeaderItemView(sTabTitle);
-					}
+							HeaderItemView = new CHeaderItemView(sTabTitle);
+						}
 
-					return {
-						item: HeaderItemView,
-						name: Settings.HashModuleName
-					};
-				},
-				getSelectFilesPopup: function () {
-					return require('modules/%ModuleName%/js/popups/SelectFilesPopup.js');
-				},
-				getMobileSyncSettingsView: function () {
-					return require('modules/%ModuleName%/js/views/MobileSyncSettingsView.js');
-				},
-				registerToolbarButtons: function (oToolbarButtons) {
-					if (oFilesView)
-					{
-						oFilesView.registerToolbarButtons([oToolbarButtons]);
+						return {
+							item: HeaderItemView,
+							name: Settings.HashModuleName
+						};
+					},
+					getSelectFilesPopup: function () {
+						return require('modules/%ModuleName%/js/popups/SelectFilesPopup.js');
+					},
+					getMobileSyncSettingsView: function () {
+						return require('modules/%ModuleName%/js/views/MobileSyncSettingsView.js');
+					},
+					registerToolbarButtons: function (oToolbarButtons) {
+						if (oFilesView)
+						{
+							oFilesView.registerToolbarButtons([oToolbarButtons]);
+						}
+						else
+						{
+							aToolbarButtons.push(oToolbarButtons);
+						}
 					}
-					else
-					{
-						aToolbarButtons.push(oToolbarButtons);
-					}
-				}
-			};
+				};
+			}
 		}
 	}
 	

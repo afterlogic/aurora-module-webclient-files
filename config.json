@@ -22,5 +22,9 @@
 	"ShowFilesApps": [
 		true,
 		"bool"
+	],
+    "AvailableFor": [
+		["MailWebclient"],
+		"array"
 	]
 }
