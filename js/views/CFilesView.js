@@ -137,6 +137,9 @@ function CFilesView(bPopup)
 		;
 		return (0 < aItems.length && bAllow);
 	});
+	this.selectedCount = ko.computed(function () {
+		return this.selector.listCheckedAndSelected().length;
+	}, this);
 	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
 		var oFile = this.getFileIfOnlyOneSelected();
 		return !!oFile && oFile.hasAction('download');

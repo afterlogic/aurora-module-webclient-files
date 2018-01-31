@@ -28,6 +28,7 @@
 	</span>
 	<span class="item delete" data-bind="command: deleteCommand, customTooltip: 'COREWEBCLIENT/ACTION_DELETE'">
 		<span class="icon"></span>
+		<span class="hint" data-bind="text: selectedCount, visible: selectedCount() > 0"></span>
 		<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
 	</span>
 	<!-- ko foreach: addToolbarButtons -->
