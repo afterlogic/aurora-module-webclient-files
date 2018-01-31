@@ -1032,11 +1032,34 @@ CFilesView.prototype.onRenameResponse = function (oResponse, oRequest)
 
 CFilesView.prototype.executeDelete = function ()
 {
-	var aChecked = this.selector.listCheckedAndSelected();
+	var
+		aChecked = this.selector.listCheckedAndSelected() || [],
+		iCheckedCount = aChecked.length,
+		bHasFolder = !!_.find(aChecked, function (oItem) {
+			return oItem instanceof CFolderModel;
+		}),
+		bHasFile = !!_.find(aChecked, function (oItem) {
+			return !(oItem instanceof CFolderModel);
+		}),
+		sConfirm = ''
+	;
 	
-	if (!this.bPublic && aChecked && aChecked.length > 0)
+	if (bHasFolder && bHasFile)
 	{
-		Popups.showPopup(ConfirmPopup, [TextUtils.i18n('COREWEBCLIENT/CONFIRM_ARE_YOU_SURE'), _.bind(this.deleteItems, this, aChecked)]);
+		sConfirm = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_ITEMS_PLURAL', {'COUNT': iCheckedCount}, null, iCheckedCount);
+	}
+	else if (bHasFolder)
+	{
+		sConfirm = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FOLDERS_PLURAL', {'COUNT': iCheckedCount}, null, iCheckedCount);
+	}
+	else
+	{
+		sConfirm = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FILES_PLURAL', {'COUNT': iCheckedCount}, null, iCheckedCount);
+	}
+	
+	if (!this.bPublic && iCheckedCount > 0)
+	{
+		Popups.showPopup(ConfirmPopup, [sConfirm, _.bind(this.deleteItems, this, aChecked), '', TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE')]);
 	}
 };
 
