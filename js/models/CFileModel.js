@@ -243,7 +243,7 @@ CFileModel.prepareUploadFileData = function (oFileData, sPath, sStorageType, fGe
 	return {
 		Name: sFileName,
 		LastModified: moment().unix(),
-		Owner: App.userPublicId(),
+		Owner: App.getUserPublicId(),
 		Path: sPath,
 		Type: sStorageType,
 		ContentType: oFileData.Type,
