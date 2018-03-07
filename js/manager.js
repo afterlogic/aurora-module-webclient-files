@@ -71,7 +71,7 @@ module.exports = function (oAppData) {
 				return {
 					enableModule: Settings.enableModule,
 					start: function (ModulesManager) {
-						if (Settings.bShowCommonSettings || Settings.bShowFilesApps)
+						if (Settings.ShowCommonSettings || Settings.ShowFilesApps)
 						{
 							ModulesManager.run('SettingsWebclient', 'registerSettingsTab', [
 								function () { return require('modules/%ModuleName%/js/views/FilesSettingsFormView.js'); },

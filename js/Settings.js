@@ -20,8 +20,8 @@ module.exports = {
 	UserSpaceLimitMb: 0,
 	
 	EditFileNameWithoutExtention: false,
-	bShowCommonSettings: true,
-	bShowFilesApps: true,
+	ShowCommonSettings: true,
+	ShowFilesApps: true,
 	
 	/**
 	 * Initializes settings from AppData object sections.
@@ -49,8 +49,8 @@ module.exports = {
 		if (!_.isEmpty(oAppDataFilesWebclientSection))
 		{
 			this.EditFileNameWithoutExtention = Types.pBool(oAppDataFilesWebclientSection.EditFileNameWithoutExtention, this.EditFileNameWithoutExtention);
-			this.bShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.bShowCommonSettings);
-			this.bShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.bShowFilesApps);
+			this.ShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.ShowCommonSettings);
+			this.ShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.ShowFilesApps);
 		}
 	},
 	
