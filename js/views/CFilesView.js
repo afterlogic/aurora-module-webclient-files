@@ -264,12 +264,13 @@ function CFilesView(bPopup)
 		}
 	}, this));
 	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
-	var
-		self = this
-	;
-	ConfirmPopup.onClose = function() {
-		self.selector.useKeyboardKeys(true);
-	};
+	
+	ConfirmPopup.opened.subscribe(_.bind(function() {
+		if (this.shown())
+		{
+			this.selector.useKeyboardKeys(true);
+		}
+	}, this));
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
