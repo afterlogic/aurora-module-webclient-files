@@ -264,6 +264,12 @@ function CFilesView(bPopup)
 		}
 	}, this));
 	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
+	var
+		self = this
+	;
+	ConfirmPopup.onClose = function() {
+		self.selector.useKeyboardKeys(true);
+	};
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
@@ -1062,6 +1068,7 @@ CFilesView.prototype.executeDelete = function ()
 	
 	if (!this.bPublic && iCheckedCount > 0)
 	{
+		this.selector.useKeyboardKeys(false);
 		Popups.showPopup(ConfirmPopup, [sConfirm, _.bind(this.deleteItems, this, aChecked), '', TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE')]);
 	}
 };
