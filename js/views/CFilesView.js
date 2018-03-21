@@ -467,6 +467,7 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 				if (oResult && oResult.ErrorCode === Enums.Errors.CanNotUploadFileQuota)
 				{
 					Popups.showPopup(AlertPopup, [TextUtils.i18n('COREWEBCLIENT/ERROR_CANT_UPLOAD_FILE_QUOTA')]);
+					bRequestFiles = true;
 				}
 				else if (oResult && oResult.ErrorCode === Enums.Errors.FileAlreadyExists)
 				{
