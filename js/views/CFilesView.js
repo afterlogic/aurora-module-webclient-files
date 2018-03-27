@@ -857,7 +857,6 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			this.newSearchPattern(oParameters.Pattern || '');
 			this.searchPattern(oParameters.Pattern || '');
 
-			this.loading(false);
 			this.loadedFiles(true);
 			clearTimeout(this.timerId);
 
@@ -872,12 +871,13 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 					this.pathItems.push(oFolder);
 				}, this));
 			}
+			this.loading(false);
 		}
 		else
 		{
-			this.loading(false);
 			if (oResponse.ErrorCode !== Enums.Errors.NotDisplayedError)
 			{
+				this.loading(false);
 				this.error(true);
 			}
 		}
