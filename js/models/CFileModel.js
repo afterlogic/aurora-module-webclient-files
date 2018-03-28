@@ -51,6 +51,8 @@ function CFileModel(oData, bPopup)
 	
 	CAbstractFileModel.call(this);
 	
+	this.content = ko.observable('');
+	
 	this.thumbUrlInQueueSubscribtion.dispose();
 	this.thumbUrlInQueue.subscribe(function () {
 		if (this.sThumbnailExternalLink !== '')
@@ -187,6 +189,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.allowActions(!bPopup && this.fullPath() !== '');
 		
 	this.fileName(Types.pString(oData.Name));
+	this.content(Types.pString(oData.Content));
 	this.id(Types.pString(oData.Id));
 	this.shared(!!oData.Shared);
 
