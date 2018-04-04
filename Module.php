@@ -144,7 +144,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				if (isset($aHash['__hash__']) && ((isset($aHash['IsFolder']) && (bool) $aHash['IsFolder'] === false) || !isset($aHash['IsFolder'])))
 				{
 					echo $this->oFilesModuleDecorator->getRawFile(
-						\Aurora\System\Api::getUserUUIDById($aHash['UserId']), 
+						null, 
 						$aHash['Type'], 
 						$aHash['Path'], 
 						$aHash['Name'], 
