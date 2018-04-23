@@ -22,7 +22,6 @@ function CFilesAdminSettingsView()
 	/* Editable fields */
 	this.enableUploadSizeLimit = ko.observable(Settings.EnableUploadSizeLimit);
 	this.uploadSizeLimitMb = ko.observable(Settings.UploadSizeLimitMb);
-	this.userSpaceLimitMb = ko.observable(Settings.UserSpaceLimitMb);
 	/*-- Editable fields */
 }
 
@@ -34,8 +33,7 @@ CFilesAdminSettingsView.prototype.getCurrentValues = function()
 {
 	return [
 		this.enableUploadSizeLimit(),
-		this.uploadSizeLimitMb(),
-		this.userSpaceLimitMb()
+		this.uploadSizeLimitMb()
 	];
 };
 
@@ -43,15 +41,13 @@ CFilesAdminSettingsView.prototype.revertGlobalValues = function()
 {
 	this.enableUploadSizeLimit(Settings.EnableUploadSizeLimit);
 	this.uploadSizeLimitMb(Settings.UploadSizeLimitMb);
-	this.userSpaceLimitMb(Settings.UserSpaceLimitMb);
 };
 
 CFilesAdminSettingsView.prototype.getParametersForSave = function ()
 {
 	return {
 		'EnableUploadSizeLimit': this.enableUploadSizeLimit(),
-		'UploadSizeLimitMb': Types.pInt(this.uploadSizeLimitMb()),
-		'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb())
+		'UploadSizeLimitMb': Types.pInt(this.uploadSizeLimitMb())
 	};
 };
 
@@ -62,7 +58,7 @@ CFilesAdminSettingsView.prototype.getParametersForSave = function ()
  */
 CFilesAdminSettingsView.prototype.applySavedValues = function (oParameters)
 {
-	Settings.updateAdmin(oParameters.EnableUploadSizeLimit, oParameters.UploadSizeLimitMb, oParameters.UserSpaceLimitMb);
+	Settings.updateAdmin(oParameters.EnableUploadSizeLimit, oParameters.UploadSizeLimitMb);
 };
 
 /**

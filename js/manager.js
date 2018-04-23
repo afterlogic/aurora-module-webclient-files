@@ -53,6 +53,16 @@ module.exports = function (oAppData) {
 						Settings.HashModuleName,
 						TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
 					]);
+					ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTabSection', [
+							function () { return require('modules/%ModuleName%/js/views/FilesPersonalAdminSettingsView.js'); },
+							'files'
+						]
+					);
+					ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTabSection', [
+							function () { return require('modules/%ModuleName%/js/views/FilesCorporateAdminSettingsView.js'); },
+							'files'
+						]
+					);
 				}
 			};
 		}

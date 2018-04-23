@@ -9,6 +9,8 @@ var
 
 module.exports = {
 	ServerModuleName: 'Files',
+	CorporateServerModuleName: 'CorporateFiles',
+	PersonalServerModuleName: 'PersonalFiles',
 	HashModuleName: 'files',
 	
 	CustomTabTitle: '',
@@ -17,7 +19,8 @@ module.exports = {
 	PublicFolderName: '',
 	PublicHash: '',
 	UploadSizeLimitMb: 0,
-	UserSpaceLimitMb: 0,
+	PersonalSpaceLimitMb: 0,
+	CorporateSpaceLimitMb: 0,
 	
 	EditFileNameWithoutExtention: false,
 	ShowCommonSettings: true,
@@ -32,6 +35,8 @@ module.exports = {
 	{
 		var
 			oAppDataFilesSection = oAppData[this.ServerModuleName],
+			oAppDataPersonalFilesSection = oAppData['PersonalFiles'],
+			oAppDataCorporateFilesSection = oAppData['CorporateFiles'],
 			oAppDataFilesWebclientSection = oAppData['%ModuleName%']
 		;
 		
@@ -43,7 +48,16 @@ module.exports = {
 			this.PublicFolderName = Types.pString(oAppDataFilesSection.PublicFolderName, this.PublicFolderName);
 			this.PublicHash = Types.pString(oAppDataFilesSection.PublicHash, this.PublicHash);
 			this.UploadSizeLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UploadSizeLimitMb, this.UploadSizeLimitMb);
-			this.UserSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UserSpaceLimitMb, this.UserSpaceLimitMb);
+		}
+		
+		if (!_.isEmpty(oAppDataPersonalFilesSection))
+		{
+			this.PersonalSpaceLimitMb = Types.pNonNegativeInt(oAppDataPersonalFilesSection.UserSpaceLimitMb, this.PersonalSpaceLimitMb);
+		}
+		
+		if (!_.isEmpty(oAppDataCorporateFilesSection))
+		{
+			this.CorporateSpaceLimitMb = Types.pNonNegativeInt(oAppDataCorporateFilesSection.SpaceLimitMb, this.CorporateSpaceLimitMb);
 		}
 			
 		if (!_.isEmpty(oAppDataFilesWebclientSection))
@@ -69,12 +83,20 @@ module.exports = {
 	 * 
 	 * @param {boolean} bEnableUploadSizeLimit Indicates if upload size limit is enabled.
 	 * @param {number} iUploadSizeLimitMb Value of upload size limit in Mb.
-	 * @param {number} iUserSpaceLimitMb Value of user space limit in Mb.
 	 */
-	updateAdmin: function (bEnableUploadSizeLimit, iUploadSizeLimitMb, iUserSpaceLimitMb)
+	updateAdmin: function (bEnableUploadSizeLimit, iUploadSizeLimitMb)
 	{
 		this.EnableUploadSizeLimit = bEnableUploadSizeLimit;
 		this.UploadSizeLimitMb = iUploadSizeLimitMb;
-		this.UserSpaceLimitMb = iUserSpaceLimitMb;
+	},
+	
+	updateAdminPersonal: function (iUserSpaceLimitMb)
+	{
+		this.PersonalSpaceLimitMb = iUserSpaceLimitMb;
+	},
+	
+	updateAdminCorporate: function (iSpaceLimitMb)
+	{
+		this.CorporateSpaceLimitMb = iSpaceLimitMb;
 	}
 };
