@@ -25,6 +25,9 @@ module.exports = {
 	EditFileNameWithoutExtention: false,
 	ShowCommonSettings: true,
 	ShowFilesApps: true,
+
+	ShowPersonalFilesAdminSection: false, 
+	ShowCorporateFilesAdminSection: false, 
 	
 	/**
 	 * Initializes settings from AppData object sections.
@@ -35,8 +38,8 @@ module.exports = {
 	{
 		var
 			oAppDataFilesSection = oAppData[this.ServerModuleName],
-			oAppDataPersonalFilesSection = oAppData['PersonalFiles'],
-			oAppDataCorporateFilesSection = oAppData['CorporateFiles'],
+			oAppDataPersonalFilesSection = oAppData[this.PersonalServerModuleName],
+			oAppDataCorporateFilesSection = oAppData[this.CorporateServerModuleName],
 			oAppDataFilesWebclientSection = oAppData['%ModuleName%']
 		;
 		
@@ -52,11 +55,13 @@ module.exports = {
 		
 		if (!_.isEmpty(oAppDataPersonalFilesSection))
 		{
+			this.ShowPersonalFilesAdminSection = true;
 			this.PersonalSpaceLimitMb = Types.pNonNegativeInt(oAppDataPersonalFilesSection.UserSpaceLimitMb, this.PersonalSpaceLimitMb);
 		}
 		
 		if (!_.isEmpty(oAppDataCorporateFilesSection))
 		{
+			this.ShowCorporateFilesAdminSection = true; 
 			this.CorporateSpaceLimitMb = Types.pNonNegativeInt(oAppDataCorporateFilesSection.SpaceLimitMb, this.CorporateSpaceLimitMb);
 		}
 			

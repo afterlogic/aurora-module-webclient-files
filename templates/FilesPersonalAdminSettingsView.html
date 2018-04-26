@@ -1,28 +1,26 @@
-<div class="middle_bar">
-	<div class="panel_top">
-		<h2 class="settings_heading" data-bind="i18n: {'key': '%MODULENAME%/HEADING_SETTINGS_TAB_PERSONAL'}"></h2>
-	</div>
-	<div class="panel_center">
-		<div class="fields">
-			<div class="fieldset">
-				<div class="row">
-					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
-					<span class="value">
-						<input class="input" type="text" data-bind="value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 
-							onEnter: save" style="width: 50px; margin-right: 5px;">
-						<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
-					</span>
-				</div>
-			</div>		
-
-			<div class="buttons">
-				<span class="button" data-bind="click: save, visible: !isSaving()">
-					<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE'}"></span>
-				</span>
-				<span class="button" data-bind="visible: isSaving()">
-					<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE_IN_PROGRESS'}"></span>
+<div class="panel_top">
+	<h2 class="settings_heading" data-bind="i18n: {'key': '%MODULENAME%/HEADING_SETTINGS_TAB_PERSONAL'}"></h2>
+</div>
+<div class="panel_center">
+	<div class="fields">
+		<div class="fieldset">
+			<div class="row">
+				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
+				<span class="value">
+					<input class="input" type="text" data-bind="value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 
+						onEnter: save" style="width: 50px; margin-right: 5px;">
+					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>
+		</div>		
+
+		<div class="buttons">
+			<span class="button" data-bind="click: save, visible: !isSaving()">
+				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE'}"></span>
+			</span>
+			<span class="button" data-bind="visible: isSaving()">
+				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE_IN_PROGRESS'}"></span>
+			</span>
 		</div>
 	</div>
 </div>
