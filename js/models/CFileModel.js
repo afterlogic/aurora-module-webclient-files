@@ -196,7 +196,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.size(Types.pInt(oData.Size));
 	this.hash(Types.pString(oData.Hash));
 	
-	this.thumbUrlInQueue(Types.pString(oData.ThumbnailUrl));
+	this.thumbUrlInQueue(Types.pString(oData.ThumbnailUrl) !== '' ? Types.pString(oData.ThumbnailUrl) + '/' + Math.random() : '');
 	
 	this.mimeType(Types.pString(oData.ContentType));
 
