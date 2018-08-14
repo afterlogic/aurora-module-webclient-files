@@ -1511,11 +1511,11 @@ CFilesView.prototype.getUploadingFiles = function ()
  */
 CFilesView.prototype.onCancelUpload = function (sFileUid)
 {
+	this.deleteUploadFileByUid(sFileUid);
 	if (this.oJua)
 	{
 		this.oJua.cancel(sFileUid);
 	}
-	this.deleteUploadFileByUid(sFileUid);
 };
 
 /**
@@ -1627,18 +1627,17 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 		 * @param {String} sFileName
 		 */
 		fOnUploadCancelCallback = _.bind(function (sFileUploadUid, sFileName) {
-			var aItems = [];
-			aItems.push({
+			var aItems = [{
 				'Path': this.currentPath(),  
 				'Name': sFileName
-			});
+			}];
 			Ajax.send('Delete', {
 					'Type': this.storageType(),
 					'Path': this.currentPath(),
 					'Items': aItems
 				}
 			);
-			this.deleteUploadFileByUid(sFileUploadUid);
+			this.onCancelUpload(sFileUploadUid);
 		}, this)
 	;
 	if (oFile.downloading())
@@ -1647,7 +1646,11 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 	}
 	else if (!oFile.uploaded() && sFileUploadUid)
 	{
-		App.broadcastEvent('CFilesView::FileUploadCancel', {sFileUploadUid: sFileUploadUid, fOnUploadCancelCallback: fOnUploadCancelCallback});	
+		var bEventCaught = App.broadcastEvent('CFilesView::FileUploadCancel', {sFileUploadUid: sFileUploadUid, sFileUploadName: oFile.fileName(), fOnUploadCancelCallback: fOnUploadCancelCallback});	
+		if (!bEventCaught)
+		{
+			fOnUploadCancelCallback(sFileUploadUid, oFile.fileName());
+		}
 	}
 };
 
