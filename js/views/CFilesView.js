@@ -486,7 +486,10 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 			}
 			else
 			{
-				this.files.push(oFile);
+				if (oFile.path() === this.currentPath() && oFile.storageType() === this.storageType())
+				{
+					this.files.push(oFile);
+				}
 				if (this.uploadingFiles().length === 0)
 				{
 					Screens.showReport(TextUtils.i18n('COREWEBCLIENT/REPORT_UPLOAD_COMPLETE'));

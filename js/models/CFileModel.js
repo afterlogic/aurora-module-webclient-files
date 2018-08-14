@@ -248,6 +248,7 @@ CFileModel.prepareUploadFileData = function (oFileData, sPath, sStorageType, fGe
 		LastModified: moment().unix(),
 		Owner: App.getUserPublicId(),
 		Path: sPath,
+		FullPath: sPath + '/' + sFileName,
 		Type: sStorageType,
 		ContentType: oFileData.Type,
 		Size: oFileData.Size
