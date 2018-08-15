@@ -119,43 +119,50 @@ function CFilesView(bPopup)
 			return oItem instanceof CFileModel;
 		});
 	}, this);
+	this.selectedCount = ko.computed(function () {
+		return this.selector.listCheckedAndSelected().length;
+	}, this);
 	
 	this.searchPattern = ko.observable('');
 	this.newSearchPattern = ko.observable('');
 	this.isSearchFocused = ko.observable(false);
 
+	this.checkedReadyForOperations = ko.computed(function () {
+		var  aItems = this.selector.listCheckedAndSelected() || [];
+		return aItems.every(function (oItem)  {
+			return !(oItem.uploaded !== undefined && oItem.uploaded() === false || oItem.downloading !== undefined && oItem.downloading() === true);
+		});
+	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, function () {
-		var aItems = this.selector.listCheckedAndSelected();
-		return (1 === aItems.length);
+		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1;
 	});
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
-		var 
-			aItems = this.selector.listCheckedAndSelected(),
-			bAllow = aItems.every(function (oItem)  {
-				return !(oItem.uploaded !== undefined && oItem.uploaded() === false || oItem.downloading !== undefined && oItem.downloading() === true);
-			})
-		;
-		return (0 < aItems.length && bAllow);
+		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0;
 	});
-	this.selectedCount = ko.computed(function () {
-		return this.selector.listCheckedAndSelected().length;
-	}, this);
 	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
-		var oFile = this.getFileIfOnlyOneSelected();
-		return !!oFile && oFile.hasAction('download');
+		if (this.checkedReadyForOperations())
+		{
+			var oFile = this.getFileIfOnlyOneSelected();
+			return !!oFile && oFile.hasAction('download');
+		}
+		return false;
 	});
 	this.shareCommand = Utils.createCommand(this, this.executeShare, function () {
 		var aItems = this.selector.listCheckedAndSelected();
-		return (1 === aItems.length && (!aItems[0].bIsLink));
+		return this.checkedReadyForOperations() && 1 === aItems.length && (!aItems[0].bIsLink);
 	});
 	this.sendCommand = Utils.createCommand(this, this.executeSend, function () {
-		var
-			aItems = this.selector.listCheckedAndSelected(),
-			aFileItems = _.filter(aItems, function (oItem) {
-				return oItem instanceof CFileModel;
-			}, this)
-		;
-		return (aFileItems.length > 0);
+		if (this.checkedReadyForOperations())
+		{
+			var
+				aItems = this.selector.listCheckedAndSelected(),
+				aFileItems = _.filter(aItems, function (oItem) {
+					return oItem instanceof CFileModel;
+				}, this)
+			;
+			return (aFileItems.length > 0);
+		}
+		return false;
 	});
 	
 	this.uploaderButton = ko.observable(null);
@@ -923,8 +930,8 @@ CFilesView.prototype.executeRename = function ()
 	var
 		oItem = _.first(this.selector.listCheckedAndSelected()),
 		bSeparateExtention = Settings.EditFileNameWithoutExtention && oItem.constructor.name === 'CFileModel',
-		sName = bSeparateExtention ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
-		sExtension = bSeparateExtention ? Utils.getFileExtension(oItem.fileName()) : ''
+			sName = bSeparateExtention ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
+			sExtension = bSeparateExtention ? Utils.getFileExtension(oItem.fileName()) : ''
 	;
 	
 	if (!this.bPublic && oItem)
@@ -955,7 +962,7 @@ CFilesView.prototype.renameItem = function (sExtention, sNamePart)
 		Ajax.send('Rename', {
 				'Type': oItem.storageType(),
 				'Path': oItem.path(),
-				'Name': oItem.id(),
+				'Name': oItem.id() || oItem.fileName(),
 				'NewName': sName,
 				'IsLink': oItem.bIsLink ? 1 : 0
 			}, this.onRenameResponse, this
@@ -1042,7 +1049,6 @@ CFilesView.prototype.onRenameResponse = function (oResponse, oRequest)
 	
 	this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true);
 };
-
 
 CFilesView.prototype.executeDelete = function ()
 {
