@@ -1116,12 +1116,17 @@ CFilesView.prototype.onHide = function ()
 
 CFilesView.prototype.getQuota = function ()
 {
-	Ajax.send('GetQuota', {}, function (oResponse) {
+	Ajax.send('GetQuota',
+		{
+			'Type': this.storageType()
+		},
+		function (oResponse) {
 			if (oResponse.Result)
 			{
 				this.parseQuota(oResponse.Result);
 			}
-		}, this
+		},
+		this
 	);
 };
 
