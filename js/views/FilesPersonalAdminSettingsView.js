@@ -22,6 +22,7 @@ function CFilesPersonalAdminSettingsView()
 	/* Editable fields */
 	this.userSpaceLimitMb = ko.observable(Settings.PersonalSpaceLimitMb);
 	/*-- Editable fields */
+	this.isVisible = ko.observable(true);
 }
 
 _.extendOwn(CFilesPersonalAdminSettingsView.prototype, CAbstractSettingsFormView.prototype);
@@ -67,6 +68,11 @@ CFilesPersonalAdminSettingsView.prototype.applySavedValues = function (oParamete
 CFilesPersonalAdminSettingsView.prototype.setAccessLevel = function (sEntityType, iEntityId)
 {
 	this.visible(sEntityType === '');
+};
+
+CFilesPersonalAdminSettingsView.prototype.hide = function ()
+{
+	this.isVisible(false);
 };
 
 module.exports = new CFilesPersonalAdminSettingsView();

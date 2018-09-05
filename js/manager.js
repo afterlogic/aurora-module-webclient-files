@@ -16,7 +16,8 @@ module.exports = function (oAppData) {
 		bNormalUser = App.getUserRole() === Enums.UserRole.NormalUser,
 		
 		aToolbarButtons = [],
-		oFilesView = null
+		oFilesView = null,
+		oPersonalFilesAdminSectionView = null
 	;
 	
 	Settings.init(oAppData);
@@ -56,7 +57,13 @@ module.exports = function (oAppData) {
 					if (Settings.ShowPersonalFilesAdminSection)
 					{
 						ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTabSection', [
-								function () { return require('modules/%ModuleName%/js/views/FilesPersonalAdminSettingsView.js'); },
+								function () {
+									if (!oPersonalFilesAdminSectionView)
+									{
+										oPersonalFilesAdminSectionView = require('modules/%ModuleName%/js/views/FilesPersonalAdminSettingsView.js');
+									}
+									return oPersonalFilesAdminSectionView;
+								},
 								'files'
 							]
 						);
@@ -68,6 +75,16 @@ module.exports = function (oAppData) {
 								'files'
 							]
 						);
+					}
+				},
+				hidePersonalFilesAdminSection: function() {
+					if (Settings.ShowPersonalFilesAdminSection)
+					{
+						if (!oPersonalFilesAdminSectionView)
+						{
+							oPersonalFilesAdminSectionView = require('modules/%ModuleName%/js/views/FilesPersonalAdminSettingsView.js');
+						}
+						oPersonalFilesAdminSectionView.hide();
 					}
 				}
 			};
