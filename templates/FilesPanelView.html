@@ -17,7 +17,7 @@
 	&raquo; <b data-bind="i18n: {'key': '%MODULENAME%/LABEL_SEARCH_RESULTS'}"></b> (<a class="text" data-bind="i18n: {'key': '%MODULENAME%/LABEL_SEARCH_CLEAR'}, click: clearSearch"></a>)
 	<!-- /ko -->
 </div>
-<div class="panel_center unselectable" style="display: flex;" data-bind="splitterFlex: {name: 'files_list1', sizes: [50, 50]}, css: {dragover: dragover()}">
+<div class="panel_center unselectable" style="display: flex; overflow: hidden;" data-bind="splitterFlex: {name: 'files_list1', sizes: [50, 50]}, css: {dragover: dragover()}">
 	<div id="files_center_panel" style="height: 100%; width: 100%; flex-grow: 1;" data-bind="customScrollbar: {x: false}">
 		<div class="uploader_mask" data-bind="initDom: uploaderArea, css: {'active': bDragActiveComp}">
 			<div class="inner"></div>
