@@ -1088,11 +1088,7 @@ CFilesView.prototype.onShow = function ()
 {
 	this.loaded(true);
 	
-	if (this.bPublic)
-	{
-		this.routeFiles(this.storageType(), this.currentPath());
-	}
-	else
+	if (!this.bPublic)
 	{
 		this.requestStorages();
 	}
@@ -1274,7 +1270,7 @@ CFilesView.prototype.onRoute = function (aParams)
 {
 	var oParams = LinksUtils.parseFiles(aParams);
 
-	if (App.isPublic())
+	if (this.bPublic)
 	{
 		this.onPublicRoute(oParams);
 	}
