@@ -96,14 +96,7 @@ function CFileModel(oData, bPopup)
 	
 	this.sHtmlEmbed = Types.pString(oData.OembedHtml);
 	
-	_.each (oData.Actions, function (oData, sAction) {
-		if (!this.oActionsData[sAction])
-		{
-			this.oActionsData[sAction] = {};
-		}
-		this.oActionsData[sAction].Url = Types.pString(oData.url);
-		this.actions.push(sAction);
-	}, this);
+	this.commonParseActions(oData);
 	
 	this.cssClasses = ko.computed(function () {
 		var aClasses = this.getCommonClasses();
