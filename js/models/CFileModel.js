@@ -65,6 +65,10 @@ function CFileModel(oData, bPopup)
 		}
 	}, this);
 	
+	this.visibleCancelButton = ko.computed(function () {
+		return this.visibleProgress() && this.progressPercent() !== 100;
+	}, this);
+	
 	this.oActionsData['list'] = {
 		'Text': TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE'),
 		'Handler': _.bind(function () { App.broadcastEvent('Files::ShowList', {'Item': this}); }, this)
