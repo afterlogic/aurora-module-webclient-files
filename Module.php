@@ -28,6 +28,11 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	 */
 	protected $oFilesModuleDecorator = null;
 
+	/**
+	 * @var array
+	 */
+	protected $aRequireModules = ['Files', 'Min'];
+
 	/***** private functions *****/
 	/**
 	 * Initializes Files Module.
@@ -37,8 +42,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	public function init() 
 	{
 		$this->oFilesModuleDecorator = \Aurora\Modules\Files\Module::Decorator();
-		$this->oMinModuleDecorator = \Aurora\Modules\Min\Module::Decorator(); // Min module is not initialized at this point
-		
+		$this->oMinModuleDecorator = \Aurora\Modules\Min\Module::Decorator();
+
 		$this->AddEntry('files-pub', 'EntryPub');
 	}
 
@@ -51,8 +56,6 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	public function EntryPub()
 	{
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
-		
-		$this->oMinModuleDecorator = \Aurora\Modules\Min\Module::Decorator();
 		
 		$sHash = (string) \Aurora\System\Application::GetPathItemByIndex(1, '');
 		$sAction = (string) \Aurora\System\Application::GetPathItemByIndex(2, 'download');
