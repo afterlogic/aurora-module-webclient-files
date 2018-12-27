@@ -22,7 +22,7 @@ module.exports = {
 	PersonalSpaceLimitMb: 0,
 	CorporateSpaceLimitMb: 0,
 	
-	EditFileNameWithoutExtention: false,
+	EditFileNameWithoutExtension: false,
 	ShowCommonSettings: true,
 	ShowFilesApps: true,
 
@@ -67,7 +67,7 @@ module.exports = {
 			
 		if (!_.isEmpty(oAppDataFilesWebclientSection))
 		{
-			this.EditFileNameWithoutExtention = Types.pBool(oAppDataFilesWebclientSection.EditFileNameWithoutExtention, this.EditFileNameWithoutExtention);
+			this.EditFileNameWithoutExtension = Types.pBool(oAppDataFilesWebclientSection.EditFileNameWithoutExtension, this.EditFileNameWithoutExtension);
 			this.ShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.ShowCommonSettings);
 			this.ShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.ShowFilesApps);
 		}
