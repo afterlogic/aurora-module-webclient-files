@@ -118,7 +118,7 @@ function CFilesView(bPopup)
 	
 	this.columnCount = ko.observable(1);
 	
-	this.selector = new CSelector(this.collection, null,
+	this.selector = new CSelector(this.collection, _.bind(this.onItemSelect, this),
 		_.bind(this.onItemDelete, this), _.bind(this.onItemDblClick, this), _.bind(this.onEnter, this), this.columnCount, true, true, true);
 		
 	this.firstSelectedFile = ko.computed(function () {
@@ -773,6 +773,14 @@ CFilesView.prototype.onItemDelete = function ()
 	if (0 < aItems.length && bAllow)
 	{
 		this.executeDelete();
+	}
+};
+
+CFilesView.prototype.onItemSelect = function (oItem)
+{
+	if (App.isMobile() && oItem instanceof CFolderModel)
+	{
+		this.onItemDblClick(oItem);
 	}
 };
 
