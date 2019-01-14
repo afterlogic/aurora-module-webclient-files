@@ -949,7 +949,7 @@ CFilesView.prototype.executeRename = function ()
 {
 	var
 		oItem = _.first(this.selector.listCheckedAndSelected()),
-		bSeparateExtention = Settings.EditFileNameWithoutExtention && oItem.constructor.name === 'CFileModel',
+		bSeparateExtention = Settings.EditFileNameWithoutExtension && oItem.constructor.name === 'CFileModel',
 			sName = bSeparateExtention ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
 			sExtension = bSeparateExtention ? Utils.getFileExtension(oItem.fileName()) : ''
 	;
