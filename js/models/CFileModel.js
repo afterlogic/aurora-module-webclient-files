@@ -207,7 +207,7 @@ CFileModel.prototype.parse = function (oData, bPopup)
 		this.actions(_.without(this.actions(), 'view'));
 	}
 	
-	App.broadcastEvent('%ModuleName%::ParseFile::after', this);
+	App.broadcastEvent('%ModuleName%::ParseFile::after', [this, oData]);
 };
 
 /**
