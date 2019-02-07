@@ -35,6 +35,7 @@ function CFolderModel()
 	this.id = ko.observable('');
 	
 	this.sMainAction = 'list';
+	this.oExtendedProps = null;
 }
 
 CFolderModel.prototype.parse = function (oData)
@@ -46,7 +47,7 @@ CFolderModel.prototype.parse = function (oData)
 	this.storageType(Types.pString(oData.Type));
 	this.displayName(this.fileName());
 	this.id(Types.pString(oData.Id));
-	
+	this.oExtendedProps = oData.ExtendedProps || [];
 	if (oData.MainAction)
 	{
 		this.sMainAction = Types.pString(oData.MainAction);
