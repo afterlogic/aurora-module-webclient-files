@@ -5,7 +5,7 @@
 			<input class="field" spellcheck="false" type="text" data-bind="hasfocus: isSearchFocused, value: newSearchPattern, onEnter: onSearch, valueUpdate: 'afterkeydown'" />
 		</span>
 	</span>
-	<span class="item new_folder" data-bind="click: onCreateFolderClick, customTooltip: '%MODULENAME%/ACTION_NEW_FOLDER'">
+	<span class="item new_folder" data-bind="command: createFolderCommand, customTooltip: '%MODULENAME%/ACTION_NEW_FOLDER'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_FOLDER'}"></span>
 	</span>

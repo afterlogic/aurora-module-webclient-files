@@ -46,7 +46,7 @@ function CFileModel(oData, bPopup)
 	
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
-	this.shared = ko.observable(false);
+	this.published = ko.observable(false);
 	this.sOwnerName = Types.pString(oData.Owner);
 	
 	CAbstractFileModel.call(this);
@@ -121,9 +121,9 @@ function CFileModel(oData, bPopup)
 		{
 			aClasses.push('deleted');
 		}
-		if (this.allowSharing() && this.shared())
+		if (this.allowPublicLink() && this.published())
 		{
-			aClasses.push('shared');
+			aClasses.push('published');
 		}
 		if (this.bIsLink)
 		{
@@ -182,13 +182,13 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.uploaded(true);
 	this.allowDrag(!bPopup);
 	this.allowUpload(true);
-	this.allowSharing(true);
+	this.allowPublicLink(true);
 	this.allowActions(!bPopup && this.fullPath() !== '');
 		
 	this.fileName(Types.pString(oData.Name));
 	this.content(Types.pString(oData.Content));
 	this.id(Types.pString(oData.Id));
-	this.shared(!!oData.Shared);
+	this.published(!!oData.Published);
 
 	this.size(Types.pInt(oData.Size));
 	this.hash(Types.pString(oData.Hash));

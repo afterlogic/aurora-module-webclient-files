@@ -56,7 +56,7 @@ CSharePopup.prototype.onCreatePublicLinkResponse = function (oResponse, oRequest
 	{
 		this.pub(UrlUtils.getAppPath() + oResponse.Result);
 		this.pubFocus(true);
-		this.item.shared(true);
+		this.item.published(true);
 	}
 };
 
@@ -69,7 +69,7 @@ CSharePopup.prototype.onCancelSharingClick = function ()
 				'Path': this.item.path(),
 				'Name': this.item.fileName()
 			}, this.closePopup, this);
-		this.item.shared(false);
+		this.item.published(false);
 	}
 };
 

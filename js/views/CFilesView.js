@@ -141,7 +141,7 @@ function CFilesView(bPopup)
 		});
 	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, function () {
-		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1;
+		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1 && !this.isDisabledRenameButton();
 	});
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
 		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0;
@@ -171,7 +171,7 @@ function CFilesView(bPopup)
 		}
 		return false;
 	});
-	
+
 	this.uploaderButton = ko.observable(null);
 	this.uploaderArea = ko.observable(null);
 	this.bDragActive = ko.observable(false);
@@ -290,6 +290,17 @@ function CFilesView(bPopup)
 	{
 		this.requestStorages();
 	}
+	this.createFolderButtonModules = ko.observableArray([]);	//list of modules that disable "create folder" button
+	this.renameButtonModules = ko.observableArray([]);	//list of modules that disable "rename" button
+	this.isDisabledCreateFolderButton = ko.computed(function () {
+		return this.createFolderButtonModules().length > 0;
+	}, this);
+	this.createFolderCommand = Utils.createCommand(this, this.executeCreateFolder, function () {
+		return !this.isDisabledCreateFolderButton();
+	});
+	this.isDisabledRenameButton = ko.computed(function () {
+		return this.renameButtonModules().length > 0;
+	}, this);
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
@@ -941,6 +952,7 @@ CFilesView.prototype.onDeleteResponse = function (oResponse, oRequest)
 	}
 	else
 	{
+		Api.showErrorByCode(oResponse);
 		this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern());
 	}
 };
@@ -1551,6 +1563,10 @@ CFilesView.prototype.onCancelUpload = function (sFileUid)
  */
 CFilesView.prototype.onCreateFolderResponse = function (oResponse, oRequest)
 {
+	if (!oResponse.Result)
+	{
+		Api.showErrorByCode(oResponse);
+	}
 	this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true);
 };
 
@@ -1577,7 +1593,7 @@ CFilesView.prototype.createFolder = function (sFolderName)
 	return '';
 };
 
-CFilesView.prototype.onCreateFolderClick = function ()
+CFilesView.prototype.executeCreateFolder = function ()
 {
 	Popups.showPopup(CreateFolderPopup, [_.bind(this.createFolder, this)]);
 };
@@ -1679,6 +1695,32 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 			fOnUploadCancelCallback(sFileUploadUid, oFile.fileName());
 		}
 	}
+};
+
+CFilesView.prototype.disableCreateFolderButton = function (sModuleName)
+{
+	if (this.createFolderButtonModules.indexOf(sModuleName) === -1)
+	{
+		this.createFolderButtonModules.push(sModuleName);
+	}
+};
+
+CFilesView.prototype.enableCreateFolderButton = function (sModuleName)
+{
+	this.createFolderButtonModules.remove(sModuleName);
+};
+
+CFilesView.prototype.disableRenameButton = function (sModuleName)
+{
+	if (this.renameButtonModules.indexOf(sModuleName) === -1)
+	{
+		this.renameButtonModules.push(sModuleName);
+	}
+};
+
+CFilesView.prototype.enableRenameButton = function (sModuleName)
+{
+	this.renameButtonModules.remove(sModuleName);
 };
 
 module.exports = CFilesView;

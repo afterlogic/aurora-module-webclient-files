@@ -20,7 +20,7 @@ function CFolderModel()
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete, css-animation
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	
-	this.shared = ko.observable(false);
+	this.published = ko.observable(false);
 	this.fileName = ko.observable('');
 	
 	//onDrop
@@ -40,7 +40,7 @@ function CFolderModel()
 
 CFolderModel.prototype.parse = function (oData)
 {
-	this.shared(!!oData.Shared);
+	this.published(!!oData.Published);
 	this.fileName(Types.pString(oData.Name));
 	this.fullPath(Types.pString(oData.FullPath));
 	this.path(Types.pString(oData.Path));
