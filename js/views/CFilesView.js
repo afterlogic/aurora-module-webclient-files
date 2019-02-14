@@ -902,7 +902,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			clearTimeout(this.timerId);
 
 			this.parseQuota(oResult.Quota);
-			
+
 			if (_.isArray(oResult.Path))
 			{
 				this.pathItems.removeAll();
@@ -913,6 +913,22 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				}, this));
 			}
 			this.loading(false);
+			//If the current path does not contain information about access, we obtain such information from the response, if possible
+			if (oResult.Access && this.pathItems().length > 0)
+			{
+				if (!this.pathItems()[this.pathItems().length - 1].oExtendedProps)
+				{
+					this.pathItems()[this.pathItems().length - 1].oExtendedProps = {
+						'Access': oResult.Access
+					};
+					this.pathItems.valueHasMutated(); // for triggering in other modules
+				}
+				else if (!this.pathItems()[this.pathItems().length - 1].oExtendedProps.Access)
+				{
+					this.pathItems()[this.pathItems().length - 1].oExtendedProps.Access = oResult.Access;
+					this.pathItems.valueHasMutated(); // for triggering in other modules
+				}
+			}
 		}
 		else
 		{
