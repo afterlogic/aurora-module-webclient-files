@@ -9,7 +9,10 @@
 		<div class="image">
 			<span class="icon animGoal"></span>
 		</div>
-		<span class="published_icon" data-bind="click: function (oItem) { $root.onShareIconClick(oItem); }"></span>						
+		<span class="published_icon" data-bind="click: function (oItem) { $root.onShareIconClick(oItem); }"></span>
+		<!-- ko if: (bIsShared()) -->
+		<span class="shared-image"></span>
+		<!-- /ko -->
 		<span class="name" data-bind="text: fileName()"></span>
 		<div class="separator"></div>
 	</div>

@@ -4,13 +4,12 @@ var
 	ko = require('knockout'),
 	
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
-	
+	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js')
 ;
 
 /**
  * @constructor
- * @extends CCommonFileModel
  */
 function CFolderModel()
 {
@@ -21,6 +20,7 @@ function CFolderModel()
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	
 	this.published = ko.observable(false);
+	this.bIsShared = ko.observable(false);
 	this.fileName = ko.observable('');
 	
 	//onDrop
@@ -52,6 +52,7 @@ CFolderModel.prototype.parse = function (oData)
 	{
 		this.sMainAction = Types.pString(oData.MainAction);
 	}
+	App.broadcastEvent('%ModuleName%::ParseFolder::after', [this, oData]);
 };
 
 CFolderModel.prototype.getMainAction = function ()
