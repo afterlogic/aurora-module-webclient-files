@@ -949,9 +949,9 @@ CFilesView.prototype.executeRename = function ()
 {
 	var
 		oItem = _.first(this.selector.listCheckedAndSelected()),
-		bSeparateExtention = Settings.EditFileNameWithoutExtension && oItem.constructor.name === 'CFileModel',
-			sName = bSeparateExtention ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
-			sExtension = bSeparateExtention ? Utils.getFileExtension(oItem.fileName()) : ''
+		bSeparateExtension = Settings.EditFileNameWithoutExtension && oItem.constructor.name === 'CFileModel',
+			sName = bSeparateExtension ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
+			sExtension = bSeparateExtension ? Utils.getFileExtension(oItem.fileName()) : ''
 	;
 	
 	if (!this.bPublic && oItem)
@@ -961,14 +961,14 @@ CFilesView.prototype.executeRename = function ()
 };
 
 /**
- * @param {string} sExtention
+ * @param {string} sExtension
  * @param {string} sNamePart
  * @returns {string}
  */
-CFilesView.prototype.renameItem = function (sExtention, sNamePart)
+CFilesView.prototype.renameItem = function (sExtension, sNamePart)
 {
 	var
-		sName = (sExtention === '') ? sNamePart : sNamePart + '.' + sExtention,
+		sName = (sExtension === '') ? sNamePart : sNamePart + '.' + sExtension,
 		oItem = _.first(this.selector.listCheckedAndSelected())
 	;
 	
