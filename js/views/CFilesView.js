@@ -144,7 +144,7 @@ function CFilesView(bPopup)
 		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1 && !this.isDisabledRenameButton();
 	});
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
-		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0;
+		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0 && !this.isDisabledDeleteButton();
 	});
 	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
 		if (this.checkedReadyForOperations())
@@ -292,6 +292,7 @@ function CFilesView(bPopup)
 	}
 	this.createFolderButtonModules = ko.observableArray([]);	//list of modules that disable "create folder" button
 	this.renameButtonModules = ko.observableArray([]);	//list of modules that disable "rename" button
+	this.deleteButtonModules = ko.observableArray([]);	//list of modules that disable "delete" button
 	this.isDisabledCreateFolderButton = ko.computed(function () {
 		return this.createFolderButtonModules().length > 0;
 	}, this);
@@ -300,6 +301,9 @@ function CFilesView(bPopup)
 	});
 	this.isDisabledRenameButton = ko.computed(function () {
 		return this.renameButtonModules().length > 0;
+	}, this);
+	this.isDisabledDeleteButton = ko.computed(function () {
+		return this.deleteButtonModules().length > 0;
 	}, this);
 }
 
@@ -1737,6 +1741,19 @@ CFilesView.prototype.disableRenameButton = function (sModuleName)
 CFilesView.prototype.enableRenameButton = function (sModuleName)
 {
 	this.renameButtonModules.remove(sModuleName);
+};
+
+CFilesView.prototype.disableDeleteButton = function (sModuleName)
+{
+	if (this.deleteButtonModules.indexOf(sModuleName) === -1)
+	{
+		this.deleteButtonModules.push(sModuleName);
+	}
+};
+
+CFilesView.prototype.enableDeleteButton = function (sModuleName)
+{
+	this.deleteButtonModules.remove(sModuleName);
 };
 
 module.exports = CFilesView;
