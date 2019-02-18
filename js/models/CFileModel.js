@@ -47,7 +47,6 @@ function CFileModel(oData, bPopup)
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	this.published = ko.observable(false);
-	this.bIsShared = ko.observable(false);
 	this.sOwnerName = Types.pString(oData.Owner);
 	
 	CAbstractFileModel.call(this);

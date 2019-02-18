@@ -20,7 +20,7 @@ function CFolderModel()
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	
 	this.published = ko.observable(false);
-	this.bIsShared = ko.observable(false);
+	this.isShared = ko.observable(false);
 	this.fileName = ko.observable('');
 	
 	//onDrop
