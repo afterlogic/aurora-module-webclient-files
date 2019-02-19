@@ -293,18 +293,25 @@ function CFilesView(bPopup)
 	this.createFolderButtonModules = ko.observableArray([]);	//list of modules that disable "create folder" button
 	this.renameButtonModules = ko.observableArray([]);	//list of modules that disable "rename" button
 	this.deleteButtonModules = ko.observableArray([]);	//list of modules that disable "delete" button
+	this.shortcutButtonModules = ko.observableArray([]);	//list of modules that disable "shortcut" button
 	this.isDisabledCreateFolderButton = ko.computed(function () {
 		return this.createFolderButtonModules().length > 0;
 	}, this);
-	this.createFolderCommand = Utils.createCommand(this, this.executeCreateFolder, function () {
-		return !this.isDisabledCreateFolderButton();
-	});
 	this.isDisabledRenameButton = ko.computed(function () {
 		return this.renameButtonModules().length > 0;
 	}, this);
 	this.isDisabledDeleteButton = ko.computed(function () {
 		return this.deleteButtonModules().length > 0;
 	}, this);
+	this.isDisabledShortcutButton = ko.computed(function () {
+		return this.shortcutButtonModules().length > 0;
+	}, this);
+	this.createFolderCommand = Utils.createCommand(this, this.executeCreateFolder, function () {
+		return !this.isDisabledCreateFolderButton();
+	});
+	this.createShortcutCommand = Utils.createCommand(this, this.executeCreateShortcut, function () {
+		return !this.isDisabledShortcutButton();
+	});
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
@@ -1640,7 +1647,7 @@ CFilesView.prototype.createLink = function (oFileItem)
 	}, this.onCreateLinkResponse, this);
 };
 
-CFilesView.prototype.onCreateLinkClick = function ()
+CFilesView.prototype.executeCreateShortcut = function ()
 {
 	var fCallBack = _.bind(this.createLink, this);
 
@@ -1754,6 +1761,19 @@ CFilesView.prototype.disableDeleteButton = function (sModuleName)
 CFilesView.prototype.enableDeleteButton = function (sModuleName)
 {
 	this.deleteButtonModules.remove(sModuleName);
+};
+
+CFilesView.prototype.disableShortcutButton = function (sModuleName)
+{
+	if (this.shortcutButtonModules.indexOf(sModuleName) === -1)
+	{
+		this.shortcutButtonModules.push(sModuleName);
+	}
+};
+
+CFilesView.prototype.enableShortcutButton = function (sModuleName)
+{
+	this.shortcutButtonModules.remove(sModuleName);
 };
 
 module.exports = CFilesView;

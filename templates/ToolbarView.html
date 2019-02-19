@@ -9,7 +9,7 @@
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_FOLDER'}"></span>
 	</span>
-	<span class="item new_link" data-bind="visible: !isCurrentStorageExternal(), click: onCreateLinkClick, customTooltip: '%MODULENAME%/ACTION_CREATE_SHORTCUT'">
+	<span class="item new_link" data-bind="visible: !isCurrentStorageExternal(), command: createShortcutCommand, customTooltip: '%MODULENAME%/ACTION_CREATE_SHORTCUT'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_CREATE_SHORTCUT'}"></span>
 	</span>
