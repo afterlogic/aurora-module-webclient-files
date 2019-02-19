@@ -1724,56 +1724,17 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 	}
 };
 
-CFilesView.prototype.disableCreateFolderButton = function (sModuleName)
+CFilesView.prototype.disableButton = function (koButtonModules, sModuleName)
 {
-	if (this.createFolderButtonModules.indexOf(sModuleName) === -1)
+	if (koButtonModules.indexOf(sModuleName) === -1)
 	{
-		this.createFolderButtonModules.push(sModuleName);
+		koButtonModules.push(sModuleName);
 	}
 };
 
-CFilesView.prototype.enableCreateFolderButton = function (sModuleName)
+CFilesView.prototype.enableButton = function (koButtonModules, sModuleName)
 {
-	this.createFolderButtonModules.remove(sModuleName);
-};
-
-CFilesView.prototype.disableRenameButton = function (sModuleName)
-{
-	if (this.renameButtonModules.indexOf(sModuleName) === -1)
-	{
-		this.renameButtonModules.push(sModuleName);
-	}
-};
-
-CFilesView.prototype.enableRenameButton = function (sModuleName)
-{
-	this.renameButtonModules.remove(sModuleName);
-};
-
-CFilesView.prototype.disableDeleteButton = function (sModuleName)
-{
-	if (this.deleteButtonModules.indexOf(sModuleName) === -1)
-	{
-		this.deleteButtonModules.push(sModuleName);
-	}
-};
-
-CFilesView.prototype.enableDeleteButton = function (sModuleName)
-{
-	this.deleteButtonModules.remove(sModuleName);
-};
-
-CFilesView.prototype.disableShortcutButton = function (sModuleName)
-{
-	if (this.shortcutButtonModules.indexOf(sModuleName) === -1)
-	{
-		this.shortcutButtonModules.push(sModuleName);
-	}
-};
-
-CFilesView.prototype.enableShortcutButton = function (sModuleName)
-{
-	this.shortcutButtonModules.remove(sModuleName);
+	koButtonModules.remove(sModuleName);
 };
 
 module.exports = CFilesView;
