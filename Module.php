@@ -72,7 +72,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 
 				if (\is_array($mData) && isset($mData['IsFolder']) && $mData['IsFolder'])
 				{
-					$oApiIntegrator = \Aurora\Modules\Core\Managers\Integrator::getInstance();
+					$oApiIntegrator = \Aurora\System\Managers\Integrator::getInstance();
 
 					if ($oApiIntegrator)
 					{
