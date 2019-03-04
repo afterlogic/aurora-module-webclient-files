@@ -1023,7 +1023,8 @@ CFilesView.prototype.renameItem = function (sExtension, sNamePart)
 				'Path': oItem.path(),
 				'Name': oItem.id() || oItem.fileName(),
 				'NewName': sName,
-				'IsLink': oItem.bIsLink ? 1 : 0
+				'IsLink': oItem.bIsLink ? 1 : 0,
+				'IsFolder': oItem instanceof CFolderModel
 			}, this.onRenameResponse, this
 		);
 	}
@@ -1471,7 +1472,7 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 				return {
 					'Path': oItem.path(),  
 					'Name': oItem.id(),
-					'IsFolder': !(oItem instanceof CFileModel)
+					'IsFolder': oItem instanceof CFolderModel
 				};
 			}
 			return null;
@@ -1699,7 +1700,8 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 		fOnUploadCancelCallback = _.bind(function (sFileUploadUid, sFileName) {
 			var aItems = [{
 				'Path': this.currentPath(),  
-				'Name': sFileName
+				'Name': sFileName,
+				'IsFolder': false
 			}];
 			Ajax.send('Delete', {
 					'Type': this.storageType(),
