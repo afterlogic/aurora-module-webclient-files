@@ -1468,10 +1468,10 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 			{
 				oItem.deleted(true);
 				sStorageType = oItem.storageType();
-				sPath = oItem.path();
 				return {
 					'Path': oItem.path(),  
-					'Name': oItem.id()
+					'Name': oItem.id(),
+					'IsFolder': !(oItem instanceof CFileModel)
 				};
 			}
 			return null;
