@@ -211,6 +211,11 @@ function CFilesView(bPopup)
 				'QUOTA': TextUtils.getFriendlySize(iQuota)
 			}) : '')
 		;
+		
+		if (UserSettings.QuotaWarningPerc > 0 && iProc !== -1 && UserSettings.QuotaWarningPerc > (100 - iProc))
+		{
+			Screens.showError(TextUtils.i18n('COREWEBCLIENT/WARNING_QUOTA_ALMOST_REACHED'), true);
+		}
 	}, this);
 	
 	this.dragover = ko.observable(false);
