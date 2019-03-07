@@ -1712,7 +1712,19 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 					'Type': this.storageType(),
 					'Path': this.currentPath(),
 					'Items': aItems
-				}
+				},
+				//Update file list after deleting file
+				_.bind(function () {
+					var bPathRequired = this.currentPath() !== '' && this.pathItems().length === 0;
+
+					Ajax.send('GetFiles', {
+							'Type': this.storageType(),
+							'Path': this.currentPath(),
+							'Pattern': this.searchPattern(),
+							'PathRequired': bPathRequired
+						}, this.onGetFilesResponse, this
+					);
+				}, this)
 			);
 			this.onCancelUpload(sFileUploadUid);
 		}, this)
