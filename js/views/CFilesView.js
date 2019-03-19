@@ -1334,7 +1334,7 @@ CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
 CFilesView.prototype.onRoute = function (aParams)
 {
 	var oParams = LinksUtils.parseFiles(aParams);
-
+	
 	if (this.bPublic)
 	{
 		this.onPublicRoute(oParams);
@@ -1352,6 +1352,7 @@ CFilesView.prototype.onRoute = function (aParams)
 CFilesView.prototype.onUserRoute = function (oParams)
 {
 	var
+		sStorage = (this.storages().indexOf(oParams.Storage) !== -1) ? oParams.Storage : (this.storages().length > 0 ? this.storages()[0].type : ''),
 		sPath = oParams.Path,
 		aPath = oParams.PathParts.reverse(),
 		oFolder = _.find(this.folders(), function (oFld) {
@@ -1366,7 +1367,7 @@ CFilesView.prototype.onUserRoute = function (oParams)
 	
 	this.error(false);
 	
-	this.storageType(oParams.Storage);
+	this.storageType(sStorage);
 	this.currentPath(sPath);
 	this.loadedFiles(false);
 	
@@ -1385,12 +1386,12 @@ CFilesView.prototype.onUserRoute = function (oParams)
 	{
 		this.pathItems.push(oFolder);
 	}
-	else if (oParams.Storage !== 'google' || sPath === '')
+	else if (sStorage !== 'google' || sPath === '')
 	{
 		this.pathItems.removeAll();
 		_.each(aPath, _.bind(function (sPathItem) {
 			var iItemPos = sPath.lastIndexOf(sPathItem);
-			this.addPathItems(oParams.Storage, sPath, sPathItem);
+			this.addPathItems(sStorage, sPath, sPathItem);
 			sPath = sPath.substr(0, iItemPos);
 		}, this));
 	}
@@ -1414,7 +1415,7 @@ CFilesView.prototype.onUserRoute = function (oParams)
 	}
 	
 	Ajax.send('GetFiles', {
-			'Type': oParams.Storage,
+			'Type': sStorage,
 			'Path': oParams.Path,
 			'Pattern': Types.pString(oParams.Search),
 			'PathRequired': bPathRequired
