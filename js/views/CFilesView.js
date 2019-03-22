@@ -1352,7 +1352,10 @@ CFilesView.prototype.onRoute = function (aParams)
 CFilesView.prototype.onUserRoute = function (oParams)
 {
 	var
-		sStorage = (this.storages().indexOf(oParams.Storage) !== -1) ? oParams.Storage : (this.storages().length > 0 ? this.storages()[0].type : ''),
+		bStorageFound = this.storages().length === 0 || !!_.find(this.storages(), function (oStorage) {
+			return oStorage.type === oParams.Storage;
+		}),
+		sStorage = bStorageFound ? oParams.Storage : (this.storages().length > 0 ? this.storages()[0].type : ''),
 		sPath = oParams.Path,
 		aPath = oParams.PathParts.reverse(),
 		oFolder = _.find(this.folders(), function (oFld) {
