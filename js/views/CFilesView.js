@@ -883,7 +883,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				{
 					var oFile = new CFileModel(oData, this.bInPopup);
 
-					if (oFile.oExtendedProps.Loading)
+					if (oFile.oExtendedProps && oFile.oExtendedProps.Loading)
 					{ // if file still loading - show warning in status
 						oFile.uploadError(true);
 						oFile.statusText(TextUtils.i18n('COREWEBCLIENT/LABEL_FILE_LOADING'));
