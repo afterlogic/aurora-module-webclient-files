@@ -14,7 +14,7 @@ module.exports = {
 	HashModuleName: 'files',
 	
 	CustomTabTitle: '',
-	enableModule: ko.observable(true),
+	Storages: [],
 	EnableUploadSizeLimit: false,
 	PublicFolderName: '',
 	PublicHash: '',
@@ -46,7 +46,7 @@ module.exports = {
 		if (!_.isEmpty(oAppDataFilesSection))
 		{
 			this.CustomTabTitle = Types.pString(oAppDataFilesSection.CustomTabTitle, this.CustomTabTitle);
-			this.enableModule =  ko.observable(Types.pBool(oAppDataFilesSection.EnableModule, this.enableModule()));
+			this.Storages = Types.pArray(oAppDataFilesSection.Storages, this.Storages);
 			this.EnableUploadSizeLimit = Types.pBool(oAppDataFilesSection.EnableUploadSizeLimit, this.EnableUploadSizeLimit);
 			this.PublicFolderName = Types.pString(oAppDataFilesSection.PublicFolderName, this.PublicFolderName);
 			this.PublicHash = Types.pString(oAppDataFilesSection.PublicHash, this.PublicHash);
@@ -71,16 +71,6 @@ module.exports = {
 			this.ShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.ShowCommonSettings);
 			this.ShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.ShowFilesApps);
 		}
-	},
-	
-	/**
-	 * Updates new settings values after saving on server.
-	 * 
-	 * @param {string} sEnableModule
-	 */
-	update: function (sEnableModule)
-	{
-		this.enableModule(sEnableModule === '1');
 	},
 	
 	/**

@@ -23,7 +23,7 @@ module.exports = function (oAppData) {
 	
 	Settings.init(oAppData);
 
-	if (!ModulesManager.isModuleAvailable(Settings.ServerModuleName))
+	if (!ModulesManager.isModuleAvailable(Settings.ServerModuleName) || Settings.Storages.length === 0)
 	{
 		return null;
 	}
@@ -108,7 +108,6 @@ module.exports = function (oAppData) {
 			else
 			{
 				return {
-					enableModule: Settings.enableModule,
 					start: function (ModulesManager) {
 						if (Settings.ShowCommonSettings || Settings.ShowFilesApps)
 						{

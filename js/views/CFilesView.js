@@ -58,13 +58,6 @@ function CFilesView(bPopup)
 	this.bPublic = App.isPublic();
 	
 	this.storages = ko.observableArray([]);
-	this.storages.subscribe(function () {
-		Settings.enableModule(this.storages().length > 0);
-		if (!Settings.enableModule())
-		{
-			Routing.replaceHash([]);
-		}
-	}, this);
 	this.folders = ko.observableArray();
 	this.files = ko.observableArray();
 	this.uploadingFiles = ko.observableArray();
@@ -291,10 +284,6 @@ function CFilesView(bPopup)
 		}
 	}, this));
 	
-	if (!this.bPublic)
-	{
-		this.requestStorages();
-	}
 	this.createFolderButtonModules = ko.observableArray([]);	//list of modules that disable "create folder" button
 	this.renameButtonModules = ko.observableArray([]);	//list of modules that disable "rename" button
 	this.deleteButtonModules = ko.observableArray([]);	//list of modules that disable "delete" button
