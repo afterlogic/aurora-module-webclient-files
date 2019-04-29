@@ -1229,7 +1229,7 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 		this.pathItems.removeAll();
 	}
 	
-	this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true);
+//	this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true);
 };
 
 /**
