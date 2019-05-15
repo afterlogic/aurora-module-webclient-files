@@ -14,7 +14,6 @@ module.exports = function (oAppData) {
 		HeaderItemView = null,
 		
 		bAdminUser = App.getUserRole() === Enums.UserRole.SuperAdmin,
-		bNormalUser = App.getUserRole() === Enums.UserRole.NormalUser,
 		
 		aToolbarButtons = [],
 		oFilesView = null,
@@ -41,7 +40,7 @@ module.exports = function (oAppData) {
 			}
 		};
 	}
-	else if (bAdminUser || bNormalUser)
+	else if (bAdminUser || App.isUserNormalOrTenant())
 	{
 		if (bAdminUser)
 		{
@@ -95,7 +94,7 @@ module.exports = function (oAppData) {
 				}
 			};
 		}
-		else if (bNormalUser)
+		else if (App.isUserNormalOrTenant())
 		{
 			if (App.isNewTab())
 			{
