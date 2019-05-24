@@ -59,6 +59,7 @@ module.exports = function (oAppData) {
 						Settings.HashModuleName,
 						TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
 					]);
+/*						
 					if (Settings.ShowPersonalFilesAdminSection)
 					{
 						ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTabSection', [
@@ -73,6 +74,7 @@ module.exports = function (oAppData) {
 							]
 						);
 					}
+*/					
 					if (Settings.ShowCorporateFilesAdminSection)
 					{
 						ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTabSection', [

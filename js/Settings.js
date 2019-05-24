@@ -19,7 +19,8 @@ module.exports = {
 	PublicFolderName: '',
 	PublicHash: '',
 	UploadSizeLimitMb: 0,
-	PersonalSpaceLimitMb: 0,
+	UserSpaceLimitMb: 0,
+	TenantSpaceLimitMb: 0,
 	CorporateSpaceLimitMb: 0,
 	
 	EditFileNameWithoutExtension: false,
@@ -38,7 +39,7 @@ module.exports = {
 	{
 		var
 			oAppDataFilesSection = oAppData[this.ServerModuleName],
-			oAppDataPersonalFilesSection = oAppData[this.PersonalServerModuleName],
+			// oAppDataPersonalFilesSection = oAppData[this.PersonalServerModuleName],
 			oAppDataCorporateFilesSection = oAppData[this.CorporateServerModuleName],
 			oAppDataFilesWebclientSection = oAppData['%ModuleName%']
 		;
@@ -51,13 +52,15 @@ module.exports = {
 			this.PublicFolderName = Types.pString(oAppDataFilesSection.PublicFolderName, this.PublicFolderName);
 			this.PublicHash = Types.pString(oAppDataFilesSection.PublicHash, this.PublicHash);
 			this.UploadSizeLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UploadSizeLimitMb, this.UploadSizeLimitMb);
+
+			this.UserSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UserSpaceLimitMb, this.UserSpaceLimitMb);
+			this.TenantSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.TenantSpaceLimitMb, this.TenantSpaceLimitMb);
 		}
 		
-		if (!_.isEmpty(oAppDataPersonalFilesSection))
-		{
-			this.ShowPersonalFilesAdminSection = true;
-			this.PersonalSpaceLimitMb = Types.pNonNegativeInt(oAppDataPersonalFilesSection.UserSpaceLimitMb, this.PersonalSpaceLimitMb);
-		}
+		// if (!_.isEmpty(oAppDataPersonalFilesSection))
+		// {
+		 	this.ShowPersonalFilesAdminSection = true;
+		// }
 		
 		if (!_.isEmpty(oAppDataCorporateFilesSection))
 		{

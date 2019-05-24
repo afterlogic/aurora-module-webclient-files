@@ -5,6 +5,14 @@
 	<div class="fields">
 		<div class="fieldset">
 			<div class="row">
+				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_TENANT_SPACE_LIMIT'}"></span>
+				<span class="value">
+					<input class="input" type="text" data-bind="value: tenantSpaceLimitMb, valueUpdate: 'afterkeydown', 
+						onEnter: save" style="width: 50px; margin-right: 5px;">
+					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
+				</span>
+			</div>
+			<div class="row">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
 				<span class="value">
 					<input class="input" type="text" data-bind="value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 

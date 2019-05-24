@@ -17,11 +17,19 @@ var
 */
 function CFilesPersonalAdminSettingsView()
 {
-	CAbstractSettingsFormView.call(this, Settings.PersonalServerModuleName);
+	CAbstractSettingsFormView.call(this, Settings.ServerModuleName, 'UpdateSettingsForEntity');
 	
 	/* Editable fields */
-	this.userSpaceLimitMb = ko.observable(Settings.PersonalSpaceLimitMb);
+	this.userSpaceLimitMb = ko.observable(Settings.UserSpaceLimitMb);
+	this.tenantSpaceLimitMb = ko.observable(Settings.TenantSpaceLimitMb);
+
 	/*-- Editable fields */
+
+	this.sEntityType = '';
+	this.iEntityId = 0;
+
+	this.isSuperAdmin = ko.observable(false);
+
 	this.isVisible = ko.observable(true);
 }
 
@@ -32,19 +40,24 @@ CFilesPersonalAdminSettingsView.prototype.ViewTemplate = '%ModuleName%_FilesPers
 CFilesPersonalAdminSettingsView.prototype.getCurrentValues = function()
 {
 	return [
-		this.userSpaceLimitMb()
+		this.userSpaceLimitMb(),
+		this.tenantSpaceLimitMb()
 	];
 };
 
 CFilesPersonalAdminSettingsView.prototype.revertGlobalValues = function()
 {
-	this.userSpaceLimitMb(Settings.PersonalSpaceLimitMb);
+	this.userSpaceLimitMb(Settings.UserSpaceLimitMb);
+	this.tenantSpaceLimitMb(Settings.TenantSpaceLimitMb);
 };
 
 CFilesPersonalAdminSettingsView.prototype.getParametersForSave = function ()
 {
 	return {
-		'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb())
+		'EntityType': this.sEntityType,
+		'EntityId': Types.pInt(this.iEntityId),
+		'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb()),
+		'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb())
 	};
 };
 
@@ -67,7 +80,13 @@ CFilesPersonalAdminSettingsView.prototype.applySavedValues = function (oParamete
  */
 CFilesPersonalAdminSettingsView.prototype.setAccessLevel = function (sEntityType, iEntityId)
 {
-	this.visible(sEntityType === '');
+	console.log(arguments);
+
+	this.sEntityType = sEntityType;
+	this.iEntityId = (sEntityType === 'User' || sEntityType === 'Tenant') ? iEntityId : 0;
+
+	this.visible(sEntityType === '' || sEntityType === 'Tenant' || sEntityType === 'User');
+	this.isSuperAdmin(sEntityType === '');
 };
 
 CFilesPersonalAdminSettingsView.prototype.hide = function ()
