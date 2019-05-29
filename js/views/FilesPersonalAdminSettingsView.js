@@ -80,8 +80,6 @@ CFilesPersonalAdminSettingsView.prototype.applySavedValues = function (oParamete
  */
 CFilesPersonalAdminSettingsView.prototype.setAccessLevel = function (sEntityType, iEntityId)
 {
-	console.log(arguments);
-
 	this.sEntityType = sEntityType;
 	this.iEntityId = (sEntityType === 'User' || sEntityType === 'Tenant') ? iEntityId : 0;
 

@@ -14,6 +14,7 @@ module.exports = function (oAppData) {
 		HeaderItemView = null,
 		
 		bAdminUser = App.getUserRole() === Enums.UserRole.SuperAdmin,
+		bTenantAdmin = App.getUserRole() === Enums.UserRole.TenantAdmin,
 		
 		aToolbarButtons = [],
 		oFilesView = null,
@@ -75,14 +76,14 @@ module.exports = function (oAppData) {
 						);
 					}
 */					
-					if (Settings.ShowCorporateFilesAdminSection)
-					{
-						ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTabSection', [
-								function () { return require('modules/%ModuleName%/js/views/FilesCorporateAdminSettingsView.js'); },
-								'files'
-							]
-						);
-					}
+					// if (Settings.ShowCorporateFilesAdminSection)
+					// {
+					// 	ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTabSection', [
+					// 			function () { return require('modules/%ModuleName%/js/views/FilesCorporateAdminSettingsView.js'); },
+					// 			'files'
+					// 		]
+					// 	);
+					// }
 				},
 				hidePersonalFilesAdminSection: function() {
 					if (Settings.ShowPersonalFilesAdminSection)
@@ -110,6 +111,24 @@ module.exports = function (oAppData) {
 			{
 				return {
 					start: function (ModulesManager) {
+
+						if (bTenantAdmin)
+						{
+							ModulesManager.run('AdminPanelWebclient', 'registerAdminPanelTab', [
+								function(resolve) {
+									require.ensure(
+										['modules/%ModuleName%/js/views/FilesAdminSettingsView.js'],
+										function() {
+											resolve(require('modules/%ModuleName%/js/views/FilesAdminSettingsView.js'));
+										},
+										"admin-bundle"
+									);
+								},
+								Settings.HashModuleName,
+								TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
+							]);
+						}
+
 						if (Settings.ShowCommonSettings || Settings.ShowFilesApps)
 						{
 							ModulesManager.run('SettingsWebclient', 'registerSettingsTab', [

@@ -44,15 +44,29 @@
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_TENANT_SPACE_LIMIT'}"></span>
 				<span class="value">
 					<input class="input" type="text" data-bind="value: tenantSpaceLimitMb, valueUpdate: 'afterkeydown', 
-						onEnter: save" style="width: 50px; margin-right: 5px;">
+						onEnter: save, visible: allowEditTenantSpaceLimitMb()" style="width: 150px; margin-right: 5px;">
+					<span data-bind="text: tenantSpaceLimitMb, visible: !allowEditTenantSpaceLimitMb()"></span>
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>
-			<div class="row">
+			<div class="row hint" data-bind="visible: allowEditUserSpaceLimitMb() && (isTenantAdmin() || isSuperAdmin())">
+				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_TENANT_SPACE_LIMIT'}"></span>
+			</div>			
+			<div class="row" data-bind="visible: allowEditUserSpaceLimitMb()">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
 				<span class="value">
 					<input class="input" type="text" data-bind="value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 
-						onEnter: save" style="width: 50px; margin-right: 5px;">
+						onEnter: save" style="width: 150px; margin-right: 5px;">
+					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
+				</span>
+			</div>
+			<div class="row hint" data-bind="visible: allowEditUserSpaceLimitMb() && (isTenantAdmin() || isSuperAdmin())">
+				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_USER_SPACE_LIMIT'}"></span>
+			</div>			
+			<div class="row" data-bind="visible: isTenantAdmin()">
+				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_ALLOCATED_SPACE'}"></span>
+				<span class="value">
+					<span data-bind="text: allocatedSpace()"></span>
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>

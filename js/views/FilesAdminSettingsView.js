@@ -6,6 +6,7 @@ var
 	
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	Ajax = require('%PathToCoreWebclientModule%/js/Ajax.js'),
+	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	
 	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 	CAbstractSettingsFormView = ModulesManager.run('AdminPanelWebclient', 'getAbstractSettingsFormViewClass'),
@@ -25,6 +26,10 @@ function CFilesAdminSettingsView()
 
 	this.isSuperAdmin = ko.observable(false);
 	this.isTenantAdmin = ko.observable(false);
+
+	this.allowEditUserSpaceLimitMb = ko.observable(true);
+	this.allowEditTenantSpaceLimitMb = ko.observable(true);
+	this.allocatedSpace = ko.observable(0);
 
 	/* Editable fields */
 	this.enableUploadSizeLimit = ko.observable(Settings.EnableUploadSizeLimit);
@@ -53,8 +58,6 @@ CFilesAdminSettingsView.prototype.clearFields = function()
 
 CFilesAdminSettingsView.prototype.revertGlobalValues = function()
 {
-	console.log('revertGlobalValues');
-
 	this.enableUploadSizeLimit(Settings.EnableUploadSizeLimit);
 	this.uploadSizeLimitMb(Settings.UploadSizeLimitMb);
 
@@ -102,24 +105,32 @@ CFilesAdminSettingsView.prototype.onRouteChild = function (aParams)
 	if (this.sEntityType === 'Tenant' || this.sEntityType === 'User')
 	{
 		this.requestPerEntitytSettings();
+
+		this.allowEditTenantSpaceLimitMb(App.getUserRole() === Enums.UserRole.SuperAdmin);
 	}
 };
 
 CFilesAdminSettingsView.prototype.requestPerEntitytSettings = function ()
 {
-	console.log('requestPerEntitytSettings', this.iEntityId);
 	if (Types.isPositiveNumber(this.iEntityId))
 	{
 		this.clearFields();
 		Ajax.send(Settings.ServerModuleName, 'GetSettingsForEntity', { 'EntityType': this.sEntityType, 'EntityId': this.iEntityId }, function (oResponse) {
 			if (oResponse.Result)
 			{
-				console.log(oResponse.Result);
-
 				this.userSpaceLimitMb(Types.pInt(oResponse.Result.UserSpaceLimitMb));
 				this.tenantSpaceLimitMb(Types.pInt(oResponse.Result.TenantSpaceLimitMb));
 
-				console.log(this.userSpaceLimitMb(), this.tenantSpaceLimitMb());
+				console.log(oResponse.Result.AllowEditUserSpaceLimitMb);
+
+				if (oResponse.Result.AllowEditUserSpaceLimitMb !== undefined)
+				{
+					this.allowEditUserSpaceLimitMb(Types.pBool(oResponse.Result.AllowEditUserSpaceLimitMb));
+				}
+				if (oResponse.Result.AllocatedSpace !== undefined)
+				{
+					this.allocatedSpace(Types.pInt(oResponse.Result.AllocatedSpace));
+				}
 
 				this.updateSavedState();
 			}
