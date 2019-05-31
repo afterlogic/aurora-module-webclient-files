@@ -52,15 +52,16 @@
 			<div class="row hint" data-bind="visible: allowEditUserSpaceLimitMb() && (isTenantAdmin() || isSuperAdmin())">
 				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_TENANT_SPACE_LIMIT'}"></span>
 			</div>			
-			<div class="row" data-bind="visible: allowEditUserSpaceLimitMb()">
+			<div class="row">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
 				<span class="value">
-					<input class="input" type="text" data-bind="value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 
+					<input class="input" type="text" data-bind="visible: allowEditUserSpaceLimitMb(), value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 
 						onEnter: save" style="width: 150px; margin-right: 5px;">
+					<span data-bind="text: userSpaceLimitMb, visible: !allowEditUserSpaceLimitMb()"></span>
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>
-			<div class="row hint" data-bind="visible: allowEditUserSpaceLimitMb() && (isTenantAdmin() || isSuperAdmin())">
+			<div class="row hint" data-bind="visible: (isTenantAdmin() || isSuperAdmin())">
 				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_USER_SPACE_LIMIT'}"></span>
 			</div>			
 			<div class="row" data-bind="visible: isTenantAdmin()">

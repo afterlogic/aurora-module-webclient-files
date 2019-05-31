@@ -121,8 +121,6 @@ CFilesAdminSettingsView.prototype.requestPerEntitytSettings = function ()
 				this.userSpaceLimitMb(Types.pInt(oResponse.Result.UserSpaceLimitMb));
 				this.tenantSpaceLimitMb(Types.pInt(oResponse.Result.TenantSpaceLimitMb));
 
-				console.log(oResponse.Result.AllowEditUserSpaceLimitMb);
-
 				if (oResponse.Result.AllowEditUserSpaceLimitMb !== undefined)
 				{
 					this.allowEditUserSpaceLimitMb(Types.pBool(oResponse.Result.AllowEditUserSpaceLimitMb));
