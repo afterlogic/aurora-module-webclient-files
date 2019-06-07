@@ -24,8 +24,9 @@ function CFilesAdminSettingsView()
 	this.sEntityType = '';
 	this.iEntityId = 0;
 
-	this.isSuperAdmin = ko.observable(false);
-	this.isTenantAdmin = ko.observable(false);
+	this.isNoEntity = ko.observable(false);
+	this.isTenantEntity = ko.observable(false);
+	this.isUserEntity = ko.observable(false);
 
 	this.allowEditUserSpaceLimitMb = ko.observable(true);
 	this.allowEditTenantSpaceLimitMb = ko.observable(true);
@@ -96,8 +97,9 @@ CFilesAdminSettingsView.prototype.setAccessLevel = function (sEntityType, iEntit
 	this.iEntityId = (sEntityType === 'User' || sEntityType === 'Tenant') ? iEntityId : 0;
 
 	this.visible(sEntityType === '' || sEntityType === 'Tenant' || sEntityType === 'User');
-	this.isSuperAdmin(sEntityType === '');
-	this.isTenantAdmin(sEntityType === 'Tenant');
+	this.isNoEntity(sEntityType === '');
+	this.isTenantEntity(sEntityType === 'Tenant');
+	this.isUserEntity(sEntityType === 'User');
 };
 
 CFilesAdminSettingsView.prototype.onRouteChild = function (aParams)

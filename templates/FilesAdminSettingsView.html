@@ -1,7 +1,7 @@
-<div class="panel_top"data-bind="visible: isSuperAdmin()">
+<div class="panel_top"data-bind="visible: isNoEntity()">
 	<h2 class="settings_heading" data-bind="i18n: {'key': '%MODULENAME%/HEADING_SETTINGS_TAB'}"></h2>
 </div>
-<div class="panel_center"data-bind="visible: isSuperAdmin()">
+<div class="panel_center"data-bind="visible: isNoEntity()">
 	<div class="fields">
 		<div class="fieldset">
 			<div class="row"> 
@@ -40,7 +40,7 @@
 <div class="panel_center" data-bind="visible: visible()">
 	<div class="fields">
 		<div class="fieldset">
-			<div class="row" data-bind="visible: isTenantAdmin() || isSuperAdmin()">
+			<div class="row" style="margin-bottom: 6px;" data-bind="visible: isTenantEntity() || isNoEntity()">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_TENANT_SPACE_LIMIT'}"></span>
 				<span class="value">
 					<input class="input" type="text" data-bind="value: tenantSpaceLimitMb, valueUpdate: 'afterkeydown', 
@@ -49,10 +49,10 @@
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>
-			<div class="row hint" data-bind="visible: allowEditUserSpaceLimitMb() && (isTenantAdmin() || isSuperAdmin())">
+			<div class="row hint" data-bind="visible: isNoEntity() || isTenantEntity()">
 				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_TENANT_SPACE_LIMIT'}"></span>
 			</div>			
-			<div class="row">
+			<div class="row" style="margin-bottom: 6px;" data-bind="visible: allowEditUserSpaceLimitMb() || isUserEntity()">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
 				<span class="value">
 					<input class="input" type="text" data-bind="visible: allowEditUserSpaceLimitMb(), value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 
@@ -61,10 +61,10 @@
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>
-			<div class="row hint" data-bind="visible: (isTenantAdmin() || isSuperAdmin())">
+			<div class="row hint" data-bind="visible: (isNoEntity() || isTenantEntity()) && allowEditUserSpaceLimitMb()">
 				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_USER_SPACE_LIMIT'}"></span>
 			</div>			
-			<div class="row" data-bind="visible: isTenantAdmin()">
+			<div class="row" data-bind="visible: isTenantEntity()">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_ALLOCATED_SPACE'}"></span>
 				<span class="value">
 					<span data-bind="text: allocatedSpace()"></span>
