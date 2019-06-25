@@ -154,12 +154,24 @@ CFilesAdminSettingsView.prototype.savePersonal = function ()
 				'EntityType': this.sEntityType,
 				'EntityId': Types.pInt(this.iEntityId),
 				'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb()),
-				'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb()),
+				'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb())
 			}, 
 			this.onResponse, 
 			this
 		);
 	}
-}
+};
+
+CFilesAdminSettingsView.prototype.applySavedValues = function (oParameters)
+{
+	if (typeof oParameters.EntityType !== 'undefined' && oParameters.EntityType === ''
+		&& typeof oParameters.UserSpaceLimitMb !== 'undefined'
+		&& typeof oParameters.TenantSpaceLimitMb !== 'undefined'
+	)
+	{
+		Settings.UserSpaceLimitMb = oParameters.UserSpaceLimitMb;
+		Settings.TenantSpaceLimitMb = oParameters.TenantSpaceLimitMb;
+	}
+};
 
 module.exports = new CFilesAdminSettingsView();
