@@ -23,7 +23,7 @@ module.exports = function (oAppData) {
 	
 	Settings.init(oAppData);
 
-	if (!ModulesManager.isModuleAvailable(Settings.ServerModuleName) || Settings.Storages.length === 0)
+	if (!ModulesManager.isModuleAvailable(Settings.ServerModuleName) || !App.isPublic() && Settings.Storages.length === 0)
 	{
 		return null;
 	}
