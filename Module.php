@@ -115,7 +115,9 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 					{
 						$sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
 					}
-
+					
+					$oModuleManager = \Aurora\System\Api::GetModuleManager();
+					$sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
 					$sResult = \file_get_contents($this->GetPath().'/templates/FilesPub.html');
 					if (\is_string($sResult))
 					{
@@ -124,7 +126,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 							'{{FileName}}' => $mData['Name'],
 							'{{FileSize}}' => \Aurora\System\Utils::GetFriendlySize($mData['Size']),
 							'{{FileType}}' => \Aurora\System\Utils::GetFileExtension($mData['Name']),
-							'{{BaseUrl}}' => $sUrlRewriteBase 
+							'{{BaseUrl}}' => $sUrlRewriteBase,
+							'{{Theme}}' => $sTheme,
 						));
 					}
 					else
@@ -134,9 +137,12 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				}
 				else 
 				{
+					$oModuleManager = \Aurora\System\Api::GetModuleManager();
+					$sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
 					$sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
 					$sResult = \strtr($sResult, array(
-						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
+						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND'),
+						'{{Theme}}' => $sTheme,
 					));
 				}
 			}
