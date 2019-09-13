@@ -182,7 +182,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			'ShowCommonSettings' => $this->getConfig('ShowCommonSettings', false),
 			'ServerUrlRewriteBase' => $this->getConfig('ServerUrlRewriteBase', false),
 			'ServerUseUrlRewrite' => $this->getConfig('ServerUseUrlRewrite', false),
-			'ShowFilesApps' => $this->getConfig('ShowFilesApps', true)
+			'ShowFilesApps' => $this->getConfig('ShowFilesApps', true),
+			'BottomLeftCornerLinks' => $this->getConfig('BottomLeftCornerLinks', []),
 		);
 		
 		return $aModuleSettings;

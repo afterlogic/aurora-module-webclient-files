@@ -183,6 +183,9 @@ function CFilesView(bPopup)
 	this.quotaDesc = ko.observable('');
 	this.quotaProc = ko.observable(-1);
 	
+	this.aBottomLeftCornerLinks = Settings.BottomLeftCornerLinks;
+	console.log('this.aBottomLeftCornerLinks', this.aBottomLeftCornerLinks)
+	
 	ko.computed(function () {
 		if (!UserSettings.ShowQuotaBar)
 		{
