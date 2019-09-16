@@ -74,8 +74,6 @@ module.exports = {
 			this.EditFileNameWithoutExtension = Types.pBool(oAppDataFilesWebclientSection.EditFileNameWithoutExtension, this.EditFileNameWithoutExtension);
 			this.ShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.ShowCommonSettings);
 			this.ShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.ShowFilesApps);
-			console.log('oAppDataFilesWebclientSection.BottomLeftCornerLinks', oAppDataFilesWebclientSection.BottomLeftCornerLinks);
-			console.log('oAppDataFilesWebclientSection', oAppDataFilesWebclientSection);
 			this.BottomLeftCornerLinks = Types.pArray(oAppDataFilesWebclientSection.BottomLeftCornerLinks, this.BottomLeftCornerLinks);
 		}
 	},
