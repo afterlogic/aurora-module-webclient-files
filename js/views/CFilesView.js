@@ -1216,7 +1216,8 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 				this.storages.push({
 					isExternal: oStorage.IsExternal,
 					type: oStorage.Type,
-					displayName: oStorage.DisplayName
+					displayName: oStorage.DisplayName,
+					droppable: Types.pBool(oStorage.IsDroppable, true)
 				});
 			}
 		}, this);
