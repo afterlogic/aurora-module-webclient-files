@@ -1106,6 +1106,11 @@ CFilesView.prototype.onRenameResponse = function (oResponse, oRequest)
 	this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true);
 };
 
+CFilesView.prototype.refresh = function ()
+{
+	this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true);
+};
+
 CFilesView.prototype.executeDelete = function ()
 {
 	var
