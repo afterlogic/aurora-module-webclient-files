@@ -71,79 +71,91 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			if ($this->oMinModuleDecorator)
 			{
 				$mData = $this->oMinModuleDecorator->GetMinByHash($sHash);
-
-				if (\is_array($mData) && isset($mData['IsFolder']) && $mData['IsFolder'])
+				$mResult = null;
+				$this->broadcastEvent(
+					'FileEntryPub',
+					$mData,
+					$mResult
+				);
+				if ($mResult)
 				{
-					$oApiIntegrator = \Aurora\System\Managers\Integrator::getInstance();
-
-					if ($oApiIntegrator)
+					$sResult = $mResult;
+				}
+				else
+				{
+					if (\is_array($mData) && isset($mData['IsFolder']) && $mData['IsFolder'])
 					{
-						$oCoreClientModule = \Aurora\System\Api::GetModule('CoreWebclient');
-						if ($oCoreClientModule instanceof \Aurora\System\Module\AbstractModule) 
-						{
-							$sResult = \file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
-							if (\is_string($sResult)) 
-							{
-								$oSettings =& \Aurora\System\Api::GetSettings();
-								$sFrameOptions = $oSettings->GetValue('XFrameOptions', '');
-								if (0 < \strlen($sFrameOptions)) 
-								{
-									@\header('X-Frame-Options: '.$sFrameOptions);
-								}
-								
-								$aConfig = array(
-									'public_app' => true,
-									'modules_list' => $oApiIntegrator->GetModulesForEntry('FilesWebclient')
-								);
+						$oApiIntegrator = \Aurora\System\Managers\Integrator::getInstance();
 
-								$sResult = \strtr($sResult, array(
-									'{{AppVersion}}' => AU_APP_VERSION,
-									'{{IntegratorDir}}' => $oApiIntegrator->isRtl() ? 'rtl' : 'ltr',
-									'{{IntegratorLinks}}' => $oApiIntegrator->buildHeadersLink(),
-									'{{IntegratorBody}}' => $oApiIntegrator->buildBody($aConfig)
-								));
+						if ($oApiIntegrator)
+						{
+							$oCoreClientModule = \Aurora\System\Api::GetModule('CoreWebclient');
+							if ($oCoreClientModule instanceof \Aurora\System\Module\AbstractModule)
+							{
+								$sResult = \file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
+								if (\is_string($sResult))
+								{
+									$oSettings =& \Aurora\System\Api::GetSettings();
+									$sFrameOptions = $oSettings->GetValue('XFrameOptions', '');
+									if (0 < \strlen($sFrameOptions))
+									{
+										@\header('X-Frame-Options: '.$sFrameOptions);
+									}
+
+									$aConfig = array(
+										'public_app' => true,
+										'modules_list' => $oApiIntegrator->GetModulesForEntry('FilesWebclient')
+									);
+
+									$sResult = \strtr($sResult, array(
+										'{{AppVersion}}' => AU_APP_VERSION,
+										'{{IntegratorDir}}' => $oApiIntegrator->isRtl() ? 'rtl' : 'ltr',
+										'{{IntegratorLinks}}' => $oApiIntegrator->buildHeadersLink(),
+										'{{IntegratorBody}}' => $oApiIntegrator->buildBody($aConfig)
+									));
+								}
 							}
 						}
 					}
-				}
-				else if ($mData && isset($mData['__hash__'], $mData['Name'], $mData['Size']))
-				{
-					$sUrl = (bool) $this->getConfig('ServerUseUrlRewrite', false) ? '/download/' : '?/files-pub/';
+					else if ($mData && isset($mData['__hash__'], $mData['Name'], $mData['Size']))
+					{
+						$sUrl = (bool) $this->getConfig('ServerUseUrlRewrite', false) ? '/download/' : '?/files-pub/';
 
-					$sUrlRewriteBase = (string) $this->getConfig('ServerUrlRewriteBase', '');
-					if (!empty($sUrlRewriteBase))
-					{
-						$sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
-					}
-					
-					$oModuleManager = \Aurora\System\Api::GetModuleManager();
-					$sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
-					$sResult = \file_get_contents($this->GetPath().'/templates/FilesPub.html');
-					if (\is_string($sResult))
-					{
-						$sResult = \strtr($sResult, array(
-							'{{Url}}' => $sUrl.$mData['__hash__'], 
-							'{{FileName}}' => $mData['Name'],
-							'{{FileSize}}' => \Aurora\System\Utils::GetFriendlySize($mData['Size']),
-							'{{FileType}}' => \Aurora\System\Utils::GetFileExtension($mData['Name']),
-							'{{BaseUrl}}' => $sUrlRewriteBase,
-							'{{Theme}}' => $sTheme,
-						));
+						$sUrlRewriteBase = (string) $this->getConfig('ServerUrlRewriteBase', '');
+						if (!empty($sUrlRewriteBase))
+						{
+							$sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
+						}
+
+						$oModuleManager = \Aurora\System\Api::GetModuleManager();
+						$sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
+						$sResult = \file_get_contents($this->GetPath().'/templates/FilesPub.html');
+						if (\is_string($sResult))
+						{
+							$sResult = \strtr($sResult, array(
+								'{{Url}}' => $sUrl.$mData['__hash__'],
+								'{{FileName}}' => $mData['Name'],
+								'{{FileSize}}' => \Aurora\System\Utils::GetFriendlySize($mData['Size']),
+								'{{FileType}}' => \Aurora\System\Utils::GetFileExtension($mData['Name']),
+								'{{BaseUrl}}' => $sUrlRewriteBase,
+								'{{Theme}}' => $sTheme,
+							));
+						}
+						else
+						{
+							\Aurora\System\Api::Log('Empty template.', \Aurora\System\Enums\LogLevel::Error);
+						}
 					}
 					else
 					{
-						\Aurora\System\Api::Log('Empty template.', \Aurora\System\Enums\LogLevel::Error);
+						$oModuleManager = \Aurora\System\Api::GetModuleManager();
+						$sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
+						$sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
+						$sResult = \strtr($sResult, array(
+							'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND'),
+							'{{Theme}}' => $sTheme,
+						));
 					}
-				}
-				else 
-				{
-					$oModuleManager = \Aurora\System\Api::GetModuleManager();
-					$sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
-					$sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
-					$sResult = \strtr($sResult, array(
-						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND'),
-						'{{Theme}}' => $sTheme,
-					));
 				}
 			}
 
