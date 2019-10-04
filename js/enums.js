@@ -13,7 +13,8 @@ Enums.FileStorageType = {
 	'Corporate': 'corporate',
 	'Shared': 'shared',
 	'GoogleDrive': 'google',
-	'Dropbox': 'dropbox'
+	'Dropbox': 'dropbox',
+	'Encrypted': 'encrypted'
 };
 
 /**
