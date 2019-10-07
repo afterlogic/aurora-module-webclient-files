@@ -163,6 +163,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		}
 		else
 		{
+			\header('Cache-Control: no-cache', true);
 			if ($this->oMinModuleDecorator)
 			{
 				$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
