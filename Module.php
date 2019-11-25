@@ -64,6 +64,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		
 		$bDownload = !(!empty($sAction) && $sAction === 'view');
 		$bList = (!empty($sAction) && $sAction === 'list');
+		$bSecure = (!empty($sAction) && $sAction === 'secure');
+		$sPassword = $bSecure ? (string) \Aurora\System\Router::getItemByIndex(3, '') : '';
 		
 		if ($bList)
 		{
@@ -167,8 +169,17 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			if ($this->oMinModuleDecorator)
 			{
 				$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
-
-				if (isset($aHash['__hash__']) && ((isset($aHash['IsFolder']) && (bool) $aHash['IsFolder'] === false) || !isset($aHash['IsFolder'])))
+				if (isset($aHash['__hash__'])
+					&& ((isset($aHash['IsFolder']) && (bool) $aHash['IsFolder'] === false) || !isset($aHash['IsFolder']))
+					&& (
+						(
+							isset($aHash['Password'])
+							&& $sPassword
+							&& \Aurora\System\Utils::EncryptValue($sPassword) === $aHash['Password']
+						)
+						|| !isset($aHash['Password'])
+					)
+				)
 				{
 					echo $this->oFilesModuleDecorator->getRawFile(
 						null, 
