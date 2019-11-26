@@ -308,6 +308,7 @@ function CFilesView(bPopup)
 	this.createShortcutCommand = Utils.createCommand(this, this.executeCreateShortcut, function () {
 		return !this.isDisabledShortcutButton();
 	});
+	this.PublicLinksEnabled = Settings.PublicLinksEnabled;
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);

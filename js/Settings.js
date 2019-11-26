@@ -28,8 +28,9 @@ module.exports = {
 	ShowFilesApps: true,
 	BottomLeftCornerLinks: [],
 
-	ShowPersonalFilesAdminSection: false, 
-	ShowCorporateFilesAdminSection: false, 
+	ShowPersonalFilesAdminSection: false,
+	ShowCorporateFilesAdminSection: false,
+	PublicLinksEnabled: true,
 	
 	/**
 	 * Initializes settings from AppData object sections.
@@ -75,6 +76,7 @@ module.exports = {
 			this.ShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.ShowCommonSettings);
 			this.ShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.ShowFilesApps);
 			this.BottomLeftCornerLinks = Types.pArray(oAppDataFilesWebclientSection.BottomLeftCornerLinks, this.BottomLeftCornerLinks);
+			this.PublicLinksEnabled = Types.pBool(oAppDataFilesWebclientSection.PublicLinksEnabled, this.PublicLinksEnabled);
 		}
 	},
 	

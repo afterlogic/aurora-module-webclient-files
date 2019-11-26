@@ -214,6 +214,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			'ServerUseUrlRewrite' => $this->getConfig('ServerUseUrlRewrite', false),
 			'ShowFilesApps' => $this->getConfig('ShowFilesApps', true),
 			'BottomLeftCornerLinks' => $this->getConfig('BottomLeftCornerLinks', []),
+			'PublicLinksEnabled' => $this->getConfig('PublicLinksEnabled', true)
 		);
 		
 		return $aModuleSettings;
