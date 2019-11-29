@@ -61,12 +61,11 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		
 		$sHash = (string) \Aurora\System\Router::getItemByIndex(1, '');
 		$sAction = (string) \Aurora\System\Router::getItemByIndex(2, 'download');
-		
+		$bSecure = \Aurora\System\Router::getItemByIndex(3, '') === 'secure';
 		$bDownload = !(!empty($sAction) && $sAction === 'view');
 		$bList = (!empty($sAction) && $sAction === 'list');
-		$bSecure = (!empty($sAction) && $sAction === 'secure');
-		$sPassword = $bSecure ? (string) \Aurora\System\Router::getItemByIndex(3, '') : '';
-		
+		$sPassword = $bSecure ? rawurldecode(\Aurora\System\Router::getItemByIndex(4, '')) : '';
+
 		if ($bList)
 		{
 			$sResult = '';
