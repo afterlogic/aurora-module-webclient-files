@@ -178,6 +178,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 						)
 						|| !isset($aHash['Password'])
 					)
+					&& isset($aHash['Type']) && isset($aHash['Path']) && isset($aHash['Name'])
 				)
 				{
 					echo $this->oFilesModuleDecorator->getRawFile(
