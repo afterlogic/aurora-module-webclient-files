@@ -622,7 +622,7 @@ CFilesView.prototype.moveItems = function (sMethod, oFolder, aChecked)
 		bAllowMove = true
 	;
 	
-	if (bSameStorage || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal)
+	if (bSameStorage || !bSameStorage && !oToStorage.isExternal && !oFromStorage.isExternal && Enums.FileStorageType.Shared !== oToStorage.type)
 	{
 		if (oToStorage.type === Enums.FileStorageType.Personal && oFromStorage.type !== Enums.FileStorageType.Personal)
 		{
