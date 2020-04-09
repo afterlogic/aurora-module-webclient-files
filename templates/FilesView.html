@@ -2,7 +2,7 @@
 	<div class="panels" data-bind="splitterFlex: {name: 'files_list', sizes: [20, 80]}">
 		<div class="panel left_panel storages_panel">
 			<div class="panel_content">
-				<div class="buttons big_single_button">
+				<div class="buttons big_single_button" data-bind="css: isUploadButtonDisabled() ? 'disabled' : '', click: function () { return !isUploadButtonDisabled(); }">
 					<span class="button" data-bind="initDom: uploaderButton"> 
 						<span data-bind="i18n: {'key': '%MODULENAME%/ACTION_UPLOAD_FILES'}"></span> 
 					</span>

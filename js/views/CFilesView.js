@@ -87,6 +87,9 @@ function CFilesView(bPopup)
 			this.selector.listCheckedAndSelected(false);
 		}
 	}, this);
+	this.isUploadButtonDisabled = ko.computed(function () {
+		return this.storageType() === Enums.FileStorageType.Shared;
+	}, this);
 	
 	this.pathItems = ko.observableArray();
 	this.currentPath = ko.observable('');
@@ -137,7 +140,7 @@ function CFilesView(bPopup)
 		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1 && !this.isDisabledRenameButton();
 	});
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
-		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0 && !this.isDisabledDeleteButton();
+		return this.storageType() !== Enums.FileStorageType.Shared && this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0 && !this.isDisabledDeleteButton();
 	});
 	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
 		if (this.checkedReadyForOperations())
@@ -233,16 +236,17 @@ function CFilesView(bPopup)
 				{
 					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_NOTHING_FOUND');
 				}
-				else
+				else if (this.storageType() === Enums.FileStorageType.Shared)
 				{
-					if (this.currentPath() !== '' || this.bInPopup || this.bPublic)
-					{
-						sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY');
-					}
-					else if (this.bAllowDragNDrop)
-					{
-						sInfoText = TextUtils.i18n('%MODULENAME%/INFO_DRAGNDROP_FILES_OR_CREATE_FOLDER');
-					}
+					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_SHARED_FOLDER_IS_EMPTY');
+				}
+				else if (this.currentPath() !== '' || this.bInPopup || this.bPublic)
+				{
+					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY');
+				}
+				else if (this.bAllowDragNDrop)
+				{
+					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_DRAGNDROP_FILES_OR_CREATE_FOLDER');
 				}
 			}
 		}
