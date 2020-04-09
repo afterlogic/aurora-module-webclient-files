@@ -276,7 +276,7 @@ function CFilesView(bPopup)
 	this.addToolbarButtons = ko.observableArray([]);
 	
 	App.subscribeEvent('Files::ShowList', _.bind(function (oParams) {
-		if (oParams.Item)
+		if (this.shown() && oParams.Item)
 		{
 			this.routeFiles(oParams.Item.storageType(), oParams.Item.fullPath());
 		}
