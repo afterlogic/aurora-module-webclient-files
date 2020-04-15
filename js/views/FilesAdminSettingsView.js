@@ -49,7 +49,9 @@ CFilesAdminSettingsView.prototype.getCurrentValues = function()
 {
 	return [
 		this.enableUploadSizeLimit(),
-		this.uploadSizeLimitMb()
+		this.uploadSizeLimitMb(),
+		this.tenantSpaceLimitMb(),
+		this.userSpaceLimitMb()
 	];
 };
 
