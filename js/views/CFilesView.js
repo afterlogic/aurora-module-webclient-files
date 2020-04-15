@@ -376,7 +376,8 @@ CFilesView.prototype.initUploader = function ()
 					return JSON.stringify({
 						'Type': self.storageType(),
 						'SubPath': oFile && oFile.Folder || '',
-						'Path': self.dropPath()
+						'Path': self.dropPath(),
+						'Overwrite': false
 					});
 				}
 			}, App.getCommonRequestParameters())
