@@ -9,7 +9,7 @@ namespace Aurora\Modules\FilesWebclient;
 
 /**
  * This module displays the web interface for managing files.
- * 
+ *
  * @license https://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
  * @license https://afterlogic.com/products/common-licensing Afterlogic Software License
  * @copyright Copyright (c) 2019, Afterlogic Corp.
@@ -23,7 +23,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	 * @var \CApiModuleDecorator
 	 */
 	protected $oMinModuleDecorator = null;
-	
+
 	/**
 	 *
 	 * @var \CApiModuleDecorator
@@ -38,10 +38,10 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	/***** private functions *****/
 	/**
 	 * Initializes Files Module.
-	 * 
+	 *
 	 * @ignore
 	 */
-	public function init() 
+	public function init()
 	{
 		$this->oFilesModuleDecorator = \Aurora\Modules\Files\Module::Decorator();
 		$this->oMinModuleDecorator = \Aurora\Modules\Min\Module::Decorator();
@@ -50,7 +50,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	}
 
 	/***** private functions *****/
-	
+
 	/***** public functions *****/
 	/**
 	 * @ignore
@@ -58,7 +58,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	public function EntryPub()
 	{
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
-		
+
 		$sHash = (string) \Aurora\System\Router::getItemByIndex(1, '');
 		$sAction = (string) \Aurora\System\Router::getItemByIndex(2, 'download');
 		$bSecure = \Aurora\System\Router::getItemByIndex(3, '') === 'secure';
@@ -182,15 +182,15 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				)
 				{
 					echo $this->oFilesModuleDecorator->getRawFile(
-						null, 
-						$aHash['Type'], 
-						$aHash['Path'], 
-						$aHash['Name'], 
-						$sHash, 
+						null,
+						$aHash['Type'],
+						$aHash['Path'],
+						$aHash['Name'],
+						$sHash,
 						$sAction
 					);
 				}
-				else 
+				else
 				{
 					$sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
 					$sResult = \strtr($sResult, array(
@@ -202,11 +202,11 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			}
 		}
 	}
-	
+
 	public function GetSettings()
 	{
 		\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
-		
+
 		$aModuleSettings = array(
 			'EditFileNameWithoutExtension' => $this->getConfig('EditFileNameWithoutExtension', false),
 			'ShowCommonSettings' => $this->getConfig('ShowCommonSettings', false),
@@ -216,7 +216,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			'BottomLeftCornerLinks' => $this->getConfig('BottomLeftCornerLinks', []),
 			'PublicLinksEnabled' => $this->getConfig('PublicLinksEnabled', true)
 		);
-		
+
 		return $aModuleSettings;
 	}
 }
