@@ -3,14 +3,14 @@
 var
 	_ = require('underscore'),
 	ko = require('knockout'),
-	
+
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	Ajax = require('%PathToCoreWebclientModule%/js/Ajax.js'),
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
-	
+
 	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 	CAbstractSettingsFormView = ModulesManager.run('AdminPanelWebclient', 'getAbstractSettingsFormViewClass'),
-	
+
 	Settings = require('modules/%ModuleName%/js/Settings.js')
 ;
 
@@ -20,7 +20,7 @@ var
 function CFilesAdminSettingsView()
 {
 	CAbstractSettingsFormView.call(this, Settings.ServerModuleName);
-	
+
 	this.sEntityType = '';
 	this.iEntityId = 0;
 
@@ -31,6 +31,7 @@ function CFilesAdminSettingsView()
 	this.allowEditUserSpaceLimitMb = ko.observable(true);
 	this.allowEditTenantSpaceLimitMb = ko.observable(true);
 	this.allocatedSpace = ko.observable(0);
+	this.visibleCorporate  = ko.observable(Settings.ShowCorporateFilesAdminSection);
 
 	/* Editable fields */
 	this.enableUploadSizeLimit = ko.observable(Settings.EnableUploadSizeLimit);
@@ -38,6 +39,7 @@ function CFilesAdminSettingsView()
 
 	this.userSpaceLimitMb = ko.observable(Settings.UserSpaceLimitMb);
 	this.tenantSpaceLimitMb = ko.observable(Settings.TenantSpaceLimitMb);
+	this.corporateSpaceLimitMb = ko.observable(Settings.CorporateSpaceLimitMb);
 	/*-- Editable fields */
 }
 
@@ -51,7 +53,8 @@ CFilesAdminSettingsView.prototype.getCurrentValues = function()
 		this.enableUploadSizeLimit(),
 		this.uploadSizeLimitMb(),
 		this.tenantSpaceLimitMb(),
-		this.userSpaceLimitMb()
+		this.userSpaceLimitMb(),
+		this.corporateSpaceLimitMb()
 	];
 };
 
@@ -66,19 +69,21 @@ CFilesAdminSettingsView.prototype.revertGlobalValues = function()
 
 	this.userSpaceLimitMb(Settings.UserSpaceLimitMb);
 	this.tenantSpaceLimitMb(Settings.TenantSpaceLimitMb);
+	this.corporateSpaceLimitMb(Settings.CorporateSpaceLimitMb);
 };
 
 CFilesAdminSettingsView.prototype.getParametersForSave = function ()
 {
 	return {
 		'EnableUploadSizeLimit': this.enableUploadSizeLimit(),
-		'UploadSizeLimitMb': Types.pInt(this.uploadSizeLimitMb())
+		'UploadSizeLimitMb': Types.pInt(this.uploadSizeLimitMb()),
+		'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb())
 	};
 };
 
 /**
  * Applies saved values to the Settings object.
- * 
+ *
  * @param {Object} oParameters Parameters which were saved on the server side.
  */
 CFilesAdminSettingsView.prototype.applySavedValues = function (oParameters)
@@ -89,7 +94,7 @@ CFilesAdminSettingsView.prototype.applySavedValues = function (oParameters)
 /**
  * Sets access level for the view via entity type and entity identifier.
  * This view is visible only for empty entity type.
- * 
+ *
  * @param {string} sEntityType Current entity type.
  * @param {number} iEntityId Indentificator of current intity.
  */
@@ -151,17 +156,31 @@ CFilesAdminSettingsView.prototype.savePersonal = function ()
 		this.isSaving(true);
 
 		Ajax.send(
-			this.sServerModule, 
+			this.sServerModule,
 			'UpdateSettingsForEntity', {
 				'EntityType': this.sEntityType,
 				'EntityId': Types.pInt(this.iEntityId),
 				'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb()),
 				'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb())
-			}, 
-			this.onResponse, 
+			},
+			this.onResponse,
 			this
 		);
 	}
+};
+
+CFilesAdminSettingsView.prototype.saveCorporate = function ()
+{
+	this.isSaving(true);
+
+	Ajax.send(
+		'CorporateFiles',
+		'UpdateSettings', {
+			'SpaceLimitMb': Types.pInt(this.corporateSpaceLimitMb())
+		},
+		this.onResponse,
+		this
+	);
 };
 
 CFilesAdminSettingsView.prototype.applySavedValues = function (oParameters)

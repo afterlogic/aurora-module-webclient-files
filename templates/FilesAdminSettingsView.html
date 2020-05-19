@@ -4,7 +4,7 @@
 <div class="panel_center"data-bind="visible: isNoEntity()">
 	<div class="fields">
 		<div class="fieldset">
-			<div class="row"> 
+			<div class="row">
 				<span class="label"></span>
 				<span class="value">
 					<label class="custom_checkbox" data-bind="css: {'checked': enableUploadSizeLimit}">
@@ -13,7 +13,7 @@
 					</label>
 					<label for="enableUploadSizeLimit" data-bind="i18n: {'key': '%MODULENAME%/LABEL_ENABLE_UPLOAD_SIZE_LIMIT'}"></label>
 				</span>
-			</div>			
+			</div>
 			<div class="row">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_UPLOAD_SIZE_LIMIT'}"></span>
 				<span class="value">
@@ -21,7 +21,7 @@
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>
-		</div>		
+		</div>
 
 		<div class="buttons">
 			<span class="button" data-bind="click: save, visible: !isSaving()">
@@ -43,7 +43,7 @@
 			<div class="row" style="margin-bottom: 6px;" data-bind="visible: isTenantEntity() || isNoEntity()">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_TENANT_SPACE_LIMIT'}"></span>
 				<span class="value">
-					<input class="input" type="text" data-bind="value: tenantSpaceLimitMb, valueUpdate: 'afterkeydown', 
+					<input class="input" type="text" data-bind="value: tenantSpaceLimitMb, valueUpdate: 'afterkeydown',
 						onEnter: save, visible: allowEditTenantSpaceLimitMb()" style="width: 150px; margin-right: 5px;">
 					<span data-bind="text: tenantSpaceLimitMb, visible: !allowEditTenantSpaceLimitMb()"></span>
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
@@ -51,11 +51,11 @@
 			</div>
 			<div class="row hint" data-bind="visible: isNoEntity() || isTenantEntity()">
 				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_TENANT_SPACE_LIMIT'}"></span>
-			</div>			
+			</div>
 			<div class="row" style="margin-bottom: 6px;" data-bind="visible: allowEditUserSpaceLimitMb() || isUserEntity()">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_USER_SPACE_LIMIT'}"></span>
 				<span class="value">
-					<input class="input" type="text" data-bind="visible: allowEditUserSpaceLimitMb(), value: userSpaceLimitMb, valueUpdate: 'afterkeydown', 
+					<input class="input" type="text" data-bind="visible: allowEditUserSpaceLimitMb(), value: userSpaceLimitMb, valueUpdate: 'afterkeydown',
 						onEnter: save" style="width: 150px; margin-right: 5px;">
 					<span data-bind="text: userSpaceLimitMb, visible: !allowEditUserSpaceLimitMb()"></span>
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
@@ -63,7 +63,7 @@
 			</div>
 			<div class="row hint" data-bind="visible: (isNoEntity() || isTenantEntity()) && allowEditUserSpaceLimitMb()">
 				<span class="value" style="margin-left: 150px; display: block;" data-bind="i18n: {'key': '%MODULENAME%/HINT_USER_SPACE_LIMIT'}"></span>
-			</div>			
+			</div>
 			<div class="row" data-bind="visible: isTenantEntity()">
 				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_ALLOCATED_SPACE'}"></span>
 				<span class="value">
@@ -71,10 +71,39 @@
 					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
 				</span>
 			</div>
-		</div>		
+		</div>
+
+
 
 		<div class="buttons">
 			<span class="button" data-bind="click: savePersonal, visible: !isSaving()">
+				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE'}"></span>
+			</span>
+			<span class="button" data-bind="visible: isSaving()">
+				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE_IN_PROGRESS'}"></span>
+			</span>
+		</div>
+	</div>
+</div>
+
+<div class="panel_top" data-bind="visible: visibleCorporate()">
+	<h2 class="settings_heading" data-bind="i18n: {'key': '%MODULENAME%/HEADING_SETTINGS_TAB_CORPORATE'}"></h2>
+</div>
+<div class="panel_center" data-bind="visible: visibleCorporate()">
+	<div class="fields">
+		<div class="fieldset">
+			<div class="row">
+				<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_CORPORATE_SPACE_LIMIT'}"></span>
+				<span class="value">
+					<input class="input" type="text" data-bind="value: corporateSpaceLimitMb, valueUpdate: 'afterkeydown',
+						onEnter: save" style="width: 50px; margin-right: 5px;">
+					<span data-bind="i18n: {'key': 'COREWEBCLIENT/LABEL_MEGABYTES'}"></span>
+				</span>
+			</div>
+		</div>
+
+		<div class="buttons">
+			<span class="button" data-bind="click: saveCorporate, visible: !isSaving()">
 				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE'}"></span>
 			</span>
 			<span class="button" data-bind="visible: isSaving()">
