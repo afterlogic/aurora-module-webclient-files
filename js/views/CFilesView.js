@@ -93,6 +93,10 @@ function CFilesView(bPopup)
 	
 	this.pathItems = ko.observableArray();
 	this.currentPath = ko.observable('');
+	this.isZipFolder = ko.computed(function () {
+		var aPath = this.currentPath().split('$ZIP:');
+		return Utils.getFileExtension(aPath[0]) === 'zip';
+	}, this);
 	this.dropPath = ko.observable('');
 	ko.computed(function () {
 		this.dropPath(this.currentPath());
@@ -137,10 +141,14 @@ function CFilesView(bPopup)
 		});
 	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, function () {
-		return this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1 && !this.isDisabledRenameButton();
+		return	!this.isZipFolder()
+				&& this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1
+				&& !this.isDisabledRenameButton();
 	});
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
-		return this.storageType() !== Enums.FileStorageType.Shared && this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0 && !this.isDisabledDeleteButton();
+		return	this.storageType() !== Enums.FileStorageType.Shared && !this.isZipFolder()
+				&& this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0
+				&& !this.isDisabledDeleteButton();
 	});
 	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
 		if (this.checkedReadyForOperations())
@@ -152,10 +160,10 @@ function CFilesView(bPopup)
 	});
 	this.shareCommand = Utils.createCommand(this, this.executeShare, function () {
 		var aItems = this.selector.listCheckedAndSelected();
-		return this.checkedReadyForOperations() && 1 === aItems.length && (!aItems[0].bIsLink);
+		return !this.isZipFolder() && this.checkedReadyForOperations() && 1 === aItems.length && (!aItems[0].bIsLink);
 	});
 	this.sendCommand = Utils.createCommand(this, this.executeSend, function () {
-		if (this.checkedReadyForOperations())
+		if (!this.isZipFolder() && this.checkedReadyForOperations())
 		{
 			var
 				aItems = this.selector.listCheckedAndSelected(),
@@ -307,10 +315,10 @@ function CFilesView(bPopup)
 		return this.shortcutButtonModules().length > 0;
 	}, this);
 	this.createFolderCommand = Utils.createCommand(this, this.executeCreateFolder, function () {
-		return !this.isDisabledCreateFolderButton();
+		return !this.isZipFolder() && !this.isDisabledCreateFolderButton();
 	});
 	this.createShortcutCommand = Utils.createCommand(this, this.executeCreateShortcut, function () {
-		return !this.isDisabledShortcutButton();
+		return !this.isZipFolder() && !this.isDisabledShortcutButton();
 	});
 	this.PublicLinksEnabled = Settings.PublicLinksEnabled;
 }
