@@ -287,4 +287,21 @@ CFileModel.prototype.openLink = function ()
 	}
 };
 
+CFileModel.prototype.commonParseActions = function (oData)
+{
+	_.each (oData.Actions, function (oData, sAction) {
+		if (!this.oActionsData[sAction])
+		{
+			this.oActionsData[sAction] = {};
+		}
+		var sHash = '';
+		if (sAction === 'download' || sAction === 'view')
+		{
+			sHash = '&' + Utils.getRandomHash();
+		}
+		this.oActionsData[sAction].Url = Types.pString(oData.url) + sHash;
+		this.actions.push(sAction);
+	}, this);
+};
+
 module.exports = CFileModel;
