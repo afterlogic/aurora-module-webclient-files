@@ -26,6 +26,7 @@ var
 	CreateLinkPopup = require('modules/%ModuleName%/js/popups/CreateLinkPopup.js'),
 	RenamePopup = require('modules/%ModuleName%/js/popups/RenamePopup.js'),
 	SharePopup = require('modules/%ModuleName%/js/popups/SharePopup.js'),
+	FileSharePopup = require('modules/SharedFiles/js/popups/FilesSharePopup.js'),
 	
 	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 	ComposeMessageWithAttachments = ModulesManager.run('MailWebclient', 'getComposeMessageWithAttachments'),
@@ -1103,6 +1104,17 @@ CFilesView.prototype.onShareIconClick = function (oItem)
 	if (oItem)
 	{
 		Popups.showPopup(SharePopup, [oItem]);
+	}
+};
+
+/**
+ * @param {Object} oItem
+ */
+CFilesView.prototype.onFileShareIconClick = function (oItem)
+{
+	if (oItem)
+	{
+		Popups.showPopup(FileSharePopup, [oItem]);
 	}
 };
 
