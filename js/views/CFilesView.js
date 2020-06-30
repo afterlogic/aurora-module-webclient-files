@@ -13,6 +13,7 @@ var
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	CJua = require('%PathToCoreWebclientModule%/js/CJua.js'),
 	CSelector = require('%PathToCoreWebclientModule%/js/CSelector.js'),
+	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 	Routing = require('%PathToCoreWebclientModule%/js/Routing.js'),
 	Screens = require('%PathToCoreWebclientModule%/js/Screens.js'),
 	UserSettings = require('%PathToCoreWebclientModule%/js/Settings.js'),
@@ -26,9 +27,8 @@ var
 	CreateLinkPopup = require('modules/%ModuleName%/js/popups/CreateLinkPopup.js'),
 	RenamePopup = require('modules/%ModuleName%/js/popups/RenamePopup.js'),
 	SharePopup = require('modules/%ModuleName%/js/popups/SharePopup.js'),
-	FileSharePopup = require('modules/SharedFiles/js/popups/FilesSharePopup.js'),
+	FilesSharePopup = ModulesManager.run('SharedFiles', 'getFilesSharePopup'),
 	
-	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 	ComposeMessageWithAttachments = ModulesManager.run('MailWebclient', 'getComposeMessageWithAttachments'),
 	
 	LinksUtils = require('modules/%ModuleName%/js/utils/Links.js'),
@@ -1112,9 +1112,9 @@ CFilesView.prototype.onShareIconClick = function (oItem)
  */
 CFilesView.prototype.onFileShareIconClick = function (oItem)
 {
-	if (oItem)
+	if (FilesSharePopup && oItem)
 	{
-		Popups.showPopup(FileSharePopup, [oItem]);
+		Popups.showPopup(FilesSharePopup, [oItem]);
 	}
 };
 
