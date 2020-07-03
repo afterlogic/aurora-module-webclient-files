@@ -65,17 +65,27 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		$bDownload = !(!empty($sAction) && $sAction === 'view');
 		$bList = (!empty($sAction) && $sAction === 'list');
 		$sPassword = $bSecure ? rawurldecode(\Aurora\System\Router::getItemByIndex(4, '')) : '';
+		$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
 
 		if ($bList)
 		{
 			$sResult = '';
 			if ($this->oMinModuleDecorator)
 			{
-				$mData = $this->oMinModuleDecorator->GetMinByHash($sHash);
+				$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
+
+				$aArgs = [
+					'UserId' => $aHash['UserId'],
+					'ResourceType' => 'file',
+					'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
+					'Action' => $sAction
+				];
+				$this->broadcastEvent('AddToActivityHistory', $aArgs);
+
 				$mResult = null;
 				$this->broadcastEvent(
 					'FileEntryPub',
-					$mData,
+					$aHash,
 					$mResult
 				);
 				if ($mResult)
@@ -84,7 +94,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				}
 				else
 				{
-					if (\is_array($mData) && isset($mData['IsFolder']) && $mData['IsFolder'])
+					if (\is_array($aHash) && isset($aHash['IsFolder']) && $aHash['IsFolder'])
 					{
 						$oApiIntegrator = \Aurora\System\Managers\Integrator::getInstance();
 
@@ -118,7 +128,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 							}
 						}
 					}
-					else if ($mData && isset($mData['__hash__'], $mData['Name'], $mData['Size']))
+					else if ($aHash && isset($aHash['__hash__'], $aHash['Name'], $aHash['Size']))
 					{
 						$sUrl = (bool) $this->getConfig('ServerUseUrlRewrite', false) ? '/download/' : '?/files-pub/';
 
@@ -134,10 +144,10 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 						if (\is_string($sResult))
 						{
 							$sResult = \strtr($sResult, array(
-								'{{Url}}' => $sUrl.$mData['__hash__'],
-								'{{FileName}}' => $mData['Name'],
-								'{{FileSize}}' => \Aurora\System\Utils::GetFriendlySize($mData['Size']),
-								'{{FileType}}' => \Aurora\System\Utils::GetFileExtension($mData['Name']),
+								'{{Url}}' => $sUrl.$aHash['__hash__'],
+								'{{FileName}}' => $aHash['Name'],
+								'{{FileSize}}' => \Aurora\System\Utils::GetFriendlySize($aHash['Size']),
+								'{{FileType}}' => \Aurora\System\Utils::GetFileExtension($aHash['Name']),
 								'{{BaseUrl}}' => $sUrlRewriteBase,
 								'{{Theme}}' => $sTheme,
 							));
@@ -167,7 +177,6 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 			\header('Cache-Control: no-cache', true);
 			if ($this->oMinModuleDecorator)
 			{
-				$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
 				if (isset($aHash['__hash__'])
 					&& ((isset($aHash['IsFolder']) && (bool) $aHash['IsFolder'] === false) || !isset($aHash['IsFolder']))
 					&& (
