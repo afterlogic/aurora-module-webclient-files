@@ -67,21 +67,19 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		$sPassword = $bSecure ? rawurldecode(\Aurora\System\Router::getItemByIndex(4, '')) : '';
 		$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
 
+		$aArgs = [
+			'UserId' => $aHash['UserId'],
+			'ResourceType' => 'file',
+			'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
+			'Action' => $sAction
+		];
+		$this->broadcastEvent('AddToActivityHistory', $aArgs);
+
 		if ($bList)
 		{
 			$sResult = '';
 			if ($this->oMinModuleDecorator)
 			{
-				$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
-
-				$aArgs = [
-					'UserId' => $aHash['UserId'],
-					'ResourceType' => 'file',
-					'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
-					'Action' => $sAction
-				];
-				$this->broadcastEvent('AddToActivityHistory', $aArgs);
-
 				$mResult = null;
 				$this->broadcastEvent(
 					'FileEntryPub',
@@ -198,9 +196,25 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 						$sHash,
 						$sAction
 					);
+
+					$aArgs = [
+						'UserId' => $aHash['UserId'],
+						'ResourceType' => 'file',
+						'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
+						'Action' => $sAction . '-finish'
+					];
+					$this->broadcastEvent('AddToActivityHistory', $aArgs);
 				}
 				else
 				{
+					$aArgs = [
+						'UserId' => $aHash['UserId'],
+						'ResourceType' => 'file',
+						'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
+						'Action' => 'wrong-password'
+					];
+					$this->broadcastEvent('AddToActivityHistory', $aArgs);
+
 					$sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
 					$sResult = \strtr($sResult, array(
 						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
