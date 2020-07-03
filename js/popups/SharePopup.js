@@ -3,12 +3,18 @@
 var
 	_ = require('underscore'),
 	ko = require('knockout'),
-	
+
+	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	UrlUtils = require('%PathToCoreWebclientModule%/js/utils/Url.js'),
+
 	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js'),
-	
+	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
+	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
+
 	Ajax = require('modules/%ModuleName%/js/Ajax.js'),
-	CFolderModel = require('modules/%ModuleName%/js/models/CFolderModel.js')
+	CFolderModel = require('modules/%ModuleName%/js/models/CFolderModel.js'),
+
+	ShowHistoryPopup = ModulesManager.run('ActivityHistory', 'getShowHistoryPopup')
 ;
 
 /**
@@ -21,6 +27,8 @@ function CSharePopup()
 	this.item = null;
 	this.pub = ko.observable('');
 	this.pubFocus = ko.observable(false);
+
+	this.bAllowShowHistory = !!ShowHistoryPopup;
 }
 
 _.extendOwn(CSharePopup.prototype, CAbstractPopup.prototype);
@@ -72,5 +80,12 @@ CSharePopup.prototype.onCancelSharingClick = function ()
 		this.item.published(false);
 	}
 };
+
+CSharePopup.prototype.showHistory = function () {
+	if (this.bAllowShowHistory)
+	{
+		Popups.showPopup(ShowHistoryPopup, [TextUtils.i18n('%MODULENAME%/HEADING_HISTORY_POPUP'), this.item]);
+	}
+}
 
 module.exports = new CSharePopup();
