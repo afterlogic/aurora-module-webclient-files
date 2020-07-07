@@ -67,10 +67,11 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		$sPassword = $bSecure ? rawurldecode(\Aurora\System\Router::getItemByIndex(4, '')) : '';
 		$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
 
+		$sResourceId = $aHash['Type'] . '/' . $aHash['Path'] . '/' . $aHash['Name'];
 		$aArgs = [
 			'UserId' => $aHash['UserId'],
 			'ResourceType' => 'file',
-			'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
+			'ResourceId' => $sResourceId,
 			'Action' => $sAction
 		];
 		$this->broadcastEvent('AddToActivityHistory', $aArgs);
@@ -200,7 +201,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 					$aArgs = [
 						'UserId' => $aHash['UserId'],
 						'ResourceType' => 'file',
-						'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
+						'ResourceId' => $sResourceId,
 						'Action' => $sAction . '-finish'
 					];
 					$this->broadcastEvent('AddToActivityHistory', $aArgs);
@@ -210,7 +211,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 					$aArgs = [
 						'UserId' => $aHash['UserId'],
 						'ResourceType' => 'file',
-						'ResourceId' => $aHash['Path'] . '/' . $aHash['Name'],
+						'ResourceId' => $sResourceId,
 						'Action' => 'wrong-password'
 					];
 					$this->broadcastEvent('AddToActivityHistory', $aArgs);
