@@ -67,7 +67,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		$sPassword = $bSecure ? rawurldecode(\Aurora\System\Router::getItemByIndex(4, '')) : '';
 		$aHash = $this->oMinModuleDecorator->GetMinByHash($sHash);
 
-		$sResourceId = $aHash['Type'] . '/' . $aHash['Path'] . '/' . $aHash['Name'];
+		$sFullPath = \ltrim($aHash['Path'], '/') . '/' . \ltrim($aHash['Name'], '/');
+		$sResourceId = $aHash['Type'] . '/' . \ltrim($sFullPath, '/');
 		$aArgs = [
 			'UserId' => $aHash['UserId'],
 			'ResourceType' => 'file',
