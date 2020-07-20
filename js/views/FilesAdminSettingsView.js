@@ -31,7 +31,9 @@ function CFilesAdminSettingsView()
 	this.allowEditUserSpaceLimitMb = ko.observable(true);
 	this.allowEditTenantSpaceLimitMb = ko.observable(true);
 	this.allocatedSpace = ko.observable(0);
-	this.visibleCorporate  = ko.observable(Settings.ShowCorporateFilesAdminSection);
+	this.visibleCorporate  = ko.computed(function () {
+		return Settings.ShowCorporateFilesAdminSection && !this.isUserEntity();
+	}, this);
 
 	/* Editable fields */
 	this.enableUploadSizeLimit = ko.observable(Settings.EnableUploadSizeLimit);
@@ -41,6 +43,9 @@ function CFilesAdminSettingsView()
 	this.tenantSpaceLimitMb = ko.observable(Settings.TenantSpaceLimitMb);
 	this.corporateSpaceLimitMb = ko.observable(Settings.CorporateSpaceLimitMb);
 	/*-- Editable fields */
+	
+	this.isPersonalSaving = ko.observable(false);
+	this.isCorporateSaving = ko.observable(false);
 }
 
 _.extendOwn(CFilesAdminSettingsView.prototype, CAbstractSettingsFormView.prototype);
@@ -153,7 +158,7 @@ CFilesAdminSettingsView.prototype.savePersonal = function ()
 {
 	if (!_.isFunction(this.validateBeforeSave) || this.validateBeforeSave())
 	{
-		this.isSaving(true);
+		this.isPersonalSaving(true);
 
 		Ajax.send(
 			this.sServerModule,
@@ -163,7 +168,10 @@ CFilesAdminSettingsView.prototype.savePersonal = function ()
 				'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb()),
 				'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb())
 			},
-			this.onResponse,
+			function (oResponse, oRequest) {
+				this.isPersonalSaving(false);
+				this.onResponse(oResponse, oRequest);
+			},
 			this
 		);
 	}
@@ -171,14 +179,17 @@ CFilesAdminSettingsView.prototype.savePersonal = function ()
 
 CFilesAdminSettingsView.prototype.saveCorporate = function ()
 {
-	this.isSaving(true);
+	this.isCorporateSaving(true);
 
 	Ajax.send(
 		'CorporateFiles',
 		'UpdateSettings', {
 			'SpaceLimitMb': Types.pInt(this.corporateSpaceLimitMb())
 		},
-		this.onResponse,
+		function (oResponse, oRequest) {
+			this.isCorporateSaving(false);
+			this.onResponse(oResponse, oRequest);
+		},
 		this
 	);
 };

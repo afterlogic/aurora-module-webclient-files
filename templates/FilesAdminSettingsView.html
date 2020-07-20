@@ -76,10 +76,10 @@
 
 
 		<div class="buttons">
-			<span class="button" data-bind="click: savePersonal, visible: !isSaving()">
+			<span class="button" data-bind="click: savePersonal, visible: !isPersonalSaving()">
 				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE'}"></span>
 			</span>
-			<span class="button" data-bind="visible: isSaving()">
+			<span class="button" data-bind="visible: isPersonalSaving()">
 				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE_IN_PROGRESS'}"></span>
 			</span>
 		</div>
@@ -103,10 +103,10 @@
 		</div>
 
 		<div class="buttons">
-			<span class="button" data-bind="click: saveCorporate, visible: !isSaving()">
+			<span class="button" data-bind="click: saveCorporate, visible: !isCorporateSaving()">
 				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE'}"></span>
 			</span>
-			<span class="button" data-bind="visible: isSaving()">
+			<span class="button" data-bind="visible: isCorporateSaving()">
 				<span data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SAVE_IN_PROGRESS'}"></span>
 			</span>
 		</div>
