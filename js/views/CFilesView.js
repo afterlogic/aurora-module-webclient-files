@@ -1110,6 +1110,17 @@ CFilesView.prototype.onShareIconClick = function (oItem)
 /**
  * @param {Object} oItem
  */
+CFilesView.prototype.onSecureIconClick = function (oItem)
+{
+	if (oItem && _.isFunction(oItem.onSecureIconClick))
+	{
+		oItem.onSecureIconClick(oItem);
+	}
+};
+
+/**
+ * @param {Object} oItem
+ */
 CFilesView.prototype.onFileShareIconClick = function (oItem)
 {
 	if (FilesSharePopup && oItem)
