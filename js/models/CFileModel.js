@@ -29,6 +29,9 @@ var
  */
 function CFileModel(oData, bPopup)
 {
+	// the constant is used instead of constructor.name because constructor.name can not be used in minified JS
+	this.IS_FILE = true;
+	
 	this.storageType = ko.observable(Types.pString(oData.Type));
 	this.sLastModified = CFileModel.parseLastModified(oData.LastModified);
 	
