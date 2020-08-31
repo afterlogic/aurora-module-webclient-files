@@ -573,8 +573,11 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 				if (this.uploadingFiles().length === 0)
 				{
 					Screens.showReport(TextUtils.i18n('COREWEBCLIENT/REPORT_UPLOAD_COMPLETE'));
-					bRequestFiles = true;
 				}
+			}
+			if (this.uploadingFiles().length === 0)
+			{
+				bRequestFiles = true;
 			}
 		}
 		else
