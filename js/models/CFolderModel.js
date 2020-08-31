@@ -36,6 +36,23 @@ function CFolderModel()
 	
 	this.sMainAction = 'list';
 	this.oExtendedProps = null;
+	
+	// The folder can be uploading. Operations should be disabled for such a folder.
+	this.uploadingFilesCount = ko.observable(0);
+	this.uploadedFilesCount = ko.observable(0);
+	this.progressPercent = ko.computed(function () {
+		if (this.uploadingFilesCount() > 0)
+		{
+			return Math.floor((this.uploadedFilesCount() / this.uploadingFilesCount()) * 100);
+		}
+		return 0;
+	}, this);
+	this.isIncomplete = ko.computed(function () {
+		return this.uploadingFilesCount() > 0;
+	}, this);
+	this.uploaded = ko.computed(function () {
+		return this.uploadingFilesCount() === 0;
+	}, this);
 }
 
 CFolderModel.prototype.parse = function (oData)
@@ -59,6 +76,17 @@ CFolderModel.prototype.getMainAction = function ()
 {
 	return this.sMainAction;
 };
+
+CFolderModel.prototype.increaseUploadingFiles = function ()
+{
+	return this.uploadingFilesCount(this.uploadingFilesCount() + 1);
+};
+
+CFolderModel.prototype.increaseUploadedFiles = function ()
+{
+	return this.uploadedFilesCount(this.uploadedFilesCount() + 1);
+};
+
 
 CFolderModel.prototype.eventDragStart = CAbstractFileModel.prototype.eventDragStart;
 

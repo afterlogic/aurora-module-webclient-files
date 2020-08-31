@@ -453,6 +453,34 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 		;
 		oFile.onUploadSelect(sFileUid, oFileData, true);
 		this.uploadingFiles.push(oFile);
+		this.onFileFromSubfolderUploadSelect(oFileData);
+	}
+};
+
+/**
+ * If selected for upload file is from subfolder increase uploading files count for this folder.
+ * @param {Object} oFileData
+ */
+CFilesView.prototype.onFileFromSubfolderUploadSelect = function (oFileData)
+{
+	if (Types.isNonEmptyString(oFileData.Folder))
+	{
+		var
+			aPath = _.compact(oFileData.Folder.split('/')),
+			sFolderName = aPath[0],
+			oFolder = _.find(this.folders(), function (oTmpFolder) {
+				return oTmpFolder.fileName() === sFolderName;
+			})
+		;
+		if (sFolderName && !oFolder)
+		{
+			oFolder = new CFolderModel();
+			oFolder.parse({
+				Name: sFolderName
+			});
+			this.folders.push(oFolder);
+		}
+		oFolder.increaseUploadingFiles();
 	}
 };
 
@@ -510,7 +538,7 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 		if (oFile)
 		{
 			oFile.onUploadComplete(sFileUid, bResponseReceived, oResult);
-			
+			this.onFileWithSubfolderUploadComplete(oFile);
 			this.deleteUploadFileByUid(sFileUid);
 			
 			if (oFile.uploadError())
@@ -562,6 +590,28 @@ CFilesView.prototype.onFileUploadComplete = function (sFileUid, bResponseReceive
 };
 
 /**
+ * If uploaded file is from subfolder increase uploaded files count for this folder.
+ * @param {Object} oFile
+ */
+CFilesView.prototype.onFileWithSubfolderUploadComplete = function (oFile)
+{
+	if (oFile.sUploadSubFolder)
+	{
+		var
+			aPath = _.compact(oFile.sUploadSubFolder.split('/')),
+			sFolderName = aPath[0],
+			oFolder = _.find(this.folders(), function (oTmpFolder) {
+				return oTmpFolder.fileName() === sFolderName;
+			})
+		;
+		if (oFolder)
+		{
+			oFolder.increaseUploadedFiles();
+		}
+	}
+};
+
+/**
  * @param {Object} oFile
  * @param {Object} oEvent
  */
@@ -571,7 +621,7 @@ CFilesView.prototype.onDrop = function (oFile, oEvent)
 	{
 		return;
 	}
-		
+
 	if (oEvent && oEvent.target && this.searchPattern() === '')
 	{
 		var oFolder = ko.dataFor(oEvent.target);
@@ -850,7 +900,10 @@ CFilesView.prototype.onItemDblClick = function (oItem)
 				}
 				break;
 			case 'list':
-				this.routeFiles(oItem.storageType(), oItem.fullPath());
+				if (!(oItem instanceof CFolderModel) || !oItem.isIncomplete())
+				{
+					this.routeFiles(oItem.storageType(), oItem.fullPath());
+				}
 				break;
 		}
 	}
@@ -883,6 +936,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				{
 					var oFolder = new CFolderModel();
 					oFolder.parse(oData);
+					this.checkIfFolderUploading(oFolder);
 					aNewFolderList.push(oFolder);
 				}
 				else
@@ -961,6 +1015,26 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			}
 		}
 	}
+};
+
+/**
+ * Checks if folder has uploding files and marks it as uploading.
+ * @param {Object} oFolder
+ */
+CFilesView.prototype.checkIfFolderUploading = function (oFolder) {
+	_.each(this.uploadingFiles(), function (oFile) {
+		if (oFile.sUploadSubFolder)
+		{
+			var
+				aPath = _.compact(oFile.sUploadSubFolder.split('/')),
+				sFolderName = aPath[0]
+			;
+			if (oFolder.fileName() === sFolderName)
+			{
+				oFolder.increaseUploadingFiles();
+			}
+		}
+	});
 };
 
 /**

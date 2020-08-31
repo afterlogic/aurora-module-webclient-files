@@ -1,11 +1,11 @@
 <div class="item folder" 
 	data-bind="
-		draggablePlace: !$parent.bInPopup ? $parent.dragAndDropHelperBound : null,
-		draggableDragStartCallback: function() {if (!$parent.bInPopup) $root.dragover(true);},
-		draggableDragStopCallback: function() {if (!$parent.bInPopup) $root.dragover(false);},
-		css: {'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published}"
+		draggablePlace: !$parent.bInPopup && !isIncomplete() ? $parent.dragAndDropHelperBound : null,
+		draggableDragStartCallback: function() {if (!$parent.bInPopup && !isIncomplete()) $root.dragover(true);},
+		draggableDragStopCallback: function() {if (!$parent.bInPopup && !isIncomplete()) $root.dragover(false);},
+		css: {'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete}"
 >
-	<div class="item_content ui-droppable dragHandle" data-bind="css: {'recivedAnim': recivedAnim()}, droppable: {valueFunc: function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);}}">
+	<div class="item_content ui-droppable dragHandle" data-bind="css: {'recivedAnim': recivedAnim()}, droppable: {valueFunc: !isIncomplete() ? function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);} : null}">
 		<div class="image">
 			<span class="icon animGoal"></span>
 		</div>
@@ -14,6 +14,12 @@
 		<span class="shared-image" data-bind="click: function (oItem) { $root.onFileShareIconClick(oItem); }"></span>
 		<!-- /ko -->
 		<span class="name" data-bind="text: fileName()"></span>
+		<div class="footer" data-bind="visible: isIncomplete">
+			<span class="progress">
+				<span data-bind="style: {'width': progressPercent() + '%'}"></span>
+				<span class="progress-percent" data-bind="text: progressPercent() + '%'"></span>
+			</span>
+		</div>
 		<div class="separator"></div>
 	</div>
 </div>
