@@ -173,6 +173,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				}
 			}
 
+			\Aurora\System\Managers\Response::HtmlOutputHeaders();
 			return $sResult;
 		}
 		else
@@ -225,6 +226,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 						'{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
 					));
 
+					\Aurora\System\Managers\Response::HtmlOutputHeaders();
 					return $sResult;
 				}
 			}
