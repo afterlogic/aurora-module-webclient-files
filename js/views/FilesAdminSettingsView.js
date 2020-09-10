@@ -158,16 +158,19 @@ CFilesAdminSettingsView.prototype.savePersonal = function ()
 {
 	if (!_.isFunction(this.validateBeforeSave) || this.validateBeforeSave())
 	{
+		var oParameters = {
+			'EntityType': this.sEntityType,
+			'EntityId': Types.pInt(this.iEntityId),
+			'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb()),
+			'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb())
+		};
+		if (this.sEntityType === 'Tenant')
+		{
+			oParameters.TenantId = oParameters.EntityId;
+		}
 		this.isPersonalSaving(true);
-
 		Ajax.send(
-			this.sServerModule,
-			'UpdateSettingsForEntity', {
-				'EntityType': this.sEntityType,
-				'EntityId': Types.pInt(this.iEntityId),
-				'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb()),
-				'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb())
-			},
+			this.sServerModule, 'UpdateSettingsForEntity', oParameters,
 			function (oResponse, oRequest) {
 				this.isPersonalSaving(false);
 				this.onResponse(oResponse, oRequest);
@@ -179,13 +182,16 @@ CFilesAdminSettingsView.prototype.savePersonal = function ()
 
 CFilesAdminSettingsView.prototype.saveCorporate = function ()
 {
+	var oParameters = {
+		'SpaceLimitMb': Types.pInt(this.corporateSpaceLimitMb())
+	};
+	if (this.sEntityType === 'Tenant')
+	{
+		oParameters.TenantId = Types.pInt(this.iEntityId);
+	}
 	this.isCorporateSaving(true);
-
 	Ajax.send(
-		'CorporateFiles',
-		'UpdateSettings', {
-			'SpaceLimitMb': Types.pInt(this.corporateSpaceLimitMb())
-		},
+		'CorporateFiles', 'UpdateSettings', oParameters,
 		function (oResponse, oRequest) {
 			this.isCorporateSaving(false);
 			this.onResponse(oResponse, oRequest);

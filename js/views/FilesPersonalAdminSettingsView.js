@@ -53,12 +53,17 @@ CFilesPersonalAdminSettingsView.prototype.revertGlobalValues = function()
 
 CFilesPersonalAdminSettingsView.prototype.getParametersForSave = function ()
 {
-	return {
+	var oParameters = {
 		'EntityType': this.sEntityType,
 		'EntityId': Types.pInt(this.iEntityId),
 		'UserSpaceLimitMb': Types.pInt(this.userSpaceLimitMb()),
 		'TenantSpaceLimitMb': Types.pInt(this.tenantSpaceLimitMb())
 	};
+	if (this.sEntityType === 'Tenant')
+	{
+		oParameters.TenantId = oParameters.EntityId;
+	}
+	return oParameters;
 };
 
 /**
