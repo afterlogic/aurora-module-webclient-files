@@ -194,6 +194,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 					&& isset($aHash['Type']) && isset($aHash['Path']) && isset($aHash['Name'])
 				)
 				{
+					$bskipCheckUserRoleStatus = \Aurora\Api::skipCheckUserRole(true);
 					echo $this->oFilesModuleDecorator->getRawFile(
 						null,
 						$aHash['Type'],
@@ -202,7 +203,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 						$sHash,
 						$sAction
 					);
-
+					\Aurora\Api::skipCheckUserRole($bskipCheckUserRoleStatus);
 					$aArgs = [
 						'UserId' => $aHash['UserId'],
 						'ResourceType' => 'file',
