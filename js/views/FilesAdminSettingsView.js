@@ -6,6 +6,7 @@ var
 
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 	Ajax = require('%PathToCoreWebclientModule%/js/Ajax.js'),
+	Api = require('%PathToCoreWebclientModule%/js/Api.js'),
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
 
 	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
@@ -61,10 +62,6 @@ CFilesAdminSettingsView.prototype.getCurrentValues = function()
 		this.userSpaceLimitMb(),
 		this.corporateSpaceLimitMb()
 	];
-};
-
-CFilesAdminSettingsView.prototype.clearFields = function()
-{
 };
 
 CFilesAdminSettingsView.prototype.revertGlobalValues = function()
@@ -128,7 +125,6 @@ CFilesAdminSettingsView.prototype.requestPerEntitytSettings = function ()
 {
 	if (Types.isPositiveNumber(this.iEntityId))
 	{
-		this.clearFields();
 		Ajax.send(Settings.ServerModuleName, 'GetSettingsForEntity', { 'EntityType': this.sEntityType, 'EntityId': this.iEntityId }, function (oResponse) {
 			if (oResponse.Result)
 			{
@@ -146,11 +142,18 @@ CFilesAdminSettingsView.prototype.requestPerEntitytSettings = function ()
 
 				this.updateSavedState();
 			}
+			else
+			{
+				this.revertGlobalValues();
+				this.allocatedSpace(0);
+				Api.showErrorByCode(oResponse);
+			}
 		}, this);
 	}
 	else
 	{
 		this.revertGlobalValues();
+		this.allocatedSpace(0);
 	}
 };
 
