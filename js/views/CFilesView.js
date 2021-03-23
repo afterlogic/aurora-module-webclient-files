@@ -91,7 +91,9 @@ function CFilesView(bPopup)
 	this.isUploadButtonDisabled = ko.computed(function () {
 		return this.storageType() === Enums.FileStorageType.Shared;
 	}, this);
-	
+	this.sCustomBigButtonModule = '';
+	this.bigButtonCustomView = ko.observable(null);
+
 	this.pathItems = ko.observableArray();
 	this.currentPath = ko.observable('');
 	this.isZipFolder = ko.computed(function () {
@@ -328,6 +330,21 @@ _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
 
 CFilesView.prototype.ViewTemplate = App.isPublic() ? '%ModuleName%_PublicFilesView' : '%ModuleName%_FilesView';
 CFilesView.prototype.ViewConstructorName = 'CFilesView';
+
+CFilesView.prototype.setCustomBigButton = function (sModuleName, oBigButtonView)
+{
+	this.sCustomBigButtonModule = sModuleName;
+	this.bigButtonCustomView(oBigButtonView);
+};
+
+CFilesView.prototype.removeCustomBigButton = function (sModuleName)
+{
+	if (this.sCustomBigButtonModule === sModuleName)
+	{
+		this.sCustomBigButtonModule = '';
+		this.bigButtonCustomView(null);
+	}
+};
 
 /**
  * @param {object} $popupDom
