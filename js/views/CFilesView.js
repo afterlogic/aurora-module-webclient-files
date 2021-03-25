@@ -88,11 +88,10 @@ function CFilesView(bPopup)
 			this.selector.listCheckedAndSelected(false);
 		}
 	}, this);
-	this.isUploadButtonDisabled = ko.computed(function () {
+	this.newItemsDisabled = ko.computed(function () {
 		return this.storageType() === Enums.FileStorageType.Shared;
 	}, this);
-	this.sCustomBigButtonModule = '';
-	this.bigButtonCustomView = ko.observable(null);
+	this.createButtonsControllers = ko.observableArray([]);
 
 	this.pathItems = ko.observableArray();
 	this.currentPath = ko.observable('');
@@ -182,6 +181,7 @@ function CFilesView(bPopup)
 	this.uploaderButton = ko.observable(null);
 	this.uploaderArea = ko.observable(null);
 	this.bDragActive = ko.observable(false);
+	this.isNewItemsMenuOpened = ko.observable(false);
 
 	this.bDragActiveComp = ko.computed(function () {
 		var bDrag = this.bDragActive();
@@ -321,7 +321,7 @@ function CFilesView(bPopup)
 		return !this.isZipFolder() && !this.isDisabledCreateFolderButton();
 	});
 	this.createShortcutCommand = Utils.createCommand(this, this.executeCreateShortcut, function () {
-		return !this.isZipFolder() && !this.isDisabledShortcutButton();
+		return !this.isZipFolder() && !this.isDisabledShortcutButton() && !this.isCurrentStorageExternal();
 	});
 	this.PublicLinksEnabled = Settings.PublicLinksEnabled;
 }
@@ -331,19 +331,9 @@ _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
 CFilesView.prototype.ViewTemplate = App.isPublic() ? '%ModuleName%_PublicFilesView' : '%ModuleName%_FilesView';
 CFilesView.prototype.ViewConstructorName = 'CFilesView';
 
-CFilesView.prototype.setCustomBigButton = function (sModuleName, oBigButtonView)
+CFilesView.prototype.registerCreateButtonsController = function (oBigButtonView)
 {
-	this.sCustomBigButtonModule = sModuleName;
-	this.bigButtonCustomView(oBigButtonView);
-};
-
-CFilesView.prototype.removeCustomBigButton = function (sModuleName)
-{
-	if (this.sCustomBigButtonModule === sModuleName)
-	{
-		this.sCustomBigButtonModule = '';
-		this.bigButtonCustomView(null);
-	}
+	this.createButtonsControllers().push(oBigButtonView);
 };
 
 /**
@@ -418,6 +408,9 @@ CFilesView.prototype.initUploader = function ()
 			.on('onBodyDragEnter', _.bind(this.bDragActive, this, true))
 			.on('onBodyDragLeave', _.bind(this.bDragActive, this, false))
 			.on('onCancel', _.bind(this.onCancelUpload, this))
+			.on('onDialog', _.bind(function () {
+				setTimeout(_.bind(this.isNewItemsMenuOpened, this, false), 0);
+			}, this, false))
 		;
 		
 		this.bAllowDragNDrop = this.oJua.isDragAndDropSupported();

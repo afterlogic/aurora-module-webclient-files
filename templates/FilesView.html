@@ -2,16 +2,29 @@
 	<div class="panels" data-bind="splitterFlex: {name: 'files_list', sizes: [20, 80]}">
 		<div class="panel left_panel storages_panel">
 			<div class="panel_content">
-				<div class="buttons big_single_button"
-						data-bind="css: isUploadButtonDisabled() ? 'disabled' : '', visible: !bigButtonCustomView(),
-						click: function () { return !isUploadButtonDisabled(); }">
-					<span class="button" data-bind="initDom: uploaderButton"> 
-						<span data-bind="i18n: {'key': '%MODULENAME%/ACTION_UPLOAD_FILES'}"></span> 
+				<span class="buttons big_single_button" data-bind="dropdown: { close: isNewItemsMenuOpened }, css: { 'disabled': newItemsDisabled }">
+					<span class="control button">
+						<span data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_ITEMS'}"></span>
+						<span class="icon arrow"></span>
+						<span class="dropdown">
+							<span class="dropdown_helper">
+								<span class="dropdown_content">
+									<div class="item" data-bind="css: newItemsDisabled() ? 'disabled' : '',
+											initDom: uploaderButton, click: function () { return !newItemsDisabled(); },
+											i18n: {'key': '%MODULENAME%/ACTION_UPLOAD_FILES'}"></div>
+									<div class="item" data-bind="command: createFolderCommand,
+											i18n: {'key': '%MODULENAME%/ACTION_NEW_FOLDER'}"></div>
+									<div class="item" data-bind="command: createShortcutCommand,
+											i18n: {'key': '%MODULENAME%/ACTION_CREATE_SHORTCUT'}"></div>
+									<!-- ko foreach: createButtonsControllers -->
+										<!-- ko template: {name: $data.ViewTemplate, data: $data} --><!-- /ko -->
+									<!-- /ko -->
+								</span>
+							</span>
+						</span>
 					</span>
-				</div>
-				<!-- ko if: bigButtonCustomView -->
-					<!-- ko template: {name: bigButtonCustomView().ViewTemplate, data: bigButtonCustomView} --><!-- /ko -->
-				<!-- /ko -->
+				</span>
+
 				<div class="middle_bar" data-bind="css: {'quota_visible': -1 < quotaProc()}">
 					<!-- ko template: { name: '%ModuleName%_StoragesPanelView'} --><!-- /ko -->
 					<div class="panel_bottom" data-bind="style: { minHeight: (24 + 16 * aBottomLeftCornerLinks.length) + 'px' }">

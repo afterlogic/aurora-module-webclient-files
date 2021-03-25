@@ -1,2 +1,28 @@
 @import "storages.less";
 @import "files.less";
+
+.FileStorageLayout .big_single_button {
+	.control.button {
+		position: relative;
+	}
+
+	.icon.arrow {
+		.init-icon-font();
+
+		&:before {
+			content: "\e66d" !important;
+			font-size: 18px;
+			line-height: 1;
+			vertical-align: middle;
+		}
+	}
+
+	&.expand .icon.arrow:before {
+		content: "\e66e" !important;
+	}
+
+	.dropdown_helper {
+		min-width: 100%;
+		top: 1px;
+	}
+}
