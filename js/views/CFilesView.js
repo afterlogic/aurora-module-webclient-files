@@ -1631,7 +1631,18 @@ CFilesView.prototype.getFileByName = function (sName)
 {
 	return _.find(this.files(), function (oItem) {
 		return oItem.fileName() === sName;
-	});	
+	});
+};
+
+/**
+ * @param {object} oFile
+ */
+CFilesView.prototype.addFileToCurrentFolder = function (oFile)
+{
+	if (this.searchPattern() === '')
+	{
+		this.files.push(oFile);
+	}
 };
 
 /**

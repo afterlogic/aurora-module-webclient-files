@@ -171,6 +171,21 @@ module.exports = function (oAppData) {
 					getMobileSyncSettingsView: function () {
 						return require('modules/%ModuleName%/js/views/MobileSyncSettingsView.js');
 					},
+					getFileConstructor: function (oFile) {
+						return require('modules/%ModuleName%/js/models/CFileModel.js');
+					},
+					addFileToCurrentFolder: function (oFile) {
+						if (oFilesView)
+						{
+							oFilesView.addFileToCurrentFolder(oFile);
+						}
+					},
+					refresh: function () {
+						if (oFilesView)
+						{
+							oFilesView.refresh();
+						}
+					},
 					registerToolbarButtons: function (oToolbarButtons) {
 						if (oFilesView)
 						{
