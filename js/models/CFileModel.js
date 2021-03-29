@@ -34,7 +34,8 @@ function CFileModel(oData, bPopup)
 	
 	this.storageType = ko.observable(Types.pString(oData.Type));
 	this.sLastModified = CFileModel.parseLastModified(oData.LastModified);
-	
+	this.iLastModified = Types.pInt(oData.LastModified);
+
 	this.path = ko.observable(Types.pString(oData.Path));
 	this.fullPath = ko.observable(Types.pString(oData.FullPath));
 	
@@ -80,7 +81,7 @@ function CFileModel(oData, bPopup)
 		'Text': TextUtils.i18n('COREWEBCLIENT/ACTION_OPEN_LINK'),
 		'Handler': _.bind(this.openLink, this)
 	};
-	
+
 	this.iconAction('');
 	
 	this.sHeaderText = _.bind(function () {
