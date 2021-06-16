@@ -124,10 +124,10 @@
 
 <script>
 import UnsavedChangesDialog from 'src/components/UnsavedChangesDialog'
-import webApi from '../../../AdminPanelWebclient/vue/src/utils/web-api'
-import notification from '../../../AdminPanelWebclient/vue/src/utils/notification'
+import webApi from 'src/utils/web-api'
+import notification from 'src/utils/notification'
 import settings from '../../../FilesWebclient/vue/settings'
-import errors from '../../../AdminPanelWebclient/vue/src/utils/errors'
+import errors from 'src/utils/errors'
 import _ from 'lodash'
 
 export default {
@@ -162,7 +162,7 @@ export default {
   methods: {
     hasChanges () {
       const data = settings.getFilesSettings()
-      return this.enableUploadSizeLimit !== data.EnableUploadSizeLimit  ||
+      return this.enableUploadSizeLimit !== data.EnableUploadSizeLimit ||
       this.uploadSizeLimitMb !== data.UploadSizeLimitMb ||
       this.userSpaceLimitMb !== data.UserSpaceLimitMb ||
       this.tenantSpaceLimitMb !== data.TenantSpaceLimitMb ||
