@@ -36,7 +36,7 @@
                :label="savingFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettings"/>
       </div>
     </div>
-  
+
     <div class="q-pa-md">
       <div class="row q-mb-md">
         <div class="col text-h5"> <div class="q-my-sm">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_PERSONAL') }}</div></div>
@@ -92,7 +92,7 @@
                :label="savingPerFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettingsForEntity"/>
       </div>
     </div>
-  
+
     <div class="q-pa-md">
       <div class="row q-mb-md">
         <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_CORPORATE') }}</div>
@@ -117,21 +117,21 @@
                :label="savingCorFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettingsCorporate"/>
       </div>
     </div>
-    
+
     <UnsavedChangesDialog ref="unsavedChangesDialog"/>
   </q-scroll-area>
 </template>
 
 <script>
 import UnsavedChangesDialog from 'src/components/UnsavedChangesDialog'
-import webApi from "../../../AdminPanelWebclient/vue/src/utils/web-api";
-import notification from "../../../AdminPanelWebclient/vue/src/utils/notification";
-import settings from "../../../FilesWebclient/vue/settings";
-import errors from "../../../AdminPanelWebclient/vue/src/utils/errors";
-import _ from "lodash";
+import webApi from '../../../AdminPanelWebclient/vue/src/utils/web-api'
+import notification from '../../../AdminPanelWebclient/vue/src/utils/notification'
+import settings from '../../../FilesWebclient/vue/settings'
+import errors from '../../../AdminPanelWebclient/vue/src/utils/errors'
+import _ from 'lodash'
 
 export default {
-  name: "FilesSettings",
+  name: 'FilesSettings',
   components: {
     UnsavedChangesDialog
   },
@@ -141,7 +141,7 @@ export default {
       savingPerFilesSetting: false,
       savingCorFilesSetting: false,
       enableUploadSizeLimit: false,
-      uploadSizeLimitMb:0,
+      uploadSizeLimitMb: 0,
       userSpaceLimitMb: 0,
       entityType: '',
       entityId: '',
@@ -172,9 +172,9 @@ export default {
       const data = settings.getFilesSettings()
       this.enableUploadSizeLimit = data.EnableUploadSizeLimit
       this.uploadSizeLimitMb = data.UploadSizeLimitMb ? data.UploadSizeLimitMb : 0
-      this.userSpaceLimitMb = data.UserSpaceLimitMb  ? data.UserSpaceLimitMb : 0
-      this.tenantSpaceLimitMb = data.TenantSpaceLimitMb  ? data.TenantSpaceLimitMb : 0
-      this.corporateSpaceLimitMb = data.CorporateSpaceLimitMb  ? data.CorporateSpaceLimitMb : 0
+      this.userSpaceLimitMb = data.UserSpaceLimitMb ? data.UserSpaceLimitMb : 0
+      this.tenantSpaceLimitMb = data.TenantSpaceLimitMb ? data.TenantSpaceLimitMb : 0
+      this.corporateSpaceLimitMb = data.CorporateSpaceLimitMb ? data.CorporateSpaceLimitMb : 0
     },
     updateSettings() {
       this.savingFilesSetting = true
