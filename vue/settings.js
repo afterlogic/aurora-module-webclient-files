@@ -43,10 +43,10 @@ export default {
   getFilesSettings () {
     return {
       EnableUploadSizeLimit: settings?.EnableUploadSizeLimit || false,
-      UploadSizeLimitMb: settings?.UploadSizeLimitMb || false,
-      TenantSpaceLimitMb: settings?.TenantSpaceLimitMb || false,
-      UserSpaceLimitMb: settings?.UserSpaceLimitMb || false,
-      CorporateSpaceLimitMb: settings?.CorporateSpaceLimitMb || false,
+      UploadSizeLimitMb: settings?.UploadSizeLimitMb || 0,
+      TenantSpaceLimitMb: settings?.TenantSpaceLimitMb || 0,
+      UserSpaceLimitMb: settings?.UserSpaceLimitMb || 0,
+      CorporateSpaceLimitMb: settings?.CorporateSpaceLimitMb || 0,
     }
   },
 

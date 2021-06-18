@@ -1,7 +1,6 @@
 import settings from '../../FilesWebclient/vue/settings'
-
 export default {
-  name: 'FilesSettings',
+  name: 'Files',
   init(appdata) {
     settings.init(appdata)
   },
@@ -12,8 +11,8 @@ export default {
         title: 'FILESTABLEVIEWWEBCLIENTPLUGIN.HEADING_BROWSER_TAB',
         component () {
           return import('src/../../../FilesWebClient/vue/components/FilesSettings')
-        },
-      },
+        }
+      }
     ]
   },
 }
