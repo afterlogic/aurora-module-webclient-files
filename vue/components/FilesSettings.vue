@@ -2,7 +2,7 @@
   <q-scroll-area class="full-height full-width">
     <div class="q-pa-md">
       <div class="row q-mb-md">
-        <div class="col text-h5">{{ $t('OPENPGPFILESWEBCLIENT.HEADING_BROWSER_TAB') }}</div>
+        <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_BROWSER_TAB') }}</div>
       </div>
       <q-card flat bordered class="card-edit-settings">
         <q-card-section>

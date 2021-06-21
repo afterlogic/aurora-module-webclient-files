@@ -12,7 +12,7 @@ export default {
     return [
       {
         tabName: 'files',
-        title: 'FILESTABLEVIEWWEBCLIENTPLUGIN.HEADING_BROWSER_TAB',
+        title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
         component () {
           return import('src/../../../FilesWebClient/vue/components/FilesSettings')
         }
