@@ -131,7 +131,7 @@ import errors from 'src/utils/errors'
 import _ from 'lodash'
 
 export default {
-  name: 'FilesSettings',
+  name: 'FilesAdminSettingsSystemWide',
   components: {
     UnsavedChangesDialog
   },
