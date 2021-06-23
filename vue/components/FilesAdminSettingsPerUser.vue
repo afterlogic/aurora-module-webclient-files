@@ -7,12 +7,12 @@
       <q-card flat bordered class="card-edit-settings">
         <q-card-section>
           <div class="row">
-            <div class="col-2">
+            <div class="col-3">
               <div class="q-my-sm">
                 {{ $t('FILESWEBCLIENT.LABEL_USER_SPACE_LIMIT') }}
               </div>
             </div>
-            <div class="q-ml-md col-3">
+            <div class="q-ml-md col-8">
               <div class="flex">
                 <q-input outlined dense class="bg-white q-ml-sm" v-model="userSpaceLimitMb"/>
                 <div class="q-ma-sm" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"></div>
@@ -131,6 +131,7 @@ export default {
               field: 'Files::UserSpaceLimitMb',
               value: parameters.UserSpaceLimitMb
             }])
+            console.log(user, 'user')
             this.populate()
           })
           notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
