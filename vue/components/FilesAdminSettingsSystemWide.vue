@@ -177,78 +177,84 @@ export default {
       this.corporateSpaceLimitMb = data.CorporateSpaceLimitMb ? data.CorporateSpaceLimitMb : 0
     },
     updateSettings() {
-      this.savingFilesSetting = true
-      const parameters = {
-        EnableUploadSizeLimit: this.enableUploadSizeLimit,
-        UploadSizeLimitMb: this.uploadSizeLimitMb,
-        UserSpaceLimitMb: this.userSpaceLimitMb
-      }
-      webApi.sendRequest({
-        moduleName: 'Files',
-        methodName: 'UpdateSettings',
-        parameters
-      }).then(result => {
-        this.savingFilesSetting = false
-        if (result) {
-          settings.saveFilesSettings(parameters)
-          notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
-        } else {
-          notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
+      if (!this.savingFilesSetting) {
+        this.savingFilesSetting = true
+        const parameters = {
+          EnableUploadSizeLimit: this.enableUploadSizeLimit,
+          UploadSizeLimitMb: this.uploadSizeLimitMb,
+          UserSpaceLimitMb: this.userSpaceLimitMb
         }
-      }, response => {
-        this.savingFilesSetting = false
-        notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
-      })
+        webApi.sendRequest({
+          moduleName: 'Files',
+          methodName: 'UpdateSettings',
+          parameters
+        }).then(result => {
+          this.savingFilesSetting = false
+          if (result) {
+            settings.saveFilesSettings(parameters)
+            notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
+          } else {
+            notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
+          }
+        }, response => {
+          this.savingFilesSetting = false
+          notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
+        })
+      }
     },
     updateSettingsForEntity() {
-      this.savingPerFilesSetting = true
-      const parameters = {
-        EntityType: '',
-        EntityId: 0,
-        UserSpaceLimitMb: this.userSpaceLimitMb,
-        TenantSpaceLimitMb: this.tenantSpaceLimitMb
-      }
-      webApi.sendRequest({
-        moduleName: 'Files',
-        methodName: 'UpdateSettingsForEntity',
-        parameters
-      }).then(result => {
-        this.savingPerFilesSetting = false
-        if (result) {
-          settings.savePersonalFilesSettings({
-            UserSpaceLimitMb: this.userSpaceLimitMb,
-            TenantSpaceLimitMb: this.tenantSpaceLimitMb
-          })
-          notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
-        } else {
-          notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
+      if (!this.savingPerFilesSetting) {
+        this.savingPerFilesSetting = true
+        const parameters = {
+          EntityType: '',
+          EntityId: 0,
+          UserSpaceLimitMb: this.userSpaceLimitMb,
+          TenantSpaceLimitMb: this.tenantSpaceLimitMb
         }
-      }, response => {
-        this.savingPerFilesSetting = false
-        notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
-      })
+        webApi.sendRequest({
+          moduleName: 'Files',
+          methodName: 'UpdateSettingsForEntity',
+          parameters
+        }).then(result => {
+          this.savingPerFilesSetting = false
+          if (result) {
+            settings.savePersonalFilesSettings({
+              UserSpaceLimitMb: this.userSpaceLimitMb,
+              TenantSpaceLimitMb: this.tenantSpaceLimitMb
+            })
+            notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
+          } else {
+            notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
+          }
+        }, response => {
+          this.savingPerFilesSetting = false
+          notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
+        })
+      }
     },
     updateSettingsCorporate() {
-      this.savingCorFilesSetting = true
-      const parameters = {
-        SpaceLimitMb: this.corporateSpaceLimitMb
-      }
-      webApi.sendRequest({
-        moduleName: 'CorporateFiles',
-        methodName: 'UpdateSettings',
-        parameters
-      }).then(result => {
-        if (result) {
-          this.savingCorFilesSetting = false
-          settings.saveCorporateFilesSettings(parameters)
-          notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
-        } else {
-          notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
+      if (!this.savingCorFilesSetting) {
+        this.savingCorFilesSetting = true
+        const parameters = {
+          SpaceLimitMb: this.corporateSpaceLimitMb
         }
-      }, response => {
-        this.savingPerFilesSetting = false
-        notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
-      })
+        webApi.sendRequest({
+          moduleName: 'CorporateFiles',
+          methodName: 'UpdateSettings',
+          parameters
+        }).then(result => {
+          if (result) {
+            this.savingCorFilesSetting = false
+            settings.saveCorporateFilesSettings(parameters)
+            notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
+          } else {
+            notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
+          }
+        }, response => {
+          this.savingPerFilesSetting = false
+          notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
+        })
+      }
     }
   }
 }
