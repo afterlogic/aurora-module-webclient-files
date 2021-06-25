@@ -131,7 +131,6 @@ export default {
               field: 'Files::UserSpaceLimitMb',
               value: parameters.UserSpaceLimitMb
             }])
-            console.log(user, 'user')
             this.populate()
           })
           notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
