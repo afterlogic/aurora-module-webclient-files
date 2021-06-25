@@ -247,8 +247,8 @@ export default {
           methodName: 'UpdateSettings',
           parameters
         }).then(result => {
+          this.savingCorFilesSetting = false
           if (result) {
-            this.savingCorFilesSetting = false
             settings.saveCorporateFilesSettings({ spaceLimitMb: this.corporateSpaceLimitMb })
             notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
           } else {
@@ -256,7 +256,7 @@ export default {
           }
         }, response => {
           this.savingPerFilesSetting = false
-          notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
+          notification.showError(errors.getTextFromResponse(response, this.$t('MAILDOMAINS.ERROR_PASSWORD_EMPTY')))
         })
       }
     }
