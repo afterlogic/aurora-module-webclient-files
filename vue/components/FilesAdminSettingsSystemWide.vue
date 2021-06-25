@@ -22,10 +22,10 @@
             <div class="col-2">
               <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_UPLOAD_SIZE_LIMIT') }}</div>
             </div>
-            <div class="q-ml-md col-2">
-              <div style="display: flex">
-                <q-input outlined dense class="bg-white q-ml-sm" v-model="uploadSizeLimitMb"/>
-                <div class="q-ma-sm" style="margin-top: 10px">MB</div>
+            <div class="q-ml-md col-3">
+              <div class="row">
+                <q-input outlined dense class="bg-white q-ml-sm col-4" v-model="uploadSizeLimitMb"/>
+                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
             </div>
           </div>
@@ -50,9 +50,9 @@
               </div>
             </div>
             <div class="q-ml-md col-3">
-            <div style="display: flex">
-              <q-input outlined dense class="bg-white q-ml-sm" v-model="tenantSpaceLimitMb"/>
-              <div class="q-ma-sm" style="margin-top: 10px">MB</div>
+            <div class="row">
+              <q-input outlined dense class="bg-white q-ml-sm col-8" v-model="tenantSpaceLimitMb"/>
+              <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
             </div>
             </div>
           </div>
@@ -71,9 +71,9 @@
               </div>
             </div>
             <div class="q-ml-md col-3">
-              <div style="display: flex">
-                <q-input outlined dense class="bg-white q-ml-sm" v-model="userSpaceLimitMb"/>
-                <div class="q-ma-sm" style="margin-top: 10px">MB</div>
+              <div class="row">
+                <q-input outlined dense class=" col-8 bg-white q-ml-sm" v-model="userSpaceLimitMb"/>
+                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
             </div>
           </div>
@@ -103,10 +103,10 @@
             <div class="col-2">
               <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_CORPORATE_SPACE_LIMIT') }}</div>
             </div>
-            <div class="q-ml-md col-2">
-              <div style="display: flex">
-                <q-input outlined dense class="bg-white q-ml-sm" v-model="corporateSpaceLimitMb"/>
-                <div class="q-ma-sm" style="margin-top: 10px">MB</div>
+            <div class="q-ml-md col-3">
+              <div class="row">
+                <q-input outlined dense class="bg-white q-ml-sm col-4" v-model="corporateSpaceLimitMb"/>
+                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
               </div>
             </div>
           </div>
@@ -162,19 +162,19 @@ export default {
   methods: {
     hasChanges () {
       const data = settings.getFilesSettings()
-      return this.enableUploadSizeLimit !== data.EnableUploadSizeLimit ||
-      this.uploadSizeLimitMb !== data.UploadSizeLimitMb ||
-      this.userSpaceLimitMb !== data.UserSpaceLimitMb ||
-      this.tenantSpaceLimitMb !== data.TenantSpaceLimitMb ||
-      this.corporateSpaceLimitMb !== data.CorporateSpaceLimitMb
+      return this.enableUploadSizeLimit !== data.enableUploadSizeLimit ||
+      this.uploadSizeLimitMb !== data.uploadSizeLimitMb ||
+      this.userSpaceLimitMb !== data.userSpaceLimitMb ||
+      this.tenantSpaceLimitMb !== data.tenantSpaceLimitMb ||
+      this.corporateSpaceLimitMb !== data.corporateSpaceLimitMb
     },
     populate () {
       const data = settings.getFilesSettings()
-      this.enableUploadSizeLimit = data.EnableUploadSizeLimit
-      this.uploadSizeLimitMb = data.UploadSizeLimitMb ? data.UploadSizeLimitMb : 0
-      this.userSpaceLimitMb = data.UserSpaceLimitMb ? data.UserSpaceLimitMb : 0
-      this.tenantSpaceLimitMb = data.TenantSpaceLimitMb ? data.TenantSpaceLimitMb : 0
-      this.corporateSpaceLimitMb = data.CorporateSpaceLimitMb ? data.CorporateSpaceLimitMb : 0
+      this.enableUploadSizeLimit = data.enableUploadSizeLimit
+      this.uploadSizeLimitMb = data.uploadSizeLimitMb ? data.uploadSizeLimitMb : 0
+      this.userSpaceLimitMb = data.userSpaceLimitMb ? data.userSpaceLimitMb : 0
+      this.tenantSpaceLimitMb = data.tenantSpaceLimitMb ? data.tenantSpaceLimitMb : 0
+      this.corporateSpaceLimitMb = data.corporateSpaceLimitMb ? data.corporateSpaceLimitMb : 0
     },
     updateSettings() {
       if (!this.savingFilesSetting) {
@@ -191,7 +191,11 @@ export default {
         }).then(result => {
           this.savingFilesSetting = false
           if (result) {
-            settings.saveFilesSettings(parameters)
+            settings.saveFilesSettings({
+              enableUploadSizeLimit: this.enableUploadSizeLimit,
+              uploadSizeLimitMb: this.uploadSizeLimitMb,
+              userSpaceLimitMb: this.userSpaceLimitMb
+            })
             notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
           } else {
             notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
@@ -219,8 +223,8 @@ export default {
           this.savingPerFilesSetting = false
           if (result) {
             settings.savePersonalFilesSettings({
-              UserSpaceLimitMb: this.userSpaceLimitMb,
-              TenantSpaceLimitMb: this.tenantSpaceLimitMb
+              userSpaceLimitMb: this.userSpaceLimitMb,
+              tenantSpaceLimitMb: this.tenantSpaceLimitMb
             })
             notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
           } else {
@@ -245,7 +249,7 @@ export default {
         }).then(result => {
           if (result) {
             this.savingCorFilesSetting = false
-            settings.saveCorporateFilesSettings(parameters)
+            settings.saveCorporateFilesSettings({ spaceLimitMb: this.corporateSpaceLimitMb })
             notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
           } else {
             notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))

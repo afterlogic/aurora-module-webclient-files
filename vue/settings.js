@@ -2,34 +2,30 @@ import _ from 'lodash'
 import typesUtils from 'src/utils/types'
 
 class FilesSettings {
-  constructor(appData) {
+  constructor (appData) {
     const filesData = typesUtils.pObject(appData.Files)
     const corporateFilesData = typesUtils.pObject(appData.CorporateFiles)
-    if (!_.isEmpty(filesData)) {
-      this.EnableUploadSizeLimit = typesUtils.pBool(filesData.EnableUploadSizeLimit, this.EnableUploadSizeLimit)
-      this.UploadSizeLimitMb = typesUtils.pNonNegativeInt(filesData.UploadSizeLimitMb, this.UploadSizeLimitMb)
-      this.UserSpaceLimitMb = typesUtils.pNonNegativeInt(filesData.UserSpaceLimitMb, this.UserSpaceLimitMb)
-      this.TenantSpaceLimitMb = typesUtils.pNonNegativeInt(filesData.TenantSpaceLimitMb, this.TenantSpaceLimitMb)
-    }
-    if (!_.isEmpty(corporateFilesData)) {
-      this.ShowCorporateFilesAdminSection = true
-      this.CorporateSpaceLimitMb = typesUtils.pNonNegativeInt(corporateFilesData.SpaceLimitMb, this.CorporateSpaceLimitMb)
-    }
+    this.enableUploadSizeLimit = typesUtils.pBool(filesData.EnableUploadSizeLimit)
+    this.uploadSizeLimitMb = typesUtils.pNonNegativeInt(filesData.UploadSizeLimitMb)
+    this.userSpaceLimitMb = typesUtils.pNonNegativeInt(filesData.UserSpaceLimitMb)
+    this.tenantSpaceLimitMb = typesUtils.pNonNegativeInt(filesData.TenantSpaceLimitMb)
+    this.showCorporateFilesAdminSection = true
+    this.corporateSpaceLimitMb = typesUtils.pNonNegativeInt(corporateFilesData.SpaceLimitMb)
   }
 
-  saveFilesSettings({ EnableUploadSizeLimit, UploadSizeLimitMb, UserSpaceLimitMb }) {
-    this.EnableUploadSizeLimit = EnableUploadSizeLimit
-    this.UploadSizeLimitMb = UploadSizeLimitMb
-    this.UserSpaceLimitMb = UserSpaceLimitMb
+  saveFilesSettings({ enableUploadSizeLimit, uploadSizeLimitMb, userSpaceLimitMb }) {
+    this.enableUploadSizeLimit = enableUploadSizeLimit
+    this.uploadSizeLimitMb = uploadSizeLimitMb
+    this.userSpaceLimitMb = userSpaceLimitMb
   }
 
-  savePersonalFilesSettings({ TenantSpaceLimitMb, UserSpaceLimitMb }) {
-    this.TenantSpaceLimitMb = TenantSpaceLimitMb
-    this.UserSpaceLimitMb = UserSpaceLimitMb
+  savePersonalFilesSettings({ tenantSpaceLimitMb, userSpaceLimitMb }) {
+    this.tenantSpaceLimitMb = tenantSpaceLimitMb
+    this.userSpaceLimitMb = userSpaceLimitMb
   }
 
-  saveCorporateFilesSettings({ SpaceLimitMb }) {
-    this.CorporateSpaceLimitMb = SpaceLimitMb
+  saveCorporateFilesSettings({ spaceLimitMb }) {
+    this.corporateSpaceLimitMb = spaceLimitMb
   }
 }
 
@@ -42,11 +38,11 @@ export default {
 
   getFilesSettings () {
     return {
-      EnableUploadSizeLimit: settings?.EnableUploadSizeLimit || false,
-      UploadSizeLimitMb: settings?.UploadSizeLimitMb || 0,
-      TenantSpaceLimitMb: settings?.TenantSpaceLimitMb || 0,
-      UserSpaceLimitMb: settings?.UserSpaceLimitMb || 0,
-      CorporateSpaceLimitMb: settings?.CorporateSpaceLimitMb || 0,
+      enableUploadSizeLimit: settings.enableUploadSizeLimit,
+      uploadSizeLimitMb: settings.uploadSizeLimitMb,
+      tenantSpaceLimitMb: settings.tenantSpaceLimitMb,
+      userSpaceLimitMb: settings.userSpaceLimitMb,
+      corporateSpaceLimitMb: settings.corporateSpaceLimitMb,
     }
   },
 
