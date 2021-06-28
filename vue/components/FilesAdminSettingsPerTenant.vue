@@ -48,6 +48,19 @@
               </div>
             </div>
           </div>
+          <div class="row">
+            <div class="col-2">
+              <div class="q-my-sm">
+                {{ $t('FILESWEBCLIENT.LABEL_ALLOCATED_SPACE') }}
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="row">
+                <span class="q-mt-sm">{{ allocatedSpace }}</span>
+                <div class="q-ma-sm q-pb-sm col-1" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
+              </div>
+            </div>
+          </div>
         </q-card-section>
       </q-card>
       <div class="q-pt-md text-right">
@@ -67,7 +80,7 @@ import notification from 'src/utils/notification'
 import errors from 'src/utils/errors'
 import cache from 'src/cache'
 import types from '../../../AdminPanelWebclient/vue/src/utils/types'
-import _ from "lodash";
+import _ from 'lodash'
 
 export default {
   name: 'FilesAdminSettingsPerTenant',
@@ -88,6 +101,7 @@ export default {
       saving: false,
       tenantSpaceLimitMb: 0,
       userSpaceLimitMb: 0,
+      allocatedSpace: 0,
       savingPerFilesSetting: false,
       savingCorFilesSetting: false,
       tenant: null
@@ -113,6 +127,7 @@ export default {
           this.tenant = tenant
           this.tenantSpaceLimitMb = tenant.completeData['FilesWebclient::TenantSpaceLimitMb']
           this.userSpaceLimitMb = tenant.completeData['FilesWebclient::UserSpaceLimitMb']
+          this.allocatedSpace = tenant.completeData['FilesWebclient::AllocatedSpace']
         } else {
           this.getSettingsForEntity()
         }
@@ -133,6 +148,7 @@ export default {
             tenant.setCompleteData({
               'FilesWebclient::UserSpaceLimitMb': result.UserSpaceLimitMb,
               'FilesWebclient::TenantSpaceLimitMb': result.TenantSpaceLimitMb,
+              'FilesWebclient::AllocatedSpace': result.AllocatedSpace
             })
             this.populate()
           })
@@ -160,6 +176,7 @@ export default {
             tenant.setCompleteData({
               'FilesWebclient::UserSpaceLimitMb': parameters.UserSpaceLimitMb,
               'FilesWebclient::TenantSpaceLimitMb': parameters.TenantSpaceLimitMb,
+              'FilesWebclient::AllocatedSpace': parameters.AllocatedSpace,
             })
             this.populate()
           })
