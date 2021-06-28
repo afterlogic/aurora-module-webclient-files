@@ -1,10 +1,8 @@
 <template>
   <q-scroll-area class="full-height full-width">
-    <div class="q-pa-md">
+    <div class="q-pa-lg">
       <div class="row q-mb-md">
-        <div class="col text-h5">
-          <div class="q-my-sm">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_PERSONAL') }}</div>
-        </div>
+        <div class="col text-h5" v-t="'FILESWEBCLIENT.HEADING_SETTINGS_TAB_PERSONAL'"/>
       </div>
       <q-card flat bordered class="card-edit-settings">
         <q-card-section>
@@ -14,17 +12,17 @@
                 {{ $t('FILESWEBCLIENT.LABEL_TENANT_SPACE_LIMIT') }}
               </div>
             </div>
-            <div class="q-ml-md col-3">
+            <div class="col-4">
               <div class="row">
-                <q-input outlined dense class="bg-white q-ml-sm col-8" v-model="tenantSpaceLimitMb"/>
+                <q-input outlined dense class="bg-white  col-5" v-model="tenantSpaceLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
               </div>
             </div>
           </div>
           <div class="row q-mb-sm">
             <div class="col-2"></div>
-            <div class="q-ml-md col-8">
-              <div class="q-mb-sm q-ml-sm text-caption">
+            <div class="col-8">
+              <div class="q-mb-sm text-caption">
                 {{ $t('FILESWEBCLIENT.HINT_TENANT_SPACE_LIMIT') }}
               </div>
             </div>
@@ -35,17 +33,17 @@
                 {{ $t('FILESWEBCLIENT.LABEL_USER_SPACE_LIMIT') }}
               </div>
             </div>
-            <div class="q-ml-md col-3">
+            <div class="col-4">
               <div class="row">
-                <q-input outlined dense class=" col-8 bg-white q-ml-sm" v-model="userSpaceLimitMb"/>
+                <q-input outlined dense class=" col-5 bg-white" v-model="userSpaceLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
               </div>
             </div>
           </div>
           <div class="row q-mb-sm">
             <div class="col-2"></div>
-            <div class="q-ml-md col-8">
-              <div class="q-my-sm q-ml-sm text-caption">
+            <div class="col-8">
+              <div class="q-my-sm text-caption">
                 {{ $t('FILESWEBCLIENT.HINT_USER_SPACE_LIMIT') }}
               </div>
             </div>
@@ -58,31 +56,6 @@
                @click="updateSettingsForEntity"/>
       </div>
     </div>
-    <div class="q-pa-md">
-      <div class="row q-mb-md">
-        <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_CORPORATE') }}</div>
-      </div>
-      <q-card flat bordered class="card-edit-settings">
-        <q-card-section>
-          <div class="row">
-            <div class="col-2">
-              <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_CORPORATE_SPACE_LIMIT') }}</div>
-            </div>
-            <div class="q-ml-md col-3">
-              <div class="row">
-                <q-input outlined dense class="bg-white q-ml-sm col-4" v-model="corporateSpaceLimitMb"/>
-                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-      </q-card>
-      <div class="q-pt-md text-right">
-        <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
-               :label="savingCorFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')"
-               @click="updateSettingsCorporate"/>
-      </div>
-    </div>
     <UnsavedChangesDialog ref="unsavedChangesDialog"/>
   </q-scroll-area>
 </template>
@@ -91,68 +64,107 @@
 import UnsavedChangesDialog from 'src/components/UnsavedChangesDialog'
 import webApi from 'src/utils/web-api'
 import notification from 'src/utils/notification'
-import settings from '../../../FilesWebclient/vue/settings'
 import errors from 'src/utils/errors'
+import cache from 'src/cache'
+import types from '../../../AdminPanelWebclient/vue/src/utils/types'
+import _ from "lodash";
 
 export default {
   name: 'FilesAdminSettingsPerTenant',
   components: {
     UnsavedChangesDialog
   },
+  computed: {
+    tenantId () {
+      return Number(this.$route?.params?.id)
+    }
+  },
+  mounted () {
+    this.saving = false
+    this.populate()
+  },
   data () {
     return {
+      saving: false,
       tenantSpaceLimitMb: 0,
-      corporateSpaceLimitMb: 0,
       userSpaceLimitMb: 0,
       savingPerFilesSetting: false,
       savingCorFilesSetting: false,
+      tenant: null
+    }
+  },
+  beforeRouteLeave (to, from, next) {
+    if (this.hasChanges() && _.isFunction(this?.$refs?.unsavedChangesDialog?.openConfirmDiscardChangesDialog)) {
+      this.$refs.unsavedChangesDialog.openConfirmDiscardChangesDialog(next)
+    } else {
+      next()
     }
   },
   methods: {
-    updateSettingsCorporate() {
-      if (!this.savingCorFilesSetting) {
-        this.savingCorFilesSetting = true
-        const parameters = {
-          SpaceLimitMb: this.corporateSpaceLimitMb
+    hasChanges () {
+      const tenantSpaceLimitMb = _.isFunction(this.tenant?.getData) ? this.tenant?.getData('FilesWebclient::TenantSpaceLimitMb') : ''
+      const userSpaceLimitMb = _.isFunction(this.tenant?.getData) ? this.tenant?.getData('FilesWebclient::UserSpaceLimitMb') : ''
+      return this.tenantSpaceLimitMb !== tenantSpaceLimitMb ||
+          this.userSpaceLimitMb !== userSpaceLimitMb
+    },
+    populate() {
+      cache.getTenant(this.tenantId).then(({ tenant }) => {
+        if (tenant.completeData['FilesWebclient::TenantSpaceLimitMb'] !== undefined) {
+          this.tenant = tenant
+          this.tenantSpaceLimitMb = tenant.completeData['FilesWebclient::TenantSpaceLimitMb']
+          this.userSpaceLimitMb = tenant.completeData['FilesWebclient::UserSpaceLimitMb']
+        } else {
+          this.getSettingsForEntity()
         }
-        webApi.sendRequest({
-          moduleName: 'CorporateFiles',
-          methodName: 'UpdateSettings',
-          parameters
-        }).then(result => {
-          this.savingCorFilesSetting = false
-          if (result) {
-            settings.saveCorporateFilesSettings({ spaceLimitMb: this.corporateSpaceLimitMb })
-            notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
-          } else {
-            notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
-          }
-        }, response => {
-          this.savingPerFilesSetting = false
-          notification.showError(errors.getTextFromResponse(response, this.$t('MAILDOMAINS.ERROR_PASSWORD_EMPTY')))
-        })
+      })
+    },
+    getSettingsForEntity () {
+      const parameters = {
+        EntityType: 'Tenant',
+        EntityId: this.tenantId,
       }
+      webApi.sendRequest({
+        moduleName: 'Files',
+        methodName: 'GetSettingsForEntity',
+        parameters
+      }).then(result => {
+        if (result) {
+          cache.getTenant(parameters.EntityId, true).then(({ tenant }) => {
+            tenant.setCompleteData({
+              'FilesWebclient::UserSpaceLimitMb': result.UserSpaceLimitMb,
+              'FilesWebclient::TenantSpaceLimitMb': result.TenantSpaceLimitMb,
+            })
+            this.populate()
+          })
+        }
+      }, response => {
+        notification.showError(errors.getTextFromResponse(response))
+      })
     },
     updateSettingsForEntity() {
       if (!this.savingPerFilesSetting) {
         this.savingPerFilesSetting = true
         const parameters = {
-          EntityType: '',
-          EntityId: 0,
-          UserSpaceLimitMb: this.userSpaceLimitMb,
-          TenantSpaceLimitMb: this.tenantSpaceLimitMb
+          EntityType: 'Tenant',
+          EntityId: this.tenantId,
+          TenantId: this.tenantId,
+          UserSpaceLimitMb: types.pInt(this.userSpaceLimitMb),
+          TenantSpaceLimitMb: types.pInt(this.tenantSpaceLimitMb),
         }
         webApi.sendRequest({
           moduleName: 'Files',
           methodName: 'UpdateSettingsForEntity',
           parameters
         }).then(result => {
+          cache.getTenant(parameters.TenantId, true).then(({ tenant }) => {
+            tenant.setCompleteData({
+              'FilesWebclient::UserSpaceLimitMb': parameters.UserSpaceLimitMb,
+              'FilesWebclient::TenantSpaceLimitMb': parameters.TenantSpaceLimitMb,
+            })
+            this.populate()
+          })
           this.savingPerFilesSetting = false
           if (result) {
-            settings.savePersonalFilesSettings({
-              userSpaceLimitMb: this.userSpaceLimitMb,
-              tenantSpaceLimitMb: this.tenantSpaceLimitMb
-            })
             notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
           } else {
             notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
