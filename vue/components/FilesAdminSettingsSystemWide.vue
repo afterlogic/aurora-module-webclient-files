@@ -101,10 +101,8 @@
             </div>
             <div class="col-3">
               <div class="row">
-                <div class="q-ml-md col-4">
-                  <q-input outlined dense class="bg-white col-4" v-model="corporateSpaceLimitMb"/>
-                  <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
-                </div>
+                <q-input outlined dense class="bg-white col-4" v-model="corporateSpaceLimitMb"/>
+                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
               </div>
             </div>
           </div>
