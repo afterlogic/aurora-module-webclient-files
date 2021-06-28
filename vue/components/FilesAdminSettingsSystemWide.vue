@@ -1,30 +1,26 @@
 <template>
   <q-scroll-area class="full-height full-width">
-    <div class="q-pa-md">
+    <div class="q-pa-lg">
       <div class="row q-mb-md">
         <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_BROWSER_TAB') }}</div>
       </div>
       <q-card flat bordered class="card-edit-settings">
         <q-card-section>
-          <div class="row">
+          <div class="row q-mb-md">
             <div class="col-2"></div>
             <div class="col2">
-              <q-item>
-                <q-item-section>
-                  <q-checkbox v-model="enableUploadSizeLimit" color="teal">
-                    <q-item-label caption>{{ $t('FILESWEBCLIENT.LABEL_ENABLE_UPLOAD_SIZE_LIMIT') }}</q-item-label>
-                  </q-checkbox>
-                </q-item-section>
-              </q-item>
+              <q-checkbox dense v-model="enableUploadSizeLimit" color="teal">
+                <q-item-label>{{ $t('FILESWEBCLIENT.LABEL_ENABLE_UPLOAD_SIZE_LIMIT') }}</q-item-label>
+              </q-checkbox>
             </div>
           </div>
           <div class="row">
             <div class="col-2">
               <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_UPLOAD_SIZE_LIMIT') }}</div>
             </div>
-            <div class="q-ml-md col-3">
+            <div class="col-3">
               <div class="row">
-                <q-input outlined dense class="bg-white q-ml-sm col-4" v-model="uploadSizeLimitMb"/>
+                <q-input outlined dense class="bg-white col-4" v-model="uploadSizeLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
             </div>
@@ -37,7 +33,7 @@
       </div>
     </div>
 
-    <div class="q-pa-md">
+    <div class="q-pa-lg">
       <div class="row q-mb-md">
         <div class="col text-h5"> <div class="q-my-sm">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_PERSONAL') }}</div></div>
       </div>
@@ -49,17 +45,17 @@
                 {{ $t('FILESWEBCLIENT.LABEL_TENANT_SPACE_LIMIT') }}
               </div>
             </div>
-            <div class="q-ml-md col-3">
+            <div class="col-3">
             <div class="row">
-              <q-input outlined dense class="bg-white q-ml-sm col-8" v-model="tenantSpaceLimitMb"/>
+              <q-input outlined dense class="bg-white col-4" v-model="tenantSpaceLimitMb"/>
               <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
             </div>
             </div>
           </div>
           <div class="row q-mb-sm">
             <div class="col-2"></div>
-            <div class="q-ml-md col-8">
-              <div class="q-mb-sm q-ml-sm text-caption">
+            <div class="col-8">
+              <div class="q-mb-sm text-caption">
                 {{ $t('FILESWEBCLIENT.HINT_TENANT_SPACE_LIMIT') }}
               </div>
             </div>
@@ -70,17 +66,17 @@
                 {{ $t('FILESWEBCLIENT.LABEL_USER_SPACE_LIMIT') }}
               </div>
             </div>
-            <div class="q-ml-md col-3">
+            <div class="col-3">
               <div class="row">
-                <q-input outlined dense class=" col-8 bg-white q-ml-sm" v-model="userSpaceLimitMb"/>
+                <q-input outlined dense class=" col-4 bg-white" v-model="userSpaceLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
             </div>
           </div>
           <div class="row q-mb-sm">
             <div class="col-2"></div>
-            <div class="q-ml-md col-8">
-              <div class="q-my-sm q-ml-sm text-caption" >
+            <div class="col-8">
+              <div class="q-my-sm text-caption" >
                 {{ $t('FILESWEBCLIENT.HINT_USER_SPACE_LIMIT') }}
               </div>
             </div>
@@ -93,7 +89,7 @@
       </div>
     </div>
 
-    <div class="q-pa-md">
+    <div class="q-pa-lg">
       <div class="row q-mb-md">
         <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_CORPORATE') }}</div>
       </div>
@@ -103,10 +99,12 @@
             <div class="col-2">
               <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_CORPORATE_SPACE_LIMIT') }}</div>
             </div>
-            <div class="q-ml-md col-3">
+            <div class="col-3">
               <div class="row">
-                <q-input outlined dense class="bg-white q-ml-sm col-4" v-model="corporateSpaceLimitMb"/>
-                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
+                <div class="q-ml-md col-4">
+                  <q-input outlined dense class="bg-white col-4" v-model="corporateSpaceLimitMb"/>
+                  <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
+                </div>
               </div>
             </div>
           </div>

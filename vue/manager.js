@@ -37,4 +37,21 @@ export default {
       }
     ]
   },
+  getAdminTenantTabs () {
+    return [
+      {
+        tabName: 'files',
+        paths: [
+          'id/:id/files',
+          'search/:search/id/:id/files',
+          'page/:page/id/:id/files',
+          'search/:search/page/:page/id/:id/files',
+        ],
+        title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
+        component () {
+          return import('src/../../../FilesWebClient/vue/components/FilesAdminSettingsPerTenant')
+        }
+      }
+    ]
+  },
 }
