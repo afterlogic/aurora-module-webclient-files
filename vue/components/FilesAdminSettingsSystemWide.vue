@@ -7,9 +7,8 @@
       <q-card flat bordered class="card-edit-settings">
         <q-card-section>
           <div class="row q-mb-md">
-            <div class="col-2"></div>
             <div class="col2">
-              <q-checkbox dense v-model="enableUploadSizeLimit" color="teal">
+              <q-checkbox dense v-model="enableUploadSizeLimit">
                 <q-item-label>{{ $t('FILESWEBCLIENT.LABEL_ENABLE_UPLOAD_SIZE_LIMIT') }}</q-item-label>
               </q-checkbox>
             </div>
