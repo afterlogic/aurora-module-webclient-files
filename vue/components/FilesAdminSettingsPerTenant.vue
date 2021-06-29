@@ -65,10 +65,13 @@
       </q-card>
       <div class="q-pt-md text-right">
         <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
-               :label="savingPerFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')"
+               :label="saving ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')"
                @click="updateSettingsForEntity"/>
       </div>
     </div>
+    <q-inner-loading style="justify-content: flex-start;" :showing="loading || saving">
+      <q-linear-progress query class="q-mt-sm" />
+    </q-inner-loading>
     <UnsavedChangesDialog ref="unsavedChangesDialog"/>
   </q-scroll-area>
 </template>
@@ -99,11 +102,10 @@ export default {
   data () {
     return {
       saving: false,
+      loading: false,
       tenantSpaceLimitMb: 0,
       userSpaceLimitMb: 0,
       allocatedSpace: 0,
-      savingPerFilesSetting: false,
-      savingCorFilesSetting: false,
       tenant: null
     }
   },
@@ -122,8 +124,10 @@ export default {
           this.userSpaceLimitMb !== userSpaceLimitMb
     },
     populate() {
+      this.loading = true
       cache.getTenant(this.tenantId).then(({ tenant }) => {
         if (tenant.completeData['FilesWebclient::TenantSpaceLimitMb'] !== undefined) {
+          this.loading = false
           this.tenant = tenant
           this.tenantSpaceLimitMb = tenant.completeData['FilesWebclient::TenantSpaceLimitMb']
           this.userSpaceLimitMb = tenant.completeData['FilesWebclient::UserSpaceLimitMb']
@@ -158,8 +162,8 @@ export default {
       })
     },
     updateSettingsForEntity() {
-      if (!this.savingPerFilesSetting) {
-        this.savingPerFilesSetting = true
+      if (!this.saving) {
+        this.saving = true
         const parameters = {
           EntityType: 'Tenant',
           EntityId: this.tenantId,
@@ -176,18 +180,18 @@ export default {
             tenant.setCompleteData({
               'FilesWebclient::UserSpaceLimitMb': parameters.UserSpaceLimitMb,
               'FilesWebclient::TenantSpaceLimitMb': parameters.TenantSpaceLimitMb,
-              'FilesWebclient::AllocatedSpace': parameters.AllocatedSpace,
+              'FilesWebclient::AllocatedSpace': this.allocatedSpace,
             })
             this.populate()
           })
-          this.savingPerFilesSetting = false
+          this.saving = false
           if (result) {
             notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
           } else {
             notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
           }
         }, response => {
-          this.savingPerFilesSetting = false
+          this.saving = false
           notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
         })
       }
