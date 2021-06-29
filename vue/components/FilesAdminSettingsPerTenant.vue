@@ -21,10 +21,10 @@
           </div>
           <div class="row q-mb-sm">
             <div class="col-2"></div>
-            <div class="col-8">
-              <div class="q-mb-sm text-caption">
+            <div class="col-8 q-mb-sm">
+              <q-item-label caption>
                 {{ $t('FILESWEBCLIENT.HINT_TENANT_SPACE_LIMIT') }}
-              </div>
+              </q-item-label>
             </div>
           </div>
           <div class="row">
@@ -42,10 +42,10 @@
           </div>
           <div class="row q-mb-sm">
             <div class="col-2"></div>
-            <div class="col-8">
-              <div class="q-my-sm text-caption">
+            <div class="col-8 q-my-sm">
+              <q-item-label caption>
                 {{ $t('FILESWEBCLIENT.HINT_USER_SPACE_LIMIT') }}
-              </div>
+              </q-item-label>
             </div>
           </div>
           <div class="row">
