@@ -52,15 +52,15 @@
             </div>
             </div>
           </div>
-          <div class="row q-mb-sm">
+          <div class="row q-mb-md">
             <div class="col-2"></div>
             <div class="col-8">
-              <div class="q-mb-sm text-caption">
-                {{ $t('FILESWEBCLIENT.HINT_TENANT_SPACE_LIMIT') }}
-              </div>
+             <q-item-label caption>
+               {{ $t('FILESWEBCLIENT.HINT_TENANT_SPACE_LIMIT') }}
+             </q-item-label>
             </div>
           </div>
-          <div class="row">
+          <div class="row q-mb-sm">
             <div class="col-2">
               <div class="q-my-sm">
                 {{ $t('FILESWEBCLIENT.LABEL_USER_SPACE_LIMIT') }}
@@ -76,9 +76,9 @@
           <div class="row q-mb-sm">
             <div class="col-2"></div>
             <div class="col-8">
-              <div class="q-my-sm text-caption" >
+              <q-item-label caption>
                 {{ $t('FILESWEBCLIENT.HINT_USER_SPACE_LIMIT') }}
-              </div>
+              </q-item-label>
             </div>
           </div>
         </q-card-section>
@@ -252,7 +252,7 @@ export default {
           }
         }, response => {
           this.savingPerFilesSetting = false
-          notification.showError(errors.getTextFromResponse(response, this.$t('MAILDOMAINS.ERROR_PASSWORD_EMPTY')))
+          notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
         })
       }
     }
