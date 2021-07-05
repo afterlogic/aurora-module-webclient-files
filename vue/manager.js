@@ -14,7 +14,7 @@ export default {
         tabName: 'files',
         title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
         component () {
-          return import('src/../../../FilesWebClient/vue/components/FilesAdminSettingsSystemWide')
+          return import('./components/FilesAdminSettingsSystemWide')
         }
       }
     ]
@@ -32,7 +32,7 @@ export default {
         ],
         title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
         component () {
-          return import('src/../../../FilesWebClient/vue/components/FilesAdminSettingsPerUser')
+          return import('./components/FilesAdminSettingsPerUser')
         }
       }
     ]
@@ -49,7 +49,7 @@ export default {
         ],
         title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
         component () {
-          return import('src/../../../FilesWebClient/vue/components/FilesAdminSettingsPerTenant')
+          return import('./components/FilesAdminSettingsPerTenant')
         }
       }
     ]
