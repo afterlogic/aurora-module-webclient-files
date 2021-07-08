@@ -19,7 +19,7 @@
             </div>
             <div class="col-3">
               <div class="row">
-                <q-input outlined dense class="bg-white col-4" v-model="uploadSizeLimitMb"/>
+                <q-input outlined dense class="bg-white col-4 input" v-model="uploadSizeLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
             </div>
@@ -46,7 +46,7 @@
             </div>
             <div class="col-3">
             <div class="row">
-              <q-input outlined dense class="bg-white col-4" v-model="tenantSpaceLimitMb"/>
+              <q-input outlined dense class="bg-white col-4 input" v-model="tenantSpaceLimitMb"/>
               <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
             </div>
             </div>
@@ -67,7 +67,7 @@
             </div>
             <div class="col-3">
               <div class="row">
-                <q-input outlined dense class=" col-4 bg-white" v-model="userSpaceLimitMb"/>
+                <q-input outlined dense class=" col-4 bg-white input" v-model="userSpaceLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
             </div>
@@ -100,7 +100,7 @@
             </div>
             <div class="col-3">
               <div class="row">
-                <q-input outlined dense class="bg-white col-4" v-model="corporateSpaceLimitMb"/>
+                <q-input outlined dense class="bg-white col-4 input" v-model="corporateSpaceLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
               </div>
             </div>
@@ -260,5 +260,7 @@ export default {
 </script>
 
 <style scoped>
-
+.input {
+  border-radius: 6px;
+}
 </style>
