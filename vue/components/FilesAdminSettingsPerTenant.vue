@@ -201,8 +201,5 @@ export default {
 </script>
 
 <style scoped>
-.input {
-  border-radius: 6px;
-}
 
 </style>
