@@ -19,7 +19,7 @@
             </div>
             <div class="col-3">
               <div class="row">
-                <q-input outlined dense class="bg-white col-4" bg-color="white" v-model="uploadSizeLimitMb"/>
+                <q-input outlined dense class="col-4" bg-color="white" v-model="uploadSizeLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
             </div>
@@ -46,7 +46,7 @@
             </div>
             <div class="col-3">
             <div class="row">
-              <q-input outlined dense class="bg-white col-4" bg-color="white" v-model="tenantSpaceLimitMb"/>
+              <q-input outlined dense class="col-4" bg-color="white" v-model="tenantSpaceLimitMb"/>
               <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
             </div>
             </div>
