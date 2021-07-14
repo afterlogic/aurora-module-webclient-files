@@ -66,7 +66,7 @@
       <div class="q-pt-md text-right">
         <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
                :label="saving ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')"
-               @click="updateSettingsForEntity"/>
+               @click="save"/>
       </div>
     </div>
     <q-inner-loading style="justify-content: flex-start;" :showing="loading || saving">
@@ -77,38 +77,49 @@
 </template>
 
 <script>
-import UnsavedChangesDialog from 'src/components/UnsavedChangesDialog'
-import webApi from 'src/utils/web-api'
-import notification from 'src/utils/notification'
-import errors from 'src/utils/errors'
-import cache from 'src/cache'
-import types from '../../../AdminPanelWebclient/vue/src/utils/types'
 import _ from 'lodash'
+
+import errors from 'src/utils/errors'
+import notification from 'src/utils/notification'
+import types from 'src/utils/types'
+import webApi from 'src/utils/web-api'
+
+import UnsavedChangesDialog from 'src/components/UnsavedChangesDialog'
 
 export default {
   name: 'FilesAdminSettingsPerTenant',
+
   components: {
     UnsavedChangesDialog
   },
-  computed: {
-    tenantId () {
-      return Number(this.$route?.params?.id)
-    }
-  },
-  mounted () {
-    this.saving = false
-    this.populate()
-  },
+
   data () {
     return {
       saving: false,
       loading: false,
-      tenantSpaceLimitMb: 0,
-      userSpaceLimitMb: 0,
-      allocatedSpace: 0,
+      tenantSpaceLimitMb: '',
+      userSpaceLimitMb: '',
+      allocatedSpace: '',
       tenant: null
     }
   },
+
+  computed: {
+    tenantId () {
+      return this.$store.getters['tenants/getCurrentTenantId']
+    },
+
+    allTenants () {
+      return this.$store.getters['tenants/getTenants']
+    },
+  },
+
+  watch: {
+    allTenants () {
+      this.populate()
+    },
+  },
+
   beforeRouteLeave (to, from, next) {
     if (this.hasChanges() && _.isFunction(this?.$refs?.unsavedChangesDialog?.openConfirmDiscardChangesDialog)) {
       this.$refs.unsavedChangesDialog.openConfirmDiscardChangesDialog(next)
@@ -116,52 +127,37 @@ export default {
       next()
     }
   },
+
+  mounted () {
+    this.loading = false
+    this.saving = false
+    this.populate()
+  },
+
   methods: {
     hasChanges () {
-      const tenantSpaceLimitMb = _.isFunction(this.tenant?.getData) ? this.tenant?.getData('FilesWebclient::TenantSpaceLimitMb') : ''
-      const userSpaceLimitMb = _.isFunction(this.tenant?.getData) ? this.tenant?.getData('FilesWebclient::UserSpaceLimitMb') : ''
-      return this.tenantSpaceLimitMb !== tenantSpaceLimitMb ||
-          this.userSpaceLimitMb !== userSpaceLimitMb
+      const tenantCompleteData = types.pObject(this.tenant?.completeData)
+      const tenantSpaceLimitMb = tenantCompleteData['FilesWebclient::TenantSpaceLimitMb']
+      const userSpaceLimitMb = tenantCompleteData['FilesWebclient::UserSpaceLimitMb']
+      return types.pInt(this.tenantSpaceLimitMb) !== tenantSpaceLimitMb ||
+          types.pInt(this.userSpaceLimitMb) !== userSpaceLimitMb
     },
+
     populate() {
-      this.loading = true
-      cache.getTenant(this.tenantId).then(({ tenant }) => {
+      const tenant = this.$store.getters['tenants/getTenant'](this.tenantId)
+      if (tenant) {
         if (tenant.completeData['FilesWebclient::TenantSpaceLimitMb'] !== undefined) {
-          this.loading = false
           this.tenant = tenant
           this.tenantSpaceLimitMb = tenant.completeData['FilesWebclient::TenantSpaceLimitMb']
           this.userSpaceLimitMb = tenant.completeData['FilesWebclient::UserSpaceLimitMb']
           this.allocatedSpace = tenant.completeData['FilesWebclient::AllocatedSpace']
         } else {
-          this.getSettingsForEntity()
+          this.getSettings()
         }
-      })
-    },
-    getSettingsForEntity () {
-      const parameters = {
-        EntityType: 'Tenant',
-        EntityId: this.tenantId,
       }
-      webApi.sendRequest({
-        moduleName: 'Files',
-        methodName: 'GetSettingsForEntity',
-        parameters
-      }).then(result => {
-        if (result) {
-          cache.getTenant(parameters.EntityId, true).then(({ tenant }) => {
-            tenant.setCompleteData({
-              'FilesWebclient::UserSpaceLimitMb': result.UserSpaceLimitMb,
-              'FilesWebclient::TenantSpaceLimitMb': result.TenantSpaceLimitMb,
-              'FilesWebclient::AllocatedSpace': result.AllocatedSpace
-            })
-            this.populate()
-          })
-        }
-      }, response => {
-        notification.showError(errors.getTextFromResponse(response))
-      })
     },
-    updateSettingsForEntity() {
+
+    save () {
       if (!this.saving) {
         this.saving = true
         const parameters = {
@@ -176,16 +172,14 @@ export default {
           methodName: 'UpdateSettingsForEntity',
           parameters
         }).then(result => {
-          cache.getTenant(parameters.TenantId, true).then(({ tenant }) => {
-            tenant.setCompleteData({
+          this.saving = false
+          if (result) {
+            const data = {
               'FilesWebclient::UserSpaceLimitMb': parameters.UserSpaceLimitMb,
               'FilesWebclient::TenantSpaceLimitMb': parameters.TenantSpaceLimitMb,
               'FilesWebclient::AllocatedSpace': this.allocatedSpace,
-            })
-            this.populate()
-          })
-          this.saving = false
-          if (result) {
+            }
+            this.$store.commit('tenants/setTenantCompleteData', { id: this.tenantId, data })
             notification.showReport(this.$t('COREWEBCLIENT.REPORT_SETTINGS_UPDATE_SUCCESS'))
           } else {
             notification.showError(this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED'))
@@ -195,6 +189,31 @@ export default {
           notification.showError(errors.getTextFromResponse(response, this.$t('COREWEBCLIENT.ERROR_SAVING_SETTINGS_FAILED')))
         })
       }
+    },
+
+    getSettings () {
+      this.loading = true
+      const parameters = {
+        EntityType: 'Tenant',
+        EntityId: this.tenantId,
+      }
+      webApi.sendRequest({
+        moduleName: 'Files',
+        methodName: 'GetSettingsForEntity',
+        parameters
+      }).then(result => {
+        this.loading = false
+        if (result) {
+          const data = {
+            'FilesWebclient::UserSpaceLimitMb': types.pInt(result.UserSpaceLimitMb),
+            'FilesWebclient::TenantSpaceLimitMb': types.pInt(result.TenantSpaceLimitMb),
+            'FilesWebclient::AllocatedSpace': types.pInt(result.AllocatedSpace),
+          }
+          this.$store.commit('tenants/setTenantCompleteData', { id: this.tenantId, data })
+        }
+      }, response => {
+        notification.showError(errors.getTextFromResponse(response))
+      })
     },
   }
 }
