@@ -100,7 +100,7 @@ export default {
           this.loading = false
           if (user && _.isFunction(user?.getData)) {
             this.user = user
-            this.userSpaceLimitMb = user.getData('Files::UserSpaceLimitMb')
+            this.userSpaceLimitMb = typesUtils.pInt(user.getData('Files::UserSpaceLimitMb'))
           } else {
             this.$emit('no-user-found')
           }
@@ -109,7 +109,7 @@ export default {
     },
 
     hasChanges () {
-      const limit = _.isFunction(this.user?.getData) ? this.user?.getData('Files::UserSpaceLimitMb') : 0
+      const limit = _.isFunction(this.user?.getData) ? typesUtils.pInt(this.user?.getData('Files::UserSpaceLimitMb')) : 0
       return this.userSpaceLimitMb !== limit
     },
 
@@ -119,7 +119,7 @@ export default {
         EntityType: 'User',
         EntityId: this.user?.id,
         TenantId: this.user.tenantId,
-        UserSpaceLimitMb: typesUtils.pInt(this.userSpaceLimitMb),
+        UserSpaceLimitMb: this.userSpaceLimitMb,
       }
       webApi.sendRequest({
         moduleName: 'Files',
