@@ -29,7 +29,6 @@
     <q-inner-loading style="justify-content: flex-start;" :showing="loading || saving">
       <q-linear-progress query />
     </q-inner-loading>
-    <UnsavedChangesDialog ref="unsavedChangesDialog"/>
   </q-scroll-area>
 </template>
 
@@ -43,14 +42,8 @@ import webApi from 'src/utils/web-api'
 
 import cache from 'src/cache'
 
-import UnsavedChangesDialog from 'src/components/UnsavedChangesDialog'
-
 export default {
   name: 'FilesAdminSettingsPerUser',
-
-  components: {
-    UnsavedChangesDialog
-  },
 
   data() {
     return {
@@ -74,11 +67,7 @@ export default {
   },
 
   beforeRouteLeave (to, from, next) {
-    if (this.hasChanges() && _.isFunction(this?.$refs?.unsavedChangesDialog?.openConfirmDiscardChangesDialog)) {
-      this.$refs.unsavedChangesDialog.openConfirmDiscardChangesDialog(next)
-    } else {
-      next()
-    }
+    this.doBeforeRouteLeave(to, from, next)
   },
 
   methods: {
@@ -108,9 +97,22 @@ export default {
       })
     },
 
+    /**
+     * Method is used in doBeforeRouteLeave mixin
+     */
     hasChanges () {
       const limit = _.isFunction(this.user?.getData) ? typesUtils.pInt(this.user?.getData('Files::UserSpaceLimitMb')) : 0
       return this.userSpaceLimitMb !== limit
+    },
+
+    /**
+     * Method is used in doBeforeRouteLeave mixin,
+     * do not use async methods - just simple and plain reverting of values
+     * !! hasChanges method must return true after executing revertChanges method
+     */
+    revertChanges () {
+      const limit = _.isFunction(this.user?.getData) ? typesUtils.pInt(this.user?.getData('Files::UserSpaceLimitMb')) : 0
+      this.userSpaceLimitMb = limit
     },
 
     updateSettingsForEntity() {

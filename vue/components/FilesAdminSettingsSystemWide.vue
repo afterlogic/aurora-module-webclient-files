@@ -112,24 +112,19 @@
                :label="savingCorFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettingsCorporate"/>
       </div>
     </div>
-
-    <UnsavedChangesDialog ref="unsavedChangesDialog"/>
   </q-scroll-area>
 </template>
 
 <script>
-import UnsavedChangesDialog from 'src/components/UnsavedChangesDialog'
-import webApi from 'src/utils/web-api'
-import notification from 'src/utils/notification'
-import settings from '../../../FilesWebclient/vue/settings'
 import errors from 'src/utils/errors'
-import _ from 'lodash'
+import notification from 'src/utils/notification'
+import webApi from 'src/utils/web-api'
+
+import settings from '../../../FilesWebclient/vue/settings'
 
 export default {
   name: 'FilesAdminSettingsSystemWide',
-  components: {
-    UnsavedChangesDialog
-  },
+
   data() {
     return {
       savingFilesSetting: false,
@@ -144,17 +139,19 @@ export default {
       corporateSpaceLimitMb: 0,
     }
   },
+
   mounted() {
     this.populate()
   },
+
   beforeRouteLeave (to, from, next) {
-    if (this.hasChanges() && _.isFunction(this?.$refs?.unsavedChangesDialog?.openConfirmDiscardChangesDialog)) {
-      this.$refs.unsavedChangesDialog.openConfirmDiscardChangesDialog(next)
-    } else {
-      next()
-    }
+    this.doBeforeRouteLeave(to, from, next)
   },
+
   methods: {
+    /**
+     * Method is used in doBeforeRouteLeave mixin
+     */
     hasChanges () {
       const data = settings.getFilesSettings()
       return this.enableUploadSizeLimit !== data.enableUploadSizeLimit ||
@@ -163,6 +160,16 @@ export default {
       this.tenantSpaceLimitMb !== data.tenantSpaceLimitMb ||
       this.corporateSpaceLimitMb !== data.corporateSpaceLimitMb
     },
+
+    /**
+     * Method is used in doBeforeRouteLeave mixin,
+     * do not use async methods - just simple and plain reverting of values
+     * !! hasChanges method must return true after executing revertChanges method
+     */
+    revertChanges () {
+      this.populate()
+    },
+
     populate () {
       const data = settings.getFilesSettings()
       this.enableUploadSizeLimit = data.enableUploadSizeLimit
