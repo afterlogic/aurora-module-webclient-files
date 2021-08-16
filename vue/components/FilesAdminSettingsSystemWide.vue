@@ -1,118 +1,123 @@
 <template>
-  <q-scroll-area class="full-height full-width">
-    <div class="q-pa-lg">
-      <div class="row q-mb-md">
-        <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_BROWSER_TAB') }}</div>
-      </div>
-      <q-card flat bordered class="card-edit-settings">
-        <q-card-section>
-          <div class="row q-mb-md">
-            <div class="col2">
-              <q-checkbox dense v-model="enableUploadSizeLimit">
-                <q-item-label>{{ $t('FILESWEBCLIENT.LABEL_ENABLE_UPLOAD_SIZE_LIMIT') }}</q-item-label>
-              </q-checkbox>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-2">
-              <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_UPLOAD_SIZE_LIMIT') }}</div>
-            </div>
-            <div class="col-3">
-              <div class="row">
-                <q-input outlined dense class="col-4" bg-color="white" v-model="uploadSizeLimitMb"/>
-                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
+  <div class="full-height full-width">
+    <q-scroll-area class="full-height full-width">
+      <div class="q-pa-lg">
+        <div class="row q-mb-md">
+          <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_BROWSER_TAB') }}</div>
+        </div>
+        <q-card flat bordered class="card-edit-settings">
+          <q-card-section>
+            <div class="row q-mb-md">
+              <div class="col2">
+                <q-checkbox dense v-model="enableUploadSizeLimit">
+                  <q-item-label>{{ $t('FILESWEBCLIENT.LABEL_ENABLE_UPLOAD_SIZE_LIMIT') }}</q-item-label>
+                </q-checkbox>
               </div>
             </div>
-          </div>
-        </q-card-section>
-      </q-card>
-      <div class="q-pt-md text-right">
-        <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
-               :label="savingFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettings"/>
-      </div>
-    </div>
-
-    <div class="q-pa-lg">
-      <div class="row q-mb-md">
-        <div class="col text-h5"> <div class="q-my-sm">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_PERSONAL') }}</div></div>
-      </div>
-      <q-card flat bordered class="card-edit-settings">
-        <q-card-section>
-          <div class="row q-mb-sm">
-            <div class="col-2">
-              <div class="q-my-sm">
-                {{ $t('FILESWEBCLIENT.LABEL_TENANT_SPACE_LIMIT') }}
-              </div>
-            </div>
-            <div class="col-3">
             <div class="row">
-              <q-input outlined dense class="col-4" bg-color="white" v-model="tenantSpaceLimitMb"/>
-              <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
-            </div>
-            </div>
-          </div>
-          <div class="row q-mb-md">
-            <div class="col-2"></div>
-            <div class="col-8">
-             <q-item-label caption>
-               {{ $t('FILESWEBCLIENT.HINT_TENANT_SPACE_LIMIT') }}
-             </q-item-label>
-            </div>
-          </div>
-          <div class="row q-mb-sm">
-            <div class="col-2">
-              <div class="q-my-sm">
-                {{ $t('FILESWEBCLIENT.LABEL_USER_SPACE_LIMIT') }}
+              <div class="col-2">
+                <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_UPLOAD_SIZE_LIMIT') }}</div>
+              </div>
+              <div class="col-3">
+                <div class="row">
+                  <q-input outlined dense class="col-4" bg-color="white" v-model="uploadSizeLimitMb"/>
+                  <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
+                </div>
               </div>
             </div>
-            <div class="col-3">
+          </q-card-section>
+        </q-card>
+        <div class="q-pt-md text-right">
+          <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
+                 :label="$t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettings"/>
+        </div>
+      </div>
+
+      <div class="q-pa-lg">
+        <div class="row q-mb-md">
+          <div class="col text-h5"> <div class="q-my-sm">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_PERSONAL') }}</div></div>
+        </div>
+        <q-card flat bordered class="card-edit-settings">
+          <q-card-section>
+            <div class="row q-mb-sm">
+              <div class="col-2">
+                <div class="q-my-sm">
+                  {{ $t('FILESWEBCLIENT.LABEL_TENANT_SPACE_LIMIT') }}
+                </div>
+              </div>
+              <div class="col-3">
               <div class="row">
-                <q-input outlined dense class="col-4" bg-color="white" v-model="userSpaceLimitMb"/>
+                <q-input outlined dense class="col-4" bg-color="white" v-model="tenantSpaceLimitMb"/>
                 <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
               </div>
-            </div>
-          </div>
-          <div class="row q-mb-sm">
-            <div class="col-2"></div>
-            <div class="col-8">
-              <q-item-label caption>
-                {{ $t('FILESWEBCLIENT.HINT_USER_SPACE_LIMIT') }}
-              </q-item-label>
-            </div>
-          </div>
-        </q-card-section>
-      </q-card>
-      <div class="q-pt-md text-right">
-        <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
-               :label="savingPerFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettingsForEntity"/>
-      </div>
-    </div>
-
-    <div class="q-pa-lg">
-      <div class="row q-mb-md">
-        <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_CORPORATE') }}</div>
-      </div>
-      <q-card flat bordered class="card-edit-settings">
-        <q-card-section>
-          <div class="row">
-            <div class="col-2">
-              <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_CORPORATE_SPACE_LIMIT') }}</div>
-            </div>
-            <div class="col-3">
-              <div class="row">
-                <q-input outlined dense bg-color="white" class="col-4" v-model="corporateSpaceLimitMb"/>
-                <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
               </div>
             </div>
-          </div>
-        </q-card-section>
-      </q-card>
-      <div class="q-pt-md text-right">
-        <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
-               :label="savingCorFilesSetting ? $t('COREWEBCLIENT.ACTION_SAVE_IN_PROGRESS') : $t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettingsCorporate"/>
+            <div class="row q-mb-md">
+              <div class="col-2"></div>
+              <div class="col-8">
+               <q-item-label caption>
+                 {{ $t('FILESWEBCLIENT.HINT_TENANT_SPACE_LIMIT') }}
+               </q-item-label>
+              </div>
+            </div>
+            <div class="row q-mb-sm">
+              <div class="col-2">
+                <div class="q-my-sm">
+                  {{ $t('FILESWEBCLIENT.LABEL_USER_SPACE_LIMIT') }}
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="row">
+                  <q-input outlined dense class="col-4" bg-color="white" v-model="userSpaceLimitMb"/>
+                  <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
+                </div>
+              </div>
+            </div>
+            <div class="row q-mb-sm">
+              <div class="col-2"></div>
+              <div class="col-8">
+                <q-item-label caption>
+                  {{ $t('FILESWEBCLIENT.HINT_USER_SPACE_LIMIT') }}
+                </q-item-label>
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
+        <div class="q-pt-md text-right">
+          <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
+                 :label="$t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettingsForEntity"/>
+        </div>
       </div>
-    </div>
-  </q-scroll-area>
+
+      <div class="q-pa-lg">
+        <div class="row q-mb-md">
+          <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_CORPORATE') }}</div>
+        </div>
+        <q-card flat bordered class="card-edit-settings">
+          <q-card-section>
+            <div class="row">
+              <div class="col-2">
+                <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_CORPORATE_SPACE_LIMIT') }}</div>
+              </div>
+              <div class="col-3">
+                <div class="row">
+                  <q-input outlined dense bg-color="white" class="col-4" v-model="corporateSpaceLimitMb"/>
+                  <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"/>
+                </div>
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
+        <div class="q-pt-md text-right">
+          <q-btn unelevated no-caps dense class="q-px-sm" :ripple="false" color="primary"
+                 :label="$t('COREWEBCLIENT.ACTION_SAVE')" @click="updateSettingsCorporate"/>
+        </div>
+      </div>
+    </q-scroll-area>
+    <q-inner-loading style="justify-content: flex-start;" :showing="savingFilesSetting || savingPerFilesSetting || savingCorFilesSetting">
+      <q-linear-progress query />
+    </q-inner-loading>
+  </div>
 </template>
 
 <script>
