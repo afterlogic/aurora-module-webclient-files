@@ -120,6 +120,10 @@ export default {
      * Method is used in doBeforeRouteLeave mixin
      */
     hasChanges () {
+      if (this.loading) {
+        return false
+      }
+
       const tenantCompleteData = types.pObject(this.tenant?.completeData)
       const tenantSpaceLimitMb = tenantCompleteData['FilesWebclient::TenantSpaceLimitMb']
       const userSpaceLimitMb = tenantCompleteData['FilesWebclient::UserSpaceLimitMb']
