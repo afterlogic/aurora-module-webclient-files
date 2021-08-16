@@ -73,7 +73,7 @@
                 </div>
               </div>
             </div>
-            <div class="row q-mb-sm">
+            <div class="row">
               <div class="col-2"></div>
               <div class="col-8">
                 <q-item-label caption>
