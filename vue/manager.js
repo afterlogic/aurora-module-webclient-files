@@ -2,7 +2,7 @@ import settings from '../../FilesWebclient/vue/settings'
 export default {
   moduleName: 'FilesWebclient',
 
-  requiredModules: ['Files', 'CorporateFiles'],
+  requiredModules: ['Files'],
 
   init (appdata) {
     settings.init(appdata)

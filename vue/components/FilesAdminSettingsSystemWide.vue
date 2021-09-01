@@ -89,7 +89,7 @@
         </div>
       </div>
 
-      <div class="q-pa-lg">
+      <div class="q-pa-lg" v-if="isCorporateAvailable">
         <div class="row q-mb-md">
           <div class="col text-h5">{{ $t('FILESWEBCLIENT.HEADING_SETTINGS_TAB_CORPORATE') }}</div>
         </div>
@@ -125,6 +125,8 @@ import errors from 'src/utils/errors'
 import notification from 'src/utils/notification'
 import webApi from 'src/utils/web-api'
 
+import moduleManager from 'src/modules-manager'
+
 import settings from '../../../FilesWebclient/vue/settings'
 
 export default {
@@ -142,11 +144,14 @@ export default {
       entityId: '',
       tenantSpaceLimitMb: 0,
       corporateSpaceLimitMb: 0,
+      isCorporateAvailable: moduleManager.isModuleAvailable('CorporateFiles'),
     }
   },
 
   mounted() {
     this.populate()
+    console.log('isModuleAvailable', moduleManager.isModuleAvailable('CorporateFiles'))
+    console.log('isCorporateAvailable', this.isCorporateAvailable)
   },
 
   beforeRouteLeave (to, from, next) {
@@ -244,7 +249,7 @@ export default {
       }
     },
     updateSettingsCorporate() {
-      if (!this.savingCorFilesSetting) {
+      if (this.isCorporateAvailable && !this.savingCorFilesSetting) {
         this.savingCorFilesSetting = true
         const parameters = {
           SpaceLimitMb: this.corporateSpaceLimitMb
