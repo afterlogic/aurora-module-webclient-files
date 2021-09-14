@@ -334,7 +334,7 @@ CFilesView.prototype.ViewConstructorName = 'CFilesView';
 
 CFilesView.prototype.registerCreateButtonsController = function (oBigButtonView)
 {
-	this.createButtonsControllers().push(oBigButtonView);
+	this.createButtonsControllers.push(oBigButtonView);
 };
 
 /**
