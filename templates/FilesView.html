@@ -25,16 +25,17 @@
 					</span>
 				</span>
 
-				<div class="middle_bar" data-bind="css: {'quota_visible': -1 < quotaProc()}">
+				<div class="middle_bar" data-bind="css: {'quota_visible': -1 < quotaProc(), 'quota_has_text_below': !bShowQuotaBarTextAsTooltip}">
 					<!-- ko template: { name: '%ModuleName%_StoragesPanelView'} --><!-- /ko -->
 					<div class="panel_bottom" data-bind="style: { minHeight: (24 + 16 * aBottomLeftCornerLinks.length) + 'px' }">
 						<div data-bind="foreach: aBottomLeftCornerLinks" style="font-size: 8pt; line-height: 16px; text-align: center;">
 							<a target="_blank" data-bind="i18n: {'key': Lang}, attr: {href: Link}" style="display: block; outline: none;"></a>
 						</div>
 						<span class="volumer" data-bind="visible: -1 < quotaProc()">
-							<span class="volumer_conteiner" data-bind="customTooltip: quotaDesc()">
+							<span class="volumer_conteiner" data-bind="customTooltip: bShowQuotaBarTextAsTooltip ? quotaDesc() : false">
 								<span class="used" data-bind="style: {'width': '' + (-1 < quotaProc() ? quotaProc() : 0) + '%' }"></span>
 							</span>
+							<span data-bind="visible: !bShowQuotaBarTextAsTooltip, text: quotaDesc"></span>
 						</span>
 					</div>
 				</div>

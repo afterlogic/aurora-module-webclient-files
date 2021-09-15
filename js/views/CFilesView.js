@@ -196,6 +196,7 @@ function CFilesView(bPopup)
 	this.used = ko.observable(0);
 	this.quotaDesc = ko.observable('');
 	this.quotaProc = ko.observable(-1);
+	this.bShowQuotaBarTextAsTooltip = UserSettings.ShowQuotaBarTextAsTooltip;
 	
 	this.aBottomLeftCornerLinks = Settings.BottomLeftCornerLinks;
 	
@@ -333,7 +334,7 @@ CFilesView.prototype.ViewConstructorName = 'CFilesView';
 
 CFilesView.prototype.registerCreateButtonsController = function (oBigButtonView)
 {
-	this.createButtonsControllers().push(oBigButtonView);
+	this.createButtonsControllers.push(oBigButtonView);
 };
 
 /**
