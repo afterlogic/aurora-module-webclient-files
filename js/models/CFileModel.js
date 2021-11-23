@@ -48,6 +48,10 @@ function CFileModel(oData, bPopup)
 	this.sLinkUrl = this.bIsLink ? Types.pString(oData.LinkUrl) : '';
 	this.sThumbnailExternalLink = this.bIsLink ? Types.pString(oData.ThumbnailUrl) : '';
 	
+	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
+	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
+	this.bSharedWithMeAccessRead = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read || oData.Shared;
+	
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	this.published = ko.observable(false);
@@ -84,9 +88,13 @@ function CFileModel(oData, bPopup)
 
 	this.iconAction('');
 	
+	this.sHeaderDenseText = this.bSharedWithMeAccessRead ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = _.bind(function () {
-		if (this.sLastModified)
-		{
+		if (this.bSharedWithMeAccessRead && this.sOwnerName) {
+			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
+				'OWNER': this.sOwnerName
+			});
+		} else if (this.sLastModified) {
 			var sLangConstName = this.sOwnerName !== '' ? '%MODULENAME%/INFO_OWNER_AND_DATA' : '%MODULENAME%/INFO_DATA';
 			return TextUtils.i18n(sLangConstName, {
 				'OWNER': this.sOwnerName,
@@ -132,6 +140,11 @@ function CFileModel(oData, bPopup)
 		if (this.bIsLink)
 		{
 			aClasses.push('aslink');
+		}
+		if (this.bSharedWithMeAccessWrite) {
+			aClasses.push('shared');
+		} else if (this.bSharedWithMeAccessRead) {
+			aClasses.push('shared_read_only');
 		}
 		
 		return aClasses.join(' ');

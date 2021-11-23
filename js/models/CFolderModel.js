@@ -3,7 +3,9 @@
 var
 	ko = require('knockout'),
 	
+	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
+
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js')
 ;
@@ -36,6 +38,11 @@ function CFolderModel()
 	
 	this.sMainAction = 'list';
 	this.oExtendedProps = null;
+
+	this.sOwnerName = '';
+	this.bSharedWithMeAccessReshare = false;
+	this.bSharedWithMeAccessWrite = false;
+	this.bSharedWithMeAccessRead = false;
 	
 	// The folder can be uploading. Operations should be disabled for such a folder.
 	this.uploadingFilesCount = ko.observable(0);
@@ -69,6 +76,22 @@ CFolderModel.prototype.parse = function (oData)
 	{
 		this.sMainAction = Types.pString(oData.MainAction);
 	}
+
+	this.sOwnerName = Types.pString(oData.Owner);
+	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
+	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
+	this.bSharedWithMeAccessRead = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read || oData.Shared;
+	
+	this.sHeaderDenseText = this.bSharedWithMeAccessRead ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
+	this.sHeaderText = function () {
+		if (this.bSharedWithMeAccessRead && this.sOwnerName) {
+			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
+				'OWNER': this.sOwnerName
+			});
+		}
+		return '';
+	}.bind(this)();
+	
 	App.broadcastEvent('%ModuleName%::ParseFolder::after', [this, oData]);
 };
 

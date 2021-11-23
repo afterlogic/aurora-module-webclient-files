@@ -3,8 +3,17 @@
 		draggablePlace: !$parent.bInPopup && !isIncomplete() ? $parent.dragAndDropHelperBound : null,
 		draggableDragStartCallback: function() {if (!$parent.bInPopup && !isIncomplete()) $root.dragover(true);},
 		draggableDragStopCallback: function() {if (!$parent.bInPopup && !isIncomplete()) $root.dragover(false);},
-		css: {'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete}"
->
+		css: {	'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete,
+				'shared': bSharedWithMeAccessWrite, 'shared_read_only': bSharedWithMeAccessRead && !bSharedWithMeAccessWrite}">
+
+	<!-- ko if: (sHeaderDenseText.length > 0) -->
+	<span class="header_dense" data-bind="text: sHeaderDenseText"></span>
+	<!-- /ko -->
+	
+	<!-- ko if: (sHeaderText.length > 0) -->
+	<span class="header" data-bind="text: sHeaderText"></span>
+	<!-- /ko -->
+
 	<div class="item_content ui-droppable dragHandle" data-bind="css: {'recivedAnim': recivedAnim()}, droppable: {valueFunc: !isIncomplete() ? function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);} : null}">
 		<div class="image">
 			<span class="icon animGoal"></span>
