@@ -80,7 +80,7 @@ CFolderModel.prototype.parse = function (oData)
 	this.sOwnerName = Types.pString(oData.Owner);
 	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
 	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
-	this.bSharedWithMeAccessRead = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read || oData.Shared;
+	this.bSharedWithMeAccessRead = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
 	
 	this.sHeaderDenseText = this.bSharedWithMeAccessRead ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = function () {
