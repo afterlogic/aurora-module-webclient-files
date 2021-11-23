@@ -88,9 +88,6 @@ function CFilesView(bPopup)
 			this.selector.listCheckedAndSelected(false);
 		}
 	}, this);
-	this.newItemsDisabled = ko.computed(function () {
-		return this.storageType() === Enums.FileStorageType.Shared;
-	}, this);
 	this.createButtonsControllers = ko.observableArray([]);
 
 	this.pathItems = ko.observableArray();
@@ -102,6 +99,10 @@ function CFilesView(bPopup)
 	this.dropPath = ko.observable('');
 	ko.computed(function () {
 		this.dropPath(this.currentPath());
+	}, this);
+
+	this.newItemsDisabled = ko.computed(function () {
+		return this.isZipFolder() || this.storageType() === Enums.FileStorageType.Shared;
 	}, this);
 	
 	this.filesCollection = ko.computed(function () {
