@@ -57,12 +57,13 @@ CCreateFolderPopup.prototype.onOKClick = function ()
 		}
 		else
 		{
-			this.closePopup();
+			// delay is necessary to avoid viewing an image on enter pressed here
+			setTimeout(function () { this.closePopup(); }.bind(this));
 		}
 	}
 	else
 	{
-		this.closePopup();
+		setTimeout(function () { this.closePopup(); }.bind(this));
 	}
 };
 
