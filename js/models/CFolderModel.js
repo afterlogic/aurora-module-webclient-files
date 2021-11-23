@@ -71,7 +71,7 @@ CFolderModel.prototype.parse = function (oData)
 	this.storageType(Types.pString(oData.Type));
 	this.displayName(this.fileName());
 	this.id(Types.pString(oData.Id));
-	this.oExtendedProps = oData.ExtendedProps || [];
+	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
 	if (oData.MainAction)
 	{
 		this.sMainAction = Types.pString(oData.MainAction);

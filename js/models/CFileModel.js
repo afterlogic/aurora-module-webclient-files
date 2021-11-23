@@ -43,7 +43,7 @@ function CFileModel(oData, bPopup)
 	this.checked = ko.observable(false);
 	
 	this.bIsLink = !!oData.IsLink;
-	this.oExtendedProps = oData.ExtendedProps;
+	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
 	this.sLinkType = this.bIsLink ? Types.pString(oData.LinkType) : '';
 	this.sLinkUrl = this.bIsLink ? Types.pString(oData.LinkUrl) : '';
 	this.sThumbnailExternalLink = this.bIsLink ? Types.pString(oData.ThumbnailUrl) : '';
