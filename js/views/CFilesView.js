@@ -144,9 +144,10 @@ function CFilesView(bPopup)
 		});
 	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, function () {
+		var aItems = this.selector.listCheckedAndSelected();
 		return	!this.isZipFolder()
-				&& this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length === 1
-				&& !this.isDisabledRenameButton();
+				&& this.checkedReadyForOperations() && aItems.length === 1
+				&& !this.isDisabledRenameButton() && (!aItems[0].bSharedWithMe || aItems[0].bSharedWithMeAccessWrite);
 	});
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
 		return	this.storageType() !== Enums.FileStorageType.Shared && !this.isZipFolder()
@@ -163,7 +164,8 @@ function CFilesView(bPopup)
 	});
 	this.shareCommand = Utils.createCommand(this, this.executeShare, function () {
 		var aItems = this.selector.listCheckedAndSelected();
-		return !this.isZipFolder() && this.checkedReadyForOperations() && 1 === aItems.length && (!aItems[0].bIsLink);
+		return !this.isZipFolder() && this.checkedReadyForOperations() && 1 === aItems.length
+				&& !aItems[0].bIsLink && (!aItems[0].bSharedWithMe || aItems[0].bSharedWithMeAccessReshare);
 	});
 	this.sendCommand = Utils.createCommand(this, this.executeSend, function () {
 		if (!this.isZipFolder() && this.checkedReadyForOperations())

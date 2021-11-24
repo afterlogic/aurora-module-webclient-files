@@ -50,7 +50,7 @@ function CFileModel(oData, bPopup)
 	
 	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
 	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
-	this.bSharedWithMeAccessRead = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
+	this.bSharedWithMe = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
 	
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
@@ -88,9 +88,9 @@ function CFileModel(oData, bPopup)
 
 	this.iconAction('');
 	
-	this.sHeaderDenseText = this.bSharedWithMeAccessRead ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
+	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = _.bind(function () {
-		if (this.bSharedWithMeAccessRead && this.sOwnerName) {
+		if (this.bSharedWithMe && this.sOwnerName) {
 			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
 				'OWNER': this.sOwnerName
 			});
@@ -143,7 +143,7 @@ function CFileModel(oData, bPopup)
 		}
 		if (this.bSharedWithMeAccessWrite) {
 			aClasses.push('shared');
-		} else if (this.bSharedWithMeAccessRead) {
+		} else if (this.bSharedWithMe) {
 			aClasses.push('shared_read_only');
 		}
 		
