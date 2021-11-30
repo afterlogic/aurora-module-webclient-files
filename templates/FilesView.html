@@ -2,15 +2,15 @@
 	<div class="panels" data-bind="splitterFlex: {name: 'files_list', sizes: [20, 80]}">
 		<div class="panel left_panel storages_panel">
 			<div class="panel_content">
-				<span class="buttons big_single_button" data-bind="dropdown: { close: isNewItemsMenuOpened }, css: { 'disabled': newItemsDisabled }">
+				<span class="buttons big_single_button" data-bind="dropdown: { close: isNewItemsMenuOpened }, css: { 'disabled': !isCreateAllowed() }">
 					<span class="control button">
 						<span data-bind="i18n: {'key': '%MODULENAME%/ACTION_NEW_ITEMS'}"></span>
 						<span class="icon arrow"></span>
 						<span class="dropdown">
 							<span class="dropdown_helper">
 								<span class="dropdown_content">
-									<div class="item" data-bind="css: newItemsDisabled() ? 'disabled' : '',
-											initDom: uploaderButton, click: function () { return !newItemsDisabled(); },
+									<div class="item" data-bind="css: !isCreateAllowed() ? 'disabled' : '',
+											initDom: uploaderButton, click: function () { return isCreateAllowed(); },
 											i18n: {'key': '%MODULENAME%/ACTION_UPLOAD_FILES'}"></div>
 									<div class="item" data-bind="command: createFolderCommand,
 											i18n: {'key': '%MODULENAME%/ACTION_NEW_FOLDER'}"></div>

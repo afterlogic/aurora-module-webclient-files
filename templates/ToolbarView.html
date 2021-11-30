@@ -14,13 +14,13 @@
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_RENAME'}"></span>
 	</span>
-	<span class="item publish" data-bind="visible: !isCurrentStorageExternal() && PublicLinksEnabled, command: shareCommand, customTooltip: '%MODULENAME%/ACTION_CREATE_PUBLIC_LINK'">
+	<span class="item publish" data-bind="visible: !isExternalStorage() && PublicLinksEnabled, command: shareCommand, customTooltip: '%MODULENAME%/ACTION_CREATE_PUBLIC_LINK'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_CREATE_PUBLIC_LINK'}"></span>
 	</span>
 	<span class="item delete" data-bind="command: deleteCommand, customTooltip: 'COREWEBCLIENT/ACTION_DELETE'">
 		<span class="icon"></span>
-		<span class="hint" data-bind="text: selectedCount, visible: selectedCount() > 0 && !isDisabledDeleteButton()"></span>
+		<span class="hint" data-bind="text: selectedCount, visible: isDeleteAllowed()"></span>
 		<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
 	</span>
 	<!-- ko foreach: addToolbarButtons -->

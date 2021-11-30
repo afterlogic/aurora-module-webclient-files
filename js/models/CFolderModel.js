@@ -62,6 +62,13 @@ function CFolderModel()
 	}, this);
 }
 
+CFolderModel.prototype.parseSharedWithMeAccess = function ()
+{
+	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
+	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
+	this.bSharedWithMe = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
+};
+
 CFolderModel.prototype.parse = function (oData)
 {
 	this.published(!!oData.Published);
@@ -78,9 +85,7 @@ CFolderModel.prototype.parse = function (oData)
 	}
 
 	this.sOwnerName = Types.pString(oData.Owner);
-	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
-	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
-	this.bSharedWithMe = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
+	this.parseSharedWithMeAccess();
 	
 	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = function () {

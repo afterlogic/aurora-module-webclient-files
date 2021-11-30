@@ -101,8 +101,18 @@ function CFilesView(bPopup)
 		this.dropPath(this.currentPath());
 	}, this);
 
-	this.newItemsDisabled = ko.computed(function () {
-		return this.isZipFolder() || this.storageType() === Enums.FileStorageType.Shared;
+	this.isCorporateStorage = ko.computed(function () {
+		return this.storageType() === Enums.FileStorageType.Corporate;
+	}, this);
+	this.isSharedStorage = ko.computed(function () {
+		return this.storageType() === Enums.FileStorageType.Shared;
+	}, this);
+	this.isEncryptedStorage = ko.computed(function () {
+		return this.storageType() === Enums.FileStorageType.Encrypted;
+	}, this);
+	this.isExternalStorage = ko.computed(function () {
+		var oStorage = this.getStorageByType(this.storageType());
+		return (oStorage && oStorage.isExternal);
 	}, this);
 	
 	this.filesCollection = ko.computed(function () {
@@ -137,49 +147,91 @@ function CFilesView(bPopup)
 	this.newSearchPattern = ko.observable('');
 	this.isSearchFocused = ko.observable(false);
 
-	this.checkedReadyForOperations = ko.computed(function () {
-		var  aItems = this.selector.listCheckedAndSelected() || [];
-		return aItems.every(function (oItem)  {
-			return !(oItem.uploaded !== undefined && oItem.uploaded() === false || oItem.downloading !== undefined && oItem.downloading() === true);
+	this.selectedFiles = ko.computed(function () {
+		return _.filter(this.selector.listCheckedAndSelected(), function (oItem) {
+			return oItem.IS_FILE;
+		}, this);
+	}, this);
+	this.allSelectedFilesReady = ko.computed(function () {
+		return _.every(this.selectedFiles(), function (oItem)  {
+			var
+				bUploading = oItem.uploaded() === false,
+				bDownloading = oItem.downloading() === true
+			;
+			return !bUploading && !bDownloading;
 		});
 	}, this);
-	this.renameCommand = Utils.createCommand(this, this.executeRename, function () {
+	this.allSelectedItemsNotShared = ko.computed(function () {
 		var aItems = this.selector.listCheckedAndSelected();
+		return _.every(aItems, function (oItem) { return !oItem.bSharedWithMe; });
+	}, this);
+	this.sharedParentFolder = ko.computed(function () {
+		return _.find(this.pathItems(), function (oParentFolder) {
+			return oParentFolder.bSharedWithMe;
+		});
+	}, this);
+
+	this.isDownloadAllowed = ko.computed(function () {
+		var oFile = this.getFileIfOnlyOneSelected();
+		return !!oFile && oFile.hasAction('download') && this.allSelectedFilesReady();
+	}, this);
+	this.downloadCommand = Utils.createCommand(this, this.executeDownload, this.isDownloadAllowed);
+
+	this.isSendAllowed = ko.computed(function () {
+		return !this.isZipFolder() && this.selectedFiles().length > 0 && this.allSelectedFilesReady();
+	}, this);
+	this.sendCommand = Utils.createCommand(this, this.executeSend, this.isSendAllowed);
+
+	this.isRenameAllowed = ko.computed(function () {
+		var
+			oSharedParentFolder = this.sharedParentFolder(),
+			aItems = this.selector.listCheckedAndSelected(),
+			oSelectedItem = aItems.length === 1 ? aItems[0] : null
+		;
 		return	!this.isZipFolder()
-				&& this.checkedReadyForOperations() && aItems.length === 1
-				&& !this.isDisabledRenameButton() && (!aItems[0].bSharedWithMe || aItems[0].bSharedWithMeAccessWrite);
-	});
-	this.deleteCommand = Utils.createCommand(this, this.executeDelete, function () {
-		return	this.storageType() !== Enums.FileStorageType.Shared && !this.isZipFolder()
-				&& this.checkedReadyForOperations() && this.selector.listCheckedAndSelected().length > 0
-				&& !this.isDisabledDeleteButton();
-	});
-	this.downloadCommand = Utils.createCommand(this, this.executeDownload, function () {
-		if (this.checkedReadyForOperations())
-		{
-			var oFile = this.getFileIfOnlyOneSelected();
-			return !!oFile && oFile.hasAction('download');
-		}
-		return false;
-	});
-	this.shareCommand = Utils.createCommand(this, this.executeShare, function () {
-		var aItems = this.selector.listCheckedAndSelected();
-		return !this.isZipFolder() && this.checkedReadyForOperations() && 1 === aItems.length
-				&& !aItems[0].bIsLink && (!aItems[0].bSharedWithMe || aItems[0].bSharedWithMeAccessReshare);
-	});
-	this.sendCommand = Utils.createCommand(this, this.executeSend, function () {
-		if (!this.isZipFolder() && this.checkedReadyForOperations())
-		{
-			var
-				aItems = this.selector.listCheckedAndSelected(),
-				aFileItems = _.filter(aItems, function (oItem) {
-					return oItem instanceof CFileModel;
-				}, this)
-			;
-			return (aFileItems.length > 0);
-		}
-		return false;
-	});
+				&& (!oSharedParentFolder || oSharedParentFolder.bSharedWithMeAccessWrite)
+				&& this.allSelectedFilesReady() && oSelectedItem
+				&& (!oSelectedItem.bSharedWithMe || oSelectedItem.bSharedWithMeAccessWrite);
+	}, this);
+	this.renameCommand = Utils.createCommand(this, this.executeRename, this.isRenameAllowed);
+
+	this.isDeleteAllowed = ko.computed(function () {
+		var
+			oSharedParentFolder = this.sharedParentFolder(),
+			aItems = this.selector.listCheckedAndSelected()
+		;
+		return	!this.isZipFolder()
+				&& (!oSharedParentFolder || oSharedParentFolder.bSharedWithMeAccessWrite)
+				&& this.allSelectedFilesReady() && aItems.length > 0
+				&& this.allSelectedItemsNotShared();
+	}, this);
+	this.deleteCommand = Utils.createCommand(this, this.executeDelete, this.isDeleteAllowed);
+
+	this.isShareAllowed = ko.computed(function () {
+		var
+			aItems = this.selector.listCheckedAndSelected(),
+			oSelectedItem = aItems.length === 1 ? aItems[0] : null
+		;
+		return	!this.isZipFolder() && !this.sharedParentFolder()
+				&& this.allSelectedFilesReady()
+				&& oSelectedItem && !oSelectedItem.bIsLink
+				&& (!this.isSharedStorage() && !oSelectedItem.bSharedWithMe || oSelectedItem.bSharedWithMeAccessReshare);
+	}, this);
+	this.shareCommand = Utils.createCommand(this, this.executeShare, this.isShareAllowed);
+
+	// Create in general for all kind of items
+	this.isCreateAllowed = ko.computed(function () {
+		var oSharedParentFolder = this.sharedParentFolder();
+		return	!this.isZipFolder()
+				&& (oSharedParentFolder && oSharedParentFolder.bSharedWithMeAccessWrite
+				|| !oSharedParentFolder && !this.isSharedStorage());
+	}, this);
+	this.createFolderCommand = Utils.createCommand(this, this.executeCreateFolder, this.isCreateAllowed);
+
+	this.isCreateShortcutAllowed = ko.computed(function () {
+		return this.isCreateAllowed() && !this.isExternalStorage() && !this.isEncryptedStorage();
+	}, this);
+	this.createShortcutCommand = Utils.createCommand(this, this.executeCreateShortcut, this.isCreateShortcutAllowed);
 
 	this.uploaderButton = ko.observable(null);
 	this.uploaderArea = ko.observable(null);
@@ -251,7 +303,7 @@ function CFilesView(bPopup)
 				{
 					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_NOTHING_FOUND');
 				}
-				else if (this.storageType() === Enums.FileStorageType.Shared)
+				else if (this.isSharedStorage())
 				{
 					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_SHARED_FOLDER_IS_EMPTY');
 				}
@@ -275,10 +327,6 @@ function CFilesView(bPopup)
 	
 	this.dragAndDropHelperBound = _.bind(this.dragAndDropHelper, this);
 	this.bInPopup = !!bPopup;
-	this.isCurrentStorageExternal = ko.computed(function () {
-		var oStorage = this.getStorageByType(this.storageType());
-		return (oStorage && oStorage.isExternal);
-	}, this);
 	this.timerId = null;
 	
 	var oParams = {
@@ -305,28 +353,6 @@ function CFilesView(bPopup)
 		}
 	}, this));
 	
-	this.createFolderButtonModules = ko.observableArray([]);	//list of modules that disable "create folder" button
-	this.renameButtonModules = ko.observableArray([]);	//list of modules that disable "rename" button
-	this.deleteButtonModules = ko.observableArray([]);	//list of modules that disable "delete" button
-	this.shortcutButtonModules = ko.observableArray([]);	//list of modules that disable "shortcut" button
-	this.isDisabledCreateFolderButton = ko.computed(function () {
-		return this.createFolderButtonModules().length > 0;
-	}, this);
-	this.isDisabledRenameButton = ko.computed(function () {
-		return this.renameButtonModules().length > 0;
-	}, this);
-	this.isDisabledDeleteButton = ko.computed(function () {
-		return this.deleteButtonModules().length > 0;
-	}, this);
-	this.isDisabledShortcutButton = ko.computed(function () {
-		return this.shortcutButtonModules().length > 0;
-	}, this);
-	this.createFolderCommand = Utils.createCommand(this, this.executeCreateFolder, function () {
-		return !this.isZipFolder() && !this.isDisabledCreateFolderButton();
-	});
-	this.createShortcutCommand = Utils.createCommand(this, this.executeCreateShortcut, function () {
-		return !this.isZipFolder() && !this.isDisabledShortcutButton() && !this.isCurrentStorageExternal();
-	});
 	this.PublicLinksEnabled = Settings.PublicLinksEnabled;
 }
 
@@ -864,14 +890,7 @@ CFilesView.prototype.dragAndDropHelper = function (oFile)
 
 CFilesView.prototype.onItemDelete = function ()
 {
-	var 
-		aItems = this.selector.listCheckedAndSelected(),
-		bAllow = aItems.every(function (oItem)  {
-			return !(oItem.uploaded !== undefined && oItem.uploaded() === false || oItem.downloading !== undefined && oItem.downloading() === true);
-		})
-	;
-	if (0 < aItems.length && bAllow)
-	{
+	if (this.isDeleteAllowed()) {
 		this.executeDelete();
 	}
 };
@@ -1006,20 +1025,17 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				}, this));
 			}
 			this.loading(false);
+
 			//If the current path does not contain information about access, we obtain such information from the response, if possible
-			if (oResult.Access && this.pathItems().length > 0)
-			{
-				if (!this.pathItems()[this.pathItems().length - 1].oExtendedProps)
-				{
-					this.pathItems()[this.pathItems().length - 1].oExtendedProps = {
-						'Access': oResult.Access
-					};
-					this.pathItems.valueHasMutated(); // for triggering in other modules
+			if (oResult.Access && this.pathItems().length > 0) {
+				var iLastIndex = this.pathItems().length - 1;
+				if (!this.pathItems()[iLastIndex].oExtendedProps) {
+					this.pathItems()[iLastIndex].oExtendedProps = {};
 				}
-				else if (!this.pathItems()[this.pathItems().length - 1].oExtendedProps.Access)
-				{
-					this.pathItems()[this.pathItems().length - 1].oExtendedProps.Access = oResult.Access;
-					this.pathItems.valueHasMutated(); // for triggering in other modules
+				if (!this.pathItems()[iLastIndex].oExtendedProps.SharedWithMeAccess) {
+					this.pathItems()[iLastIndex].oExtendedProps.SharedWithMeAccess = oResult.Access;
+					this.pathItems()[iLastIndex].parseSharedWithMeAccess();
+					this.pathItems.valueHasMutated(); // for triggering sharedParentFolder computing
 				}
 			}
 		}
@@ -1162,11 +1178,7 @@ CFilesView.prototype.executeShare = function ()
 CFilesView.prototype.executeSend = function ()
 {
 	var
-		aItems = this.selector.listCheckedAndSelected(),
-		aFileItems = _.filter(aItems, function (oItem) {
-			return oItem instanceof CFileModel;
-		}, this),
-		aFilesData = _.map(aFileItems, function (oItem) {
+		aFilesData = _.map(this.selectedFiles(), function (oItem) {
 			return {
 				'Storage': oItem.storageType(),
 				'Path': oItem.path(),
@@ -1176,7 +1188,7 @@ CFilesView.prototype.executeSend = function ()
 		})
 	;
 	
-	if (this.bAllowSendEmails && aFileItems.length > 0)
+	if (this.bAllowSendEmails && aFilesData.length > 0)
 	{
 		Ajax.send('SaveFilesAsTempFiles', { 'Files': aFilesData }, function (oResponse) {
 			if (oResponse.Result)
@@ -1244,12 +1256,8 @@ CFilesView.prototype.executeDelete = function ()
 	var
 		aChecked = this.selector.listCheckedAndSelected() || [],
 		iCheckedCount = aChecked.length,
-		bHasFolder = !!_.find(aChecked, function (oItem) {
-			return oItem instanceof CFolderModel;
-		}),
-		bHasFile = !!_.find(aChecked, function (oItem) {
-			return !(oItem instanceof CFolderModel);
-		}),
+		bHasFolder = !!_.find(aChecked, function (oItem) { return !oItem.IS_FILE; }),
+		bHasFile = !!_.find(aChecked, function (oItem) { return oItem.IS_FILE; }),
 		sConfirm = ''
 	;
 	
@@ -1884,19 +1892,6 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 			fOnUploadCancelCallback(sFileUploadUid, oFile.fileName());
 		}
 	}
-};
-
-CFilesView.prototype.disableButton = function (koButtonModules, sModuleName)
-{
-	if (koButtonModules.indexOf(sModuleName) === -1)
-	{
-		koButtonModules.push(sModuleName);
-	}
-};
-
-CFilesView.prototype.enableButton = function (koButtonModules, sModuleName)
-{
-	koButtonModules.remove(sModuleName);
 };
 
 module.exports = CFilesView;
