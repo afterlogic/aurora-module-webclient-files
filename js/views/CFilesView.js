@@ -1141,8 +1141,9 @@ CFilesView.prototype.renameItem = function (sExtension, sNamePart)
 				'Path': oItem.path(),
 				'Name': oItem.id() || oItem.fileName(),
 				'NewName': sName,
-				'IsLink': oItem.bIsLink ? 1 : 0,
-				'IsFolder': oItem instanceof CFolderModel
+				'IsLink': oItem.bIsLink,
+				'IsFolder': !oItem.IS_FILE,
+				'Shared': oItem.bSharedWithMe
 			}, this.onRenameResponse, this
 		);
 	}
