@@ -1514,7 +1514,7 @@ CFilesView.prototype.onUserRoute = function (oParams)
 	this.loadedFiles(false);
 	
 	if (iPathItemIndex !== -1) {
-		this.pathItems(this.pathItems().slice([0, iPathItemIndex + 1]));
+		this.pathItems(this.pathItems().slice(0, iPathItemIndex + 1));
 	} else if (oFolder) {
 		this.pathItems.push(oFolder);
 	} else if (sStorage !== 'google' || sPath === '') {
