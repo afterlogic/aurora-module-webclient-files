@@ -12,8 +12,9 @@ var
 
 /**
  * @constructor
+ * @param {boolean} bInPopup
  */
-function CFolderModel()
+function CFolderModel(bInPopup)
 {
 	//template
 	this.selected = ko.observable(false);
@@ -59,6 +60,10 @@ function CFolderModel()
 	}, this);
 	this.uploaded = ko.computed(function () {
 		return this.uploadingFilesCount() === 0;
+	}, this);
+	
+	this.allowDrag = ko.computed(function () {
+		return !bInPopup && !this.isIncomplete() && this.storageType() !== Enums.FileStorageType.Shared;
 	}, this);
 }
 

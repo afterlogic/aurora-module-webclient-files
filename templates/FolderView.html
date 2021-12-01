@@ -1,8 +1,8 @@
 <div class="item folder" 
 	data-bind="
-		draggablePlace: !$parent.bInPopup && !isIncomplete() ? $parent.dragAndDropHelperBound : null,
-		draggableDragStartCallback: function() {if (!$parent.bInPopup && !isIncomplete()) $root.dragover(true);},
-		draggableDragStopCallback: function() {if (!$parent.bInPopup && !isIncomplete()) $root.dragover(false);},
+		draggablePlace: allowDrag() ? $parent.dragAndDropHelperBound : null,
+		draggableDragStartCallback: function() {if (allowDrag()) $root.dragover(true);},
+		draggableDragStopCallback: function() {if (allowDrag()) $root.dragover(false);},
 		css: {	'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete,
 				'shared': bSharedWithMeAccessWrite, 'shared_read_only': bSharedWithMe && !bSharedWithMeAccessWrite}">
 

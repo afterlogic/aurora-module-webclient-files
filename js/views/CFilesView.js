@@ -87,6 +87,12 @@ function CFilesView(bPopup)
 			}
 			this.selector.listCheckedAndSelected(false);
 		}
+		if (this.oJua) {
+			// this.isSharedStorage is not computed here yet
+			var bSharedStorage = this.storageType() === Enums.FileStorageType.Shared;
+			this.oJua.setDragAndDropEnabledStatus(!bSharedStorage);
+			this.allowDropFilesAndFolders(!bSharedStorage && this.oJua.isDragAndDropSupported());
+		}
 	}, this);
 	this.createButtonsControllers = ko.observableArray([]);
 
@@ -243,7 +249,7 @@ function CFilesView(bPopup)
 		return bDrag && this.searchPattern() === '';
 	}, this);
 	
-	this.bAllowDragNDrop = false;
+	this.allowDropFilesAndFolders = ko.observable(false);
 	
 	this.uploadError = ko.observable(false);
 	
@@ -311,7 +317,7 @@ function CFilesView(bPopup)
 				{
 					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY');
 				}
-				else if (this.bAllowDragNDrop)
+				else if (this.allowDropFilesAndFolders())
 				{
 					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_DRAGNDROP_FILES_OR_CREATE_FOLDER');
 				}
@@ -443,7 +449,8 @@ CFilesView.prototype.initUploader = function ()
 			}, this, false))
 		;
 		
-		this.bAllowDragNDrop = this.oJua.isDragAndDropSupported();
+		this.oJua.setDragAndDropEnabledStatus(!this.isSharedStorage());
+		this.allowDropFilesAndFolders(!this.isSharedStorage() && this.oJua.isDragAndDropSupported());
 	}
 };
 
@@ -514,7 +521,7 @@ CFilesView.prototype.onFileFromSubfolderUploadSelect = function (oFileData)
 		;
 		if (sFolderName && !oFolder)
 		{
-			oFolder = new CFolderModel();
+			oFolder = new CFolderModel(this.bInPopup);
 			oFolder.parse({
 				Name: sFolderName
 			});
@@ -970,7 +977,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			_.each(oResult.Items, function (oData) {
 				if (oData.IsFolder)
 				{
-					var oFolder = new CFolderModel();
+					var oFolder = new CFolderModel(this.bInPopup);
 					oFolder.parse(oData);
 					this.checkIfFolderUploading(oFolder);
 					aNewFolderList.push(oFolder);
@@ -1019,7 +1026,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			{
 				this.pathItems.removeAll();
 				_.each(oResult.Path.reverse(), _.bind(function (oPathItem) {
-					var oFolder = new CFolderModel();
+					var oFolder = new CFolderModel(this.bInPopup);
 					oFolder.parse(oPathItem);
 					this.pathItems.push(oFolder);
 				}, this));
@@ -1458,7 +1465,7 @@ CFilesView.prototype.routeFiles = function (sStorage, sFullPath, sSearch, bNotLo
  */
 CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
 {
-	var oFolder = new CFolderModel();
+	var oFolder = new CFolderModel(this.bInPopup);
 	oFolder.storageType(sStorage);
 	oFolder.displayName(sName);
 	oFolder.fileName(sName);
@@ -1803,7 +1810,7 @@ CFilesView.prototype.clearSearch = function ()
 
 CFilesView.prototype.getCurrentFolder = function ()
 {
-	var oFolder = new CFolderModel();
+	var oFolder = new CFolderModel(this.bInPopup);
 	oFolder.fullPath(this.currentPath());
 	oFolder.storageType(this.storageType());
 	return oFolder;
