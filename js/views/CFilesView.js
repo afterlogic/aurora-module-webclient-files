@@ -142,7 +142,7 @@ function CFilesView(bPopup)
 		
 	this.firstSelectedFile = ko.computed(function () {
 		return _.find(this.selector.listCheckedAndSelected(), function (oItem) {
-			return oItem instanceof CFileModel;
+			return oItem.IS_FILE;
 		});
 	}, this);
 	this.selectedCount = ko.computed(function () {
@@ -1114,8 +1114,8 @@ CFilesView.prototype.executeRename = function ()
 	var
 		oItem = _.first(this.selector.listCheckedAndSelected()),
 		bSeparateExtension = Settings.EditFileNameWithoutExtension && oItem instanceof CFileModel,
-			sName = bSeparateExtension ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
-			sExtension = bSeparateExtension ? Utils.getFileExtension(oItem.fileName()) : ''
+		sName = bSeparateExtension ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
+		sExtension = bSeparateExtension ? Utils.getFileExtension(oItem.fileName()) : ''
 	;
 	
 	if (!this.bPublic && oItem)
@@ -1467,7 +1467,6 @@ CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
 {
 	var oFolder = new CFolderModel(this.bInPopup);
 	oFolder.storageType(sStorage);
-	oFolder.displayName(sName);
 	oFolder.fileName(sName);
 	oFolder.path(sPath);
 	oFolder.fullPath(sPath);

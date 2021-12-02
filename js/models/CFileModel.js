@@ -53,12 +53,19 @@ function CFileModel(oData, bPopup)
 	this.bSharedWithMe = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
 	this.bSharedWithMeFirstLevel = Types.pBool(oData.Shared);
 	
-	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete
+	this.deleted = ko.observable(false); // temporary removal until it was confirmed from the server
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	this.published = ko.observable(false);
 	this.sOwnerName = Types.pString(oData.Owner);
 	
 	CAbstractFileModel.call(this);
+	
+	this.displayName = ko.computed(function () {
+		if (this.storageType() === Enums.FileStorageType.Shared && this.bSharedWithMeFirstLevel) {
+			return this.fullPath().replace(/^\//, '');
+		}
+		return this.fileName();
+	}, this);
 	
 	this.content = ko.observable('');
 	

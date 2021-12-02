@@ -5,12 +5,12 @@
 		<!-- ko if: !$parent.bPublic || $index() > 0 -->&raquo;<!-- /ko -->
 		
 		<!-- ko if: ($index() !== ($parent.pathItems().length - 1)) || $parent.searchPattern() !== '' -->		
-			<a data-bind="text: displayName(), click: function () { $parent.routeFiles(storageType(), fullPath()); },
+			<a data-bind="text: fileName(), click: function () { $parent.routeFiles(storageType(), fullPath()); },
 				droppable: { valueFunc: function (oEvent, oUi) { $root.filesDrop($data, oEvent, oUi); } }"></a>
 		<!-- /ko -->
 		
 		<!-- ko if: ($index() === ($parent.pathItems().length - 1)) &&  $parent.searchPattern() === '' -->		
-			<b data-bind="text: displayName()"></b>
+			<b data-bind="text: fileName()"></b>
 		<!-- /ko -->
 	<!-- /ko -->
 	<!-- ko if: searchPattern() !== '' -->		

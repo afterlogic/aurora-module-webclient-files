@@ -34,7 +34,6 @@ function CFolderModel(bInPopup)
 	
 	//pathItems
 	this.storageType = ko.observable(Enums.FileStorageType.Personal);
-	this.displayName = ko.observable('');
 	this.id = ko.observable('');
 	
 	this.sMainAction = 'list';
@@ -82,7 +81,6 @@ CFolderModel.prototype.parse = function (oData)
 	this.fullPath(Types.pString(oData.FullPath));
 	this.path(Types.pString(oData.Path));
 	this.storageType(Types.pString(oData.Type));
-	this.displayName(this.fileName());
 	this.id(Types.pString(oData.Id));
 	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
 	if (oData.MainAction)
@@ -93,6 +91,13 @@ CFolderModel.prototype.parse = function (oData)
 	this.sOwnerName = Types.pString(oData.Owner);
 	this.parseSharedWithMeAccess();
 	this.bSharedWithMeFirstLevel = Types.pBool(oData.Shared);
+	
+	this.displayName = ko.computed(function () {
+		if (this.storageType() === Enums.FileStorageType.Shared && this.bSharedWithMeFirstLevel) {
+			return this.fullPath().replace(/^\//, '');
+		}
+		return this.fileName();
+	}, this);
 	
 	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = function () {
