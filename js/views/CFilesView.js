@@ -331,7 +331,6 @@ function CFilesView(bPopup)
 		return sInfoText;
 	}, this);
 	
-	this.dragAndDropHelperBound = _.bind(this.dragAndDropHelper, this);
 	this.bInPopup = !!bPopup;
 	this.timerId = null;
 	
@@ -848,48 +847,35 @@ CFilesView.prototype.onMoveResponse = function (oResponse, oRequest)
 };
 
 /**
- * @param {Object} oFile
+ * @param {Object} oDraggedItem
+ * @param {boolean} bCtrl
  */
-CFilesView.prototype.dragAndDropHelper = function (oFile)
+CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, bCtrl)
 {
-	if (oFile)
-	{
-		oFile.checked(true);
+	if (!oDraggedItem || !oDraggedItem.allowDrag()) {
+		return $('');
 	}
+
+	oDraggedItem.checked(true);
 
 	var
 		oHelper = Utils.draggableItems(),
 		aItems = this.selector.listCheckedAndSelected(),
-		nCount = aItems.length,
-		nFilesCount = 0,
-		nFoldersCount = 0,
-		sText = '';
-	
-	_.each(aItems, function (oItem) {
-		if (oItem instanceof CFolderModel)
-		{
-			nFoldersCount++;
-		}
-		else
-		{
-			nFilesCount++;
-		}
+		oCounts = _.countBy(aItems, function(oItem) {
+			return oItem.IS_FILE ? 'file': 'folder';
+		}),
+		sPlusPrefix = bCtrl ? '+ ' : '',
+		sText = ''
+	;
 
-	}, this);
-	
-	if (nFilesCount !== 0 && nFoldersCount !== 0)
-	{
-		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_ITEMS_PLURAL', {'COUNT': nCount}, null, nCount);
+	if (!oCounts.file) {
+		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_FOLDERS_PLURAL', {'COUNT': sPlusPrefix + oCounts.folder}, null, oCounts.folder);
+	} else if (!oCounts.folder) {
+		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_FILES_PLURAL', {'COUNT': sPlusPrefix + oCounts.file}, null, oCounts.file);
+	} else {
+		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_ITEMS_PLURAL', {'COUNT': sPlusPrefix + aItems.length}, null, aItems.length);
 	}
-	else if (nFilesCount === 0)
-	{
-		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_FOLDERS_PLURAL', {'COUNT': nFoldersCount}, null, nFoldersCount);
-	}
-	else if (nFoldersCount === 0)
-	{
-		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_FILES_PLURAL', {'COUNT': nFilesCount}, null, nFilesCount);
-	}
-	
+
 	$('.count-text', oHelper).text(sText);
 
 	return oHelper;

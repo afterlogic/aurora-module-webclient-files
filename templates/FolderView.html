@@ -1,10 +1,10 @@
 <div class="item folder" 
 	data-bind="
-		draggablePlace: allowDrag() ? $parent.dragAndDropHelperBound : null,
-		draggableDragStartCallback: function() {if (allowDrag()) $root.dragover(true);},
-		draggableDragStopCallback: function() {if (allowDrag()) $root.dragover(false);},
-		css: {	'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete,
-				'shared': bSharedWithMeAccessWrite, 'shared_read_only': bSharedWithMe && !bSharedWithMeAccessWrite}">
+		draggablePlace: allowDrag() ? function (oFile, bCtrl) { return $parent.dragAndDropHelper(oFile, bCtrl); } : null,
+		draggableDragStartCallback: function() { if (allowDrag()) $root.dragover(true); },
+		draggableDragStopCallback: function() { if (allowDrag()) $root.dragover(false); },
+		css: { 'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete,
+				'shared': bSharedWithMeAccessWrite, 'shared_read_only': bSharedWithMe && !bSharedWithMeAccessWrite }">
 
 	<!-- ko if: (sHeaderDenseText.length > 0) -->
 	<span class="header_dense" data-bind="text: sHeaderDenseText"></span>
