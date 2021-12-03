@@ -14,7 +14,9 @@
 	<span class="header" data-bind="text: sHeaderText"></span>
 	<!-- /ko -->
 
-	<div class="item_content ui-droppable dragHandle" data-bind="css: {'recivedAnim': recivedAnim()}, droppable: {valueFunc: !isIncomplete() ? function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);} : null}">
+	<div class="item_content ui-droppable dragHandle"
+		 data-bind="css: {'recivedAnim': recivedAnim()},
+					droppable: {valueFunc: allowDrop() ? function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);} : null}">
 		<div class="image">
 			<span class="icon animGoal"></span>
 		</div>

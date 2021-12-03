@@ -12,10 +12,12 @@ var
 
 /**
  * @constructor
- * @param {boolean} bInPopup
+ * @param {object} oParent
  */
-function CFolderModel(bInPopup)
+function CFolderModel(oParent)
 {
+	this.oParent = oParent;
+	
 	//template
 	this.selected = ko.observable(false);
 	this.checked = ko.observable(false); // ? = selected ?
@@ -63,7 +65,7 @@ function CFolderModel(bInPopup)
 	}, this);
 	
 	this.allowDrag = ko.computed(function () {
-		return !bInPopup && !this.isIncomplete() && this.storageType() !== Enums.FileStorageType.Shared;
+		return !oParent.bInPopup && !this.isIncomplete() && this.storageType() !== Enums.FileStorageType.Shared;
 	}, this);
 }
 
@@ -97,6 +99,11 @@ CFolderModel.prototype.parse = function (oData)
 			return this.fullPath().replace(/^\//, '');
 		}
 		return this.fileName();
+	}, this);
+
+	this.allowDrop = ko.computed(function () {
+		return	!this.oParent.bInPopup && !this.isIncomplete() && this.storageType() !== Enums.FileStorageType.Shared
+				&& (!this.bSharedWithMe || this.bSharedWithMeAccessWrite && (!this.oParent.selectedHasShared() || this.oParent.needToCopyDraggedItems()));
 	}, this);
 	
 	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';

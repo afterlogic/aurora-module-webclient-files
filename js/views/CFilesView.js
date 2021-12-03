@@ -148,6 +148,11 @@ function CFilesView(bPopup)
 	this.selectedCount = ko.computed(function () {
 		return this.selector.listCheckedAndSelected().length;
 	}, this);
+	this.selectedHasShared = ko.computed(function () {
+		return !!_.find(this.selector.listCheckedAndSelected(), function(oItem) {
+			return oItem.bSharedWithMe;
+		});
+	}, this);
 	
 	this.searchPattern = ko.observable('');
 	this.newSearchPattern = ko.observable('');
@@ -248,6 +253,7 @@ function CFilesView(bPopup)
 		var bDrag = this.bDragActive();
 		return bDrag && this.searchPattern() === '';
 	}, this);
+	this.needToCopyDraggedItems = ko.observable(false);
 	
 	this.allowDropFilesAndFolders = ko.observable(false);
 	
@@ -520,7 +526,7 @@ CFilesView.prototype.onFileFromSubfolderUploadSelect = function (oFileData)
 		;
 		if (sFolderName && !oFolder)
 		{
-			oFolder = new CFolderModel(this.bInPopup);
+			oFolder = new CFolderModel(this);
 			oFolder.parse({
 				Name: sFolderName
 			});
@@ -867,6 +873,8 @@ CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, bCtrl)
 		sPlusPrefix = bCtrl ? '+ ' : '',
 		sText = ''
 	;
+	
+	this.needToCopyDraggedItems(bCtrl);
 
 	if (!oCounts.file) {
 		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_FOLDERS_PLURAL', {'COUNT': sPlusPrefix + oCounts.folder}, null, oCounts.folder);
@@ -963,7 +971,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			_.each(oResult.Items, function (oData) {
 				if (oData.IsFolder)
 				{
-					var oFolder = new CFolderModel(this.bInPopup);
+					var oFolder = new CFolderModel(this);
 					oFolder.parse(oData);
 					this.checkIfFolderUploading(oFolder);
 					aNewFolderList.push(oFolder);
@@ -1012,7 +1020,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			{
 				this.pathItems.removeAll();
 				_.each(oResult.Path.reverse(), _.bind(function (oPathItem) {
-					var oFolder = new CFolderModel(this.bInPopup);
+					var oFolder = new CFolderModel(this);
 					oFolder.parse(oPathItem);
 					this.pathItems.push(oFolder);
 				}, this));
@@ -1451,7 +1459,7 @@ CFilesView.prototype.routeFiles = function (sStorage, sFullPath, sSearch, bNotLo
  */
 CFilesView.prototype.addPathItems = function (sStorage, sPath, sName)
 {
-	var oFolder = new CFolderModel(this.bInPopup);
+	var oFolder = new CFolderModel(this);
 	oFolder.storageType(sStorage);
 	oFolder.fileName(sName);
 	oFolder.path(sPath);
@@ -1795,7 +1803,7 @@ CFilesView.prototype.clearSearch = function ()
 
 CFilesView.prototype.getCurrentFolder = function ()
 {
-	var oFolder = new CFolderModel(this.bInPopup);
+	var oFolder = new CFolderModel(this);
 	oFolder.fullPath(this.currentPath());
 	oFolder.storageType(this.storageType());
 	return oFolder;
