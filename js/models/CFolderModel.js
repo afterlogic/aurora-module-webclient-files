@@ -65,7 +65,7 @@ function CFolderModel(oParent)
 	}, this);
 	
 	this.allowDrag = ko.computed(function () {
-		return !oParent.bInPopup && !this.isIncomplete() && this.storageType() !== Enums.FileStorageType.Shared;
+		return !oParent.bInPopup && !this.isIncomplete();
 	}, this);
 }
 

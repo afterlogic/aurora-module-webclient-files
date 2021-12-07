@@ -87,12 +87,6 @@ function CFilesView(bPopup)
 			}
 			this.selector.listCheckedAndSelected(false);
 		}
-		if (this.oJua) {
-			// this.isSharedStorage is not computed here yet
-			var bSharedStorage = this.storageType() === Enums.FileStorageType.Shared;
-			this.oJua.setDragAndDropEnabledStatus(!bSharedStorage);
-			this.allowDropFilesAndFolders(!bSharedStorage && this.oJua.isDragAndDropSupported());
-		}
 	}, this);
 	this.createButtonsControllers = ko.observableArray([]);
 
@@ -172,10 +166,6 @@ function CFilesView(bPopup)
 			return !bUploading && !bDownloading;
 		});
 	}, this);
-	this.allSelectedItemsNotShared = ko.computed(function () {
-		var aItems = this.selector.listCheckedAndSelected();
-		return _.every(aItems, function (oItem) { return !oItem.bSharedWithMe; });
-	}, this);
 	this.sharedParentFolder = ko.computed(function () {
 		return _.find(this.pathItems(), function (oParentFolder) {
 			return oParentFolder.bSharedWithMe;
@@ -212,11 +202,27 @@ function CFilesView(bPopup)
 			aItems = this.selector.listCheckedAndSelected()
 		;
 		return	!this.isZipFolder()
-				&& (!oSharedParentFolder || oSharedParentFolder.bSharedWithMeAccessWrite)
-				&& this.allSelectedFilesReady() && aItems.length > 0
-				&& this.allSelectedItemsNotShared();
+				&& (!oSharedParentFolder && !this.selectedHasShared() || !!oSharedParentFolder && oSharedParentFolder.bSharedWithMeAccessWrite)
+				&& this.allSelectedFilesReady() && aItems.length > 0;
 	}, this);
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, this.isDeleteAllowed);
+
+	this.needToCopyDraggedItems = ko.observable(false);
+	this.isCutAllowed = ko.computed(function () {
+		var
+			oSharedParentFolder = this.sharedParentFolder(),
+			aItems = this.selector.listCheckedAndSelected()
+		;
+		return	!this.isZipFolder()
+				&& (!oSharedParentFolder && !this.isSharedStorage() || !!oSharedParentFolder && oSharedParentFolder.bSharedWithMeAccessWrite)
+				&& this.allSelectedFilesReady() && aItems.length > 0;
+	}, this);
+	this.isCopyAllowed = ko.computed(function () {
+		return this.allSelectedFilesReady() && this.selector.listCheckedAndSelected().length > 0;
+	}, this);
+	this.isDragAllowed = ko.computed(function () {
+		return this.isCutAllowed() || this.needToCopyDraggedItems() && this.isCopyAllowed();
+	}, this);
 
 	this.isShareAllowed = ko.computed(function () {
 		var
@@ -253,9 +259,13 @@ function CFilesView(bPopup)
 		var bDrag = this.bDragActive();
 		return bDrag && this.searchPattern() === '';
 	}, this);
-	this.needToCopyDraggedItems = ko.observable(false);
 	
-	this.allowDropFilesAndFolders = ko.observable(false);
+	this.isDragAndDropSupported = ko.observable(false);
+	this.isCreateAllowed.subscribe(function () {
+		if (this.oJua) {
+			this.oJua.setDragAndDropEnabledStatus(this.isCreateAllowed());
+		}
+	}, this);
 	
 	this.uploadError = ko.observable(false);
 	
@@ -323,7 +333,7 @@ function CFilesView(bPopup)
 				{
 					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY');
 				}
-				else if (this.allowDropFilesAndFolders())
+				else if (this.isDragAndDropSupported())
 				{
 					sInfoText = TextUtils.i18n('%MODULENAME%/INFO_DRAGNDROP_FILES_OR_CREATE_FOLDER');
 				}
@@ -454,8 +464,7 @@ CFilesView.prototype.initUploader = function ()
 			}, this, false))
 		;
 		
-		this.oJua.setDragAndDropEnabledStatus(!this.isSharedStorage());
-		this.allowDropFilesAndFolders(!this.isSharedStorage() && this.oJua.isDragAndDropSupported());
+		this.isDragAndDropSupported(this.oJua.isDragAndDropSupported());
 	}
 };
 
@@ -698,6 +707,11 @@ CFilesView.prototype.onDrop = function (oFile, oEvent)
  */
 CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 {
+	if (this.bPublic || !this.isDragAllowed())
+	{
+		return;
+	}
+
 	if (oEvent)
 	{
 		var
@@ -859,10 +873,16 @@ CFilesView.prototype.onMoveResponse = function (oResponse, oRequest)
 CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, bCtrl)
 {
 	if (!oDraggedItem || !oDraggedItem.allowDrag()) {
-		return $('');
+		return $('<span></span>');
 	}
 
 	oDraggedItem.checked(true);
+
+	this.needToCopyDraggedItems(bCtrl);
+
+	if (!this.isDragAllowed()) {
+		return $('<span></span>');
+	}
 
 	var
 		oHelper = Utils.draggableItems(),
@@ -874,8 +894,6 @@ CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, bCtrl)
 		sText = ''
 	;
 	
-	this.needToCopyDraggedItems(bCtrl);
-
 	if (!oCounts.file) {
 		sText = TextUtils.i18n('%MODULENAME%/LABEL_DRAG_FOLDERS_PLURAL', {'COUNT': sPlusPrefix + oCounts.folder}, null, oCounts.folder);
 	} else if (!oCounts.folder) {

@@ -205,7 +205,7 @@ CFileModel.prepareLinkData = function (oData, sLinkUrl)
 CFileModel.prototype.parse = function (oData, bPopup)
 {
 	this.uploaded(true);
-	this.allowDrag(!bPopup && this.storageType() !== Enums.FileStorageType.Shared);
+	this.allowDrag(!bPopup);
 	this.allowUpload(true);
 	this.allowPublicLink(true);
 	this.allowActions(!bPopup && this.fullPath() !== '');
