@@ -95,7 +95,7 @@ CFolderModel.prototype.parse = function (oData)
 	this.bSharedWithMeFirstLevel = Types.pBool(oData.Shared);
 	
 	this.displayName = ko.computed(function () {
-		if (this.storageType() === Enums.FileStorageType.Shared && this.bSharedWithMeFirstLevel) {
+		if (this.storageType() === Enums.FileStorageType.Shared && !this.oParent.sharedParentFolder()) {
 			return this.fullPath().replace(/^\//, '');
 		}
 		return this.fileName();

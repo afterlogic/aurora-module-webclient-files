@@ -510,7 +510,7 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 					});
 				}
 			}, this)),
-			oFile = new CFileModel(oData)
+			oFile = new CFileModel(oData, this)
 		;
 		oFile.onUploadSelect(sFileUid, oFileData, true);
 		this.uploadingFiles.push(oFile);
@@ -996,7 +996,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 				}
 				else
 				{
-					var oFile = new CFileModel(oData, this.bInPopup);
+					var oFile = new CFileModel(oData, this);
 
 					if (oFile.oExtendedProps && oFile.oExtendedProps.Loading)
 					{ // if file still loading - show warning in status

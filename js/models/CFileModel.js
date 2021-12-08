@@ -24,11 +24,12 @@ var
 /**
  * @constructor
  * @param {Object} oData
- * @param {bool} bPopup
+ * @param {bool} oParent
  * @extends CAbstractFileModel
  */
-function CFileModel(oData, bPopup)
+function CFileModel(oData, oParent)
 {
+	this.oParent = Types.pObject(oParent);
 	// the constant is used instead of constructor.name because constructor.name can not be used in minified JS
 	this.IS_FILE = true;
 	
@@ -61,7 +62,7 @@ function CFileModel(oData, bPopup)
 	CAbstractFileModel.call(this);
 	
 	this.displayName = ko.computed(function () {
-		if (this.storageType() === Enums.FileStorageType.Shared && this.bSharedWithMeFirstLevel) {
+		if (this.storageType() === Enums.FileStorageType.Shared && !!this.oParent.sharedParentFolder && !this.oParent.sharedParentFolder()) {
 			return this.fullPath().replace(/^\//, '');
 		}
 		return this.fileName();
@@ -158,7 +159,7 @@ function CFileModel(oData, bPopup)
 		return aClasses.join(' ');
 	}, this);
 	
-	this.parse(oData, bPopup);
+	this.parse(oData, !!oParent.bInPopup);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
