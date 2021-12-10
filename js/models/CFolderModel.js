@@ -45,7 +45,6 @@ function CFolderModel(oParent)
 	this.bSharedWithMeAccessReshare = false;
 	this.bSharedWithMeAccessWrite = false;
 	this.bSharedWithMe = false;
-	this.bSharedWithMeFirstLevel = false;
 	
 	// The folder can be uploading. Operations should be disabled for such a folder.
 	this.uploadingFilesCount = ko.observable(0);
@@ -92,7 +91,6 @@ CFolderModel.prototype.parse = function (oData)
 
 	this.sOwnerName = Types.pString(oData.Owner);
 	this.parseSharedWithMeAccess();
-	this.bSharedWithMeFirstLevel = Types.pBool(oData.Shared);
 	
 	this.displayName = ko.computed(function () {
 		if (this.storageType() === Enums.FileStorageType.Shared && !this.oParent.sharedParentFolder()) {

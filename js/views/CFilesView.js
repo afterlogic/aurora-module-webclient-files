@@ -1161,8 +1161,7 @@ CFilesView.prototype.renameItem = function (sExtension, sNamePart)
 				'Name': oItem.id() || oItem.fileName(),
 				'NewName': sName,
 				'IsLink': oItem.bIsLink,
-				'IsFolder': !oItem.IS_FILE,
-				'Shared': oItem.bSharedWithMeFirstLevel
+				'IsFolder': !oItem.IS_FILE
 			}, this.onRenameResponse, this
 		);
 	}
@@ -1203,8 +1202,7 @@ CFilesView.prototype.executeSend = function ()
 				'Storage': oItem.storageType(),
 				'Path': oItem.path(),
 				'Name': oItem.fileName(),
-				'Id': oItem.id(),
-				'Shared': oItem.bSharedWithMeFirstLevel
+				'Id': oItem.id()
 			};
 		})
 	;
@@ -1418,7 +1416,6 @@ CFilesView.prototype.currentGetFiles = function ()
 		oParameters = {
 			'Type': this.storageType(),
 			'Path': this.currentPath(),
-			'Shared': oLastPathItem ? oLastPathItem.bSharedWithMeFirstLevel : false,
 			'Pattern': this.searchPattern(),
 			'PathRequired': this.currentPath() !== '' && this.pathItems().length === 0
 		}
@@ -1612,8 +1609,7 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 				return {
 					'Path': oItem.path(),  
 					'Name': oItem.id(),
-					'IsFolder': !oItem.IS_FILE,
-					'Shared': oItem.bSharedWithMeFirstLevel
+					'IsFolder': !oItem.IS_FILE
 				};
 			}
 			return null;

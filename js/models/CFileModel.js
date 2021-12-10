@@ -52,7 +52,6 @@ function CFileModel(oData, oParent)
 	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
 	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
 	this.bSharedWithMe = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
-	this.bSharedWithMeFirstLevel = Types.pBool(oData.Shared);
 	
 	this.deleted = ko.observable(false); // temporary removal until it was confirmed from the server
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
