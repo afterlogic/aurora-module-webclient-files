@@ -3,24 +3,14 @@
 		<div class="items_list">
 			<!-- ko foreach: storages -->
 			<div class="item canSelect" data-bind="css: {'selected': type === $parent.storageType()}">
-				<!-- ko if: !droppable -->
-				<a href="javascript: void(0);" class="title" data-bind="click: function () { $parent.routeFiles(type); }">
-					<span class="name">
-						<span class="icon" data-bind="css: 'type' + type"></span>
-						<span class="text" data-bind="text: displayName"></span>
-					</span>
-				</a>
-				<!-- /ko -->
-				<!-- ko if: droppable -->
 				<a href="javascript: void(0);" class="title" data-bind="
-					droppable: {valueFunc: function (oEvent, oUi) {$parent.filesDrop($data, oEvent, oUi);}},
+					droppable: {valueFunc: droppable() ? function (oEvent, oUi) {$parent.filesDrop($data, oEvent, oUi);} : null},
 					click: function () { $parent.routeFiles(type); }">
 					<span class="name">
 						<span class="icon" data-bind="css: 'type' + type"></span>
 						<span class="text" data-bind="text: displayName"></span>
 					</span>
 				</a>
-				<!-- /ko -->
 			</div>
 			<!-- /ko -->
 		</div>

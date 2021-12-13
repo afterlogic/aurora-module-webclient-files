@@ -81,7 +81,7 @@ function CFilesView(bPopup)
 			{
 				this.rootPath(oStorage.displayName);
 			}
-			else if (this.storageType() === 'corporate')
+			else if (this.isCorporateStorage())
 			{
 				this.rootPath(TextUtils.i18n('%MODULENAME%/LABEL_CORPORATE_STORAGE'));
 			}
@@ -1377,7 +1377,9 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 					isExternal: oStorage.IsExternal,
 					type: oStorage.Type,
 					displayName: oStorage.DisplayName,
-					droppable: Types.pBool(oStorage.IsDroppable, true)
+					droppable: ko.computed(function () {
+						return oStorage.IsDroppable && !this.selectedHasShared();
+					}, this)
 				});
 			}
 		}, this);
