@@ -1,12 +1,12 @@
 <div class="panel_top pathway">
 	<a data-bind="text: storageDisplayName(), click: function () { routeFiles(storageType(), ''); },
-		droppable: { valueFunc: function (oEvent, oUi) { filesDrop(null, oEvent, oUi); } }"></a>
+		droppable: { valueFunc: storageDroppable() ? function (oEvent, oUi) { filesDrop(null, oEvent, oUi); } : null }"></a>
 	<!-- ko foreach: pathItems() -->
 		<!-- ko if: !$parent.bPublic || $index() > 0 -->&raquo;<!-- /ko -->
 		
 		<!-- ko if: ($index() !== ($parent.pathItems().length - 1)) || $parent.searchPattern() !== '' -->		
 			<a data-bind="text: fileName(), click: function () { $parent.routeFiles(storageType(), fullPath()); },
-				droppable: { valueFunc: function (oEvent, oUi) { $root.filesDrop($data, oEvent, oUi); } }"></a>
+				droppable: { valueFunc: allowDrop() ? function (oEvent, oUi) { $root.filesDrop($data, oEvent, oUi); } : null }"></a>
 		<!-- /ko -->
 		
 		<!-- ko if: ($index() === ($parent.pathItems().length - 1)) &&  $parent.searchPattern() === '' -->		

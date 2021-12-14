@@ -65,25 +65,21 @@ function CFilesView(bPopup)
 
 	this.rootPath = ko.observable(this.bPublic ? Settings.PublicFolderName : TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE'));
 	this.storageType = ko.observable(Enums.FileStorageType.Personal);
+	this.currentStorage = ko.computed(function () {
+		return this.getStorageByType(this.storageType());
+	}, this);
+	this.storageDroppable = ko.computed(function () {
+		return this.currentStorage() ? this.currentStorage().droppable() : '';
+	}, this);
 	this.storageDisplayName = ko.computed(function () {
-		var oStorage = this.getStorageByType(this.storageType());
-		return oStorage ? oStorage.displayName : '';
+		return this.currentStorage() ? this.currentStorage().displayName : '';
 	}, this);
 	this.storageType.subscribe(function () {
-		if (this.bPublic)
-		{
+		if (this.bPublic) {
 			this.rootPath(Settings.PublicFolderName);
-		}
-		else
-		{
-			var oStorage = this.getStorageByType(this.storageType());
-			if (oStorage)
-			{
-				this.rootPath(oStorage.displayName);
-			}
-			else if (this.isCorporateStorage())
-			{
-				this.rootPath(TextUtils.i18n('%MODULENAME%/LABEL_CORPORATE_STORAGE'));
+		} else {
+			if (this.currentStorage()) {
+				this.rootPath(this.currentStorage().displayName);
 			}
 			this.selector.listCheckedAndSelected(false);
 		}
@@ -111,8 +107,7 @@ function CFilesView(bPopup)
 		return this.storageType() === Enums.FileStorageType.Encrypted;
 	}, this);
 	this.isExternalStorage = ko.computed(function () {
-		var oStorage = this.getStorageByType(this.storageType());
-		return (oStorage && oStorage.isExternal);
+		return (this.currentStorage() && this.currentStorage().isExternal);
 	}, this);
 	
 	this.filesCollection = ko.computed(function () {
@@ -748,7 +743,7 @@ CFilesView.prototype.moveItems = function (sMethod, oFolder, aChecked)
 		aItems = [],
 		sStorageType = oFolder ? (oFolder instanceof CFolderModel ? oFolder.storageType() : oFolder.type) : this.storageType(),
 		oToStorage = this.getStorageByType(sStorageType),
-		oFromStorage = this.getStorageByType(this.storageType()),
+		oFromStorage = this.currentStorage(),
 		bSameStorage = oToStorage.type === oFromStorage.type,
 		iUsed = this.used(),
 		iQuota = this.quota(),
@@ -1388,8 +1383,8 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 			return oStorage.Type;
 		}, this));
 	}
-	if (!this.getStorageByType(this.storageType()))
-	{
+
+	if (!this.currentStorage()) {
 		this.storageType(Enums.FileStorageType.Personal);
 		this.pathItems.removeAll();
 	}

@@ -100,8 +100,17 @@ CFolderModel.prototype.parse = function (oData)
 	}, this);
 
 	this.allowDrop = ko.computed(function () {
-		return	!this.oParent.bInPopup && !this.isIncomplete() && this.storageType() !== Enums.FileStorageType.Shared
-				&& (!this.bSharedWithMe || this.bSharedWithMeAccessWrite && (!this.oParent.selectedHasShared() || this.oParent.needToCopyDraggedItems()));
+		if (!this.oParent.bInPopup && !this.isIncomplete()) {
+			var sharedParentFolder = this.oParent.sharedParentFolder();
+			if (sharedParentFolder) {
+				return sharedParentFolder.bSharedWithMeAccessWrite && this.fullPath().indexOf(sharedParentFolder.fullPath()) === 0;
+			} else if (this.storageType() !== Enums.FileStorageType.Shared) {
+				return !this.bSharedWithMe
+					   || this.bSharedWithMeAccessWrite
+					   && (!this.oParent.selectedHasShared() || this.oParent.needToCopyDraggedItems());
+			}
+		}
+		return false;
 	}, this);
 	
 	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
