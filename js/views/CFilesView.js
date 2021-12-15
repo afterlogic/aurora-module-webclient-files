@@ -711,7 +711,7 @@ CFilesView.prototype.filesDrop = function (oFolder, oEvent, oUi)
 	{
 		var
 			aChecked = this.selector.listCheckedAndSelected(),
-			sMethod = oEvent.ctrlKey ? 'Copy' : 'Move'
+			sMethod = this.needToCopyDraggedItems() ? 'Copy' : 'Move'
 		;
 		
 		if (this.moveItems(sMethod, oFolder, aChecked))
@@ -863,9 +863,9 @@ CFilesView.prototype.onMoveResponse = function (oResponse, oRequest)
 
 /**
  * @param {Object} oDraggedItem
- * @param {boolean} bCtrl
+ * @param {boolean} ctrlOrCmdUsed
  */
-CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, bCtrl)
+CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, ctrlOrCmdUsed)
 {
 	if (!oDraggedItem || !oDraggedItem.allowDrag()) {
 		return $('<span></span>');
@@ -873,7 +873,7 @@ CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, bCtrl)
 
 	oDraggedItem.checked(true);
 
-	this.needToCopyDraggedItems(bCtrl);
+	this.needToCopyDraggedItems(ctrlOrCmdUsed);
 
 	if (!this.isDragAllowed()) {
 		return $('<span></span>');
@@ -885,7 +885,7 @@ CFilesView.prototype.dragAndDropHelper = function (oDraggedItem, bCtrl)
 		oCounts = _.countBy(aItems, function(oItem) {
 			return oItem.IS_FILE ? 'file': 'folder';
 		}),
-		sPlusPrefix = bCtrl ? '+ ' : '',
+		sPlusPrefix = ctrlOrCmdUsed ? '+ ' : '',
 		sText = ''
 	;
 	
