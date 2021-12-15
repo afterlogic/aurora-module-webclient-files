@@ -158,7 +158,7 @@ function CFileModel(oData, oParent)
 		return aClasses.join(' ');
 	}, this);
 	
-	this.parse(oData, !!oParent.bInPopup);
+	this.parse(oData, !!this.oParent.bInPopup);
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
