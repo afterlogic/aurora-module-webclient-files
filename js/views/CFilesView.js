@@ -1373,7 +1373,8 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 					type: oStorage.Type,
 					displayName: oStorage.DisplayName,
 					droppable: ko.computed(function () {
-						return oStorage.IsDroppable && !this.selectedHasShared();
+						return oStorage.IsDroppable && (!this.selectedHasShared() || this.needToCopyDraggedItems()
+							   || !this.sharedParentFolder() && oStorage.Type === Enums.FileStorageType.Personal && this.storageType() === Enums.FileStorageType.Personal);
 					}, this)
 				});
 			}

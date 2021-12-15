@@ -227,7 +227,12 @@
 			.header_dense {
 				display: block;
 				height: 15px;
-				margin: 1px 1px -22px;
+				left: 1px;
+				margin: 1px 0px -22px;
+				padding: 4px 0 2px;
+				position: absolute;
+				top: 0;
+				width: calc(100% - 2px);
 			}
 
 			.title {
@@ -247,6 +252,9 @@
 			.header_dense {
 				background: white;
 				opacity: 0.9;
+			}
+			.droppableHover + .header_dense {
+				background: #dcd9d1;
 			}
 			&.selected .header,
 			&.checked .header,

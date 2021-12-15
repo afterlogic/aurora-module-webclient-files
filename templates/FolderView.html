@@ -6,10 +6,6 @@
 		css: { 'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete,
 				'shared': bSharedWithMeAccessWrite, 'shared_read_only': bSharedWithMe && !bSharedWithMeAccessWrite }">
 
-	<!-- ko if: (sHeaderDenseText.length > 0) -->
-	<span class="header_dense" data-bind="text: sHeaderDenseText"></span>
-	<!-- /ko -->
-	
 	<!-- ko if: (sHeaderText.length > 0) -->
 	<span class="header" data-bind="text: sHeaderText"></span>
 	<!-- /ko -->
@@ -33,4 +29,8 @@
 		</div>
 		<div class="separator"></div>
 	</div>
+
+	<!-- ko if: (sHeaderDenseText.length > 0) -->
+	<span class="header_dense" data-bind="text: sHeaderDenseText"></span>
+	<!-- /ko -->
 </div>
