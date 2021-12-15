@@ -243,21 +243,22 @@
 				padding-top: 2px;
 			}
 
-			&:hover .header {
+			&:hover .header,
+			.header_dense {
 				background: white;
+				opacity: 0.9;
 			}
 			&.selected .header,
 			&.checked .header,
 			&.selected:hover .header,
-			&.checked:hover .header {
+			&.checked:hover .header,
+			&.selected .header_dense,
+			&.checked .header_dense {
 				background: #ebf7cb;
 			}
 			&:hover,
 			&.selected,
 			&.checked {
-				.header {
-					opacity: 0.9;
-				}
 				.header,
 				.controls {
 					display: block;
