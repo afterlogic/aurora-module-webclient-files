@@ -2,7 +2,7 @@
 
 var
 	ko = require('knockout'),
-	
+
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 
@@ -17,27 +17,27 @@ var
 function CFolderModel(oParent)
 {
 	this.oParent = oParent;
-	
+
 	//template
 	this.selected = ko.observable(false);
 	this.checked = ko.observable(false); // ? = selected ?
 	this.deleted = ko.observable(false); // temporary removal until it was confirmation from the server to delete, css-animation
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
-	
+
 	this.published = ko.observable(false);
 	this.sharedWithOthers = ko.observable(false); // can be changed by other modules
 	this.fileName = ko.observable('');
-	
+
 	//onDrop
 	this.fullPath = ko.observable('');
-	
+
 	//rename
 	this.path = ko.observable('');
-	
+
 	//pathItems
 	this.storageType = ko.observable(Enums.FileStorageType.Personal);
 	this.id = ko.observable('');
-	
+
 	this.sMainAction = 'list';
 	this.oExtendedProps = null;
 
@@ -45,7 +45,7 @@ function CFolderModel(oParent)
 	this.bSharedWithMeAccessReshare = false;
 	this.bSharedWithMeAccessWrite = false;
 	this.bSharedWithMe = false;
-	
+
 	// The folder can be uploading. Operations should be disabled for such a folder.
 	this.uploadingFilesCount = ko.observable(0);
 	this.uploadedFilesCount = ko.observable(0);
@@ -62,7 +62,7 @@ function CFolderModel(oParent)
 	this.uploaded = ko.computed(function () {
 		return this.uploadingFilesCount() === 0;
 	}, this);
-	
+
 	this.allowDrag = ko.computed(function () {
 		return !oParent.bInPopup && !this.isIncomplete();
 	}, this);
@@ -102,17 +102,14 @@ CFolderModel.prototype.parse = function (oData)
 	this.allowDrop = ko.computed(function () {
 		if (!this.oParent.bInPopup && !this.isIncomplete()) {
 			var sharedParentFolder = this.oParent.sharedParentFolder();
-			if (sharedParentFolder) {
-				return sharedParentFolder.bSharedWithMeAccessWrite && this.fullPath().indexOf(sharedParentFolder.fullPath()) === 0;
-			} else if (this.storageType() !== Enums.FileStorageType.Shared) {
-				return !this.bSharedWithMe
-					   || this.bSharedWithMeAccessWrite
-					   && (!this.oParent.selectedHasShared() || this.oParent.needToCopyDraggedItems());
-			}
+			return this.storageType() === Enums.FileStorageType.Personal
+					&& (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
+					|| this.storageType() === Enums.FileStorageType.Corporate
+					|| this.storageType() === Enums.FileStorageType.Shared && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
 		}
 		return false;
 	}, this);
-	
+
 	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = function () {
 		if (this.bSharedWithMe && this.sOwnerName) {
@@ -122,7 +119,7 @@ CFolderModel.prototype.parse = function (oData)
 		}
 		return '';
 	}.bind(this)();
-	
+
 	App.broadcastEvent('%ModuleName%::ParseFolder::after', [this, oData]);
 };
 
@@ -140,7 +137,6 @@ CFolderModel.prototype.increaseUploadedFiles = function ()
 {
 	return this.uploadedFilesCount(this.uploadedFilesCount() + 1);
 };
-
 
 CFolderModel.prototype.eventDragStart = CAbstractFileModel.prototype.eventDragStart;
 

@@ -1373,8 +1373,9 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 					type: oStorage.Type,
 					displayName: oStorage.DisplayName,
 					droppable: ko.computed(function () {
-						return oStorage.IsDroppable && (!this.selectedHasShared() || this.needToCopyDraggedItems()
-							   || !this.sharedParentFolder() && oStorage.Type === Enums.FileStorageType.Personal && this.storageType() === Enums.FileStorageType.Personal);
+						return oStorage.IsDroppable && (!this.sharedParentFolder() && !this.selectedHasShared()
+								|| this.needToCopyDraggedItems()
+								|| this.sharedParentFolder() && this.sharedParentFolder().bSharedWithMeAccessWrite);
 					}, this)
 				});
 			}
@@ -1389,7 +1390,7 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 		this.storageType(Enums.FileStorageType.Personal);
 		this.pathItems.removeAll();
 	}
-	
+
 	if (this.bInPopup)
 	{
 		this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true);
