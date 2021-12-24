@@ -64,7 +64,18 @@ function CFolderModel(oParent)
 	}, this);
 
 	this.allowDrag = ko.computed(function () {
-		return !oParent.bInPopup && !this.isIncomplete();
+		return !oParent.bInPopup && !this.isIncomplete() && !App.isPublic();
+	}, this);
+
+	this.allowDrop = ko.computed(function () {
+		if (!this.oParent.bInPopup && !this.isIncomplete()) {
+			var sharedParentFolder = this.oParent.sharedParentFolder();
+			return this.storageType() === Enums.FileStorageType.Personal
+					&& (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
+					|| this.storageType() === Enums.FileStorageType.Corporate
+					|| this.storageType() === Enums.FileStorageType.Shared && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
+		}
+		return false;
 	}, this);
 }
 
@@ -97,17 +108,6 @@ CFolderModel.prototype.parse = function (oData)
 			return this.fullPath().replace(/^\//, '');
 		}
 		return this.fileName();
-	}, this);
-
-	this.allowDrop = ko.computed(function () {
-		if (!this.oParent.bInPopup && !this.isIncomplete()) {
-			var sharedParentFolder = this.oParent.sharedParentFolder();
-			return this.storageType() === Enums.FileStorageType.Personal
-					&& (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
-					|| this.storageType() === Enums.FileStorageType.Corporate
-					|| this.storageType() === Enums.FileStorageType.Shared && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
-		}
-		return false;
 	}, this);
 
 	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';

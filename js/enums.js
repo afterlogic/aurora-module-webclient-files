@@ -29,6 +29,15 @@ Enums.FileStorageLinkType = {
 	'SoundCloud': 5
 };
 
+/**
+ * @enum {number}
+ */
+Enums.SharedFileAccess = {
+	'Write': 1,
+	'Read': 2,
+	'Reshare': 3
+};
+
 if (typeof window.Enums === 'undefined')
 {
 	window.Enums = {};
