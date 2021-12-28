@@ -1849,13 +1849,17 @@ CFilesView.prototype.onFileRemove = function (sFileUploadUid, oFile)
 				'Type': this.storageType(),
 				'Path': this.currentPath(),
 				'Items': [{
-					'Path': this.currentPath(),  
+					'Path': this.currentPath(),
 					'Name': sFileName,
-					'IsFolder': false,
-					'Shared': false
+					'IsFolder': false
 				}]
 			};
-			Ajax.send('Delete', oParameters, this.currentGetFiles, this);
+			Ajax.send('Delete', oParameters, function (oResponse) {
+				if (!oResponse.Result) {
+					Api.showErrorByCode(oResponse);
+				}
+				this.currentGetFiles();
+			}, this);
 			this.onCancelUpload(sFileUploadUid);
 		}, this)
 	;
