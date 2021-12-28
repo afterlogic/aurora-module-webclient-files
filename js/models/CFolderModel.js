@@ -70,10 +70,13 @@ function CFolderModel(oParent)
 	this.allowDrop = ko.computed(function () {
 		if (!this.oParent.bInPopup && !this.isIncomplete()) {
 			var sharedParentFolder = this.oParent.sharedParentFolder();
-			return this.storageType() === Enums.FileStorageType.Personal
-					&& (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
-					|| this.storageType() === Enums.FileStorageType.Corporate
-					|| this.storageType() === Enums.FileStorageType.Shared && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
+			if (sharedParentFolder) {
+				return sharedParentFolder.bSharedWithMeAccessWrite;
+			} else if (this.storageType() !== Enums.FileStorageType.Shared) {
+				return !this.bSharedWithMe
+						|| this.bSharedWithMeAccessWrite
+						&& (!this.oParent.selectedHasShared() || this.oParent.needToCopyDraggedItems());
+			}
 		}
 		return false;
 	}, this);
