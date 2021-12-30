@@ -186,8 +186,7 @@ function CFilesView(bPopup)
 		;
 		return	!this.isZipFolder()
 				&& (!oSharedParentFolder || oSharedParentFolder.bSharedWithMeAccessWrite)
-				&& this.allSelectedFilesReady() && oSelectedItem
-				&& (!oSelectedItem.bSharedWithMe || oSelectedItem.bSharedWithMeAccessWrite);
+				&& this.allSelectedFilesReady() && oSelectedItem;
 	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, this.isRenameAllowed);
 
