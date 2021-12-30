@@ -134,13 +134,21 @@ function CFilesView(bPopup)
 			return oItem.IS_FILE;
 		});
 	}, this);
-	this.selectedCount = ko.computed(function () {
-		return this.selector.listCheckedAndSelected().length;
+	this.selectedOwnItems = ko.computed(function () {
+		return _.filter(this.selector.listCheckedAndSelected(), function(item) {
+			return !item.bSharedWithMe;
+		});
+	}, this);
+	this.selectedOwnItemsCount = ko.computed(function () {
+		return this.selectedOwnItems().length;
 	}, this);
 	this.selectedHasShared = ko.computed(function () {
 		return !!_.find(this.selector.listCheckedAndSelected(), function(oItem) {
 			return oItem.bSharedWithMe;
 		});
+	}, this);
+	this.selectedHasOwnItems = ko.computed(function () {
+		return this.selectedOwnItemsCount() > 0;
 	}, this);
 	
 	this.searchPattern = ko.observable('');
@@ -192,12 +200,12 @@ function CFilesView(bPopup)
 
 	this.isDeleteAllowed = ko.computed(function () {
 		var
-			oSharedParentFolder = this.sharedParentFolder(),
-			aItems = this.selector.listCheckedAndSelected()
+			sharedParentFolder = this.sharedParentFolder(),
+			items = this.selector.listCheckedAndSelected()
 		;
 		return	!this.isZipFolder()
-				&& (!oSharedParentFolder && !this.selectedHasShared() || !!oSharedParentFolder && oSharedParentFolder.bSharedWithMeAccessWrite)
-				&& this.allSelectedFilesReady() && aItems.length > 0;
+				&& (!sharedParentFolder && this.selectedHasOwnItems() || !!sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
+				&& this.allSelectedFilesReady() && items.length > 0;
 	}, this);
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, this.isDeleteAllowed);
 
@@ -1268,30 +1276,31 @@ CFilesView.prototype.refresh = function ()
 CFilesView.prototype.executeDelete = function ()
 {
 	var
-		aChecked = this.selector.listCheckedAndSelected() || [],
-		iCheckedCount = aChecked.length,
-		bHasFolder = !!_.find(aChecked, function (oItem) { return !oItem.IS_FILE; }),
-		bHasFile = !!_.find(aChecked, function (oItem) { return oItem.IS_FILE; }),
-		sConfirm = ''
+		items = this.selector.listCheckedAndSelected() || [],
+		ownItems = this.selectedOwnItems(),
+		ownItemsCount = ownItems.length
 	;
-	
-	if (bHasFolder && bHasFile)
-	{
-		sConfirm = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_ITEMS_PLURAL', {'COUNT': iCheckedCount}, null, iCheckedCount);
-	}
-	else if (bHasFolder)
-	{
-		sConfirm = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FOLDERS_PLURAL', {'COUNT': iCheckedCount}, null, iCheckedCount);
-	}
-	else
-	{
-		sConfirm = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FILES_PLURAL', {'COUNT': iCheckedCount}, null, iCheckedCount);
-	}
-	
-	if (!this.bPublic && iCheckedCount > 0)
-	{
+
+	if (!this.bPublic && ownItemsCount > 0) {
+		var
+			hasShared = items.length !== ownItemsCount,
+			hasFolder = !!_.find(ownItems, function (item) { return !item.IS_FILE; }),
+			hasFile = !!_.find(ownItems, function (item) { return item.IS_FILE; }),
+			confirmText = ''
+		;
+
+		if (hasShared) {
+			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_NOT_ALL_ITEMS_OWN');
+		} else if (hasFolder && hasFile) {
+			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_ITEMS_PLURAL', {'COUNT': ownItemsCount}, null, ownItemsCount);
+		} else if (hasFolder) {
+			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FOLDERS_PLURAL', {'COUNT': ownItemsCount}, null, ownItemsCount);
+		} else {
+			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FILES_PLURAL', {'COUNT': ownItemsCount}, null, ownItemsCount);
+		}
+
 		this.selector.useKeyboardKeys(false);
-		Popups.showPopup(ConfirmPopup, [sConfirm, _.bind(this.deleteItems, this, aChecked), '', TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE')]);
+		Popups.showPopup(ConfirmPopup, [confirmText, _.bind(this.deleteItems, this, ownItems), '', TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE')]);
 	}
 };
 
