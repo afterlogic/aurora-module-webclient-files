@@ -1067,6 +1067,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			{
 				this.loading(false);
 				this.error(true);
+				Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILES_NOT_RECEIVED'));
 			}
 		}
 	}
