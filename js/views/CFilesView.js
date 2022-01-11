@@ -139,18 +139,12 @@ function CFilesView(bPopup)
 			return !item.bSharedWithMe;
 		});
 	}, this);
-	this.selectedOwnItemsCount = ko.computed(function () {
-		return this.selectedOwnItems().length;
-	}, this);
 	this.selectedHasShared = ko.computed(function () {
 		return !!_.find(this.selector.listCheckedAndSelected(), function(oItem) {
 			return oItem.bSharedWithMe;
 		});
 	}, this);
-	this.selectedHasOwnItems = ko.computed(function () {
-		return this.selectedOwnItemsCount() > 0;
-	}, this);
-	
+
 	this.searchPattern = ko.observable('');
 	this.newSearchPattern = ko.observable('');
 	this.isSearchFocused = ko.observable(false);
@@ -198,14 +192,17 @@ function CFilesView(bPopup)
 	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, this.isRenameAllowed);
 
+	this.itemsToDeleteCount = ko.computed(function () {
+		var sharedParentFolder = this.sharedParentFolder();
+		if (!!sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite) {
+			return this.selector.listCheckedAndSelected().length;
+		}
+		return this.selectedOwnItems().length;
+	}, this);
 	this.isDeleteAllowed = ko.computed(function () {
-		var
-			sharedParentFolder = this.sharedParentFolder(),
-			items = this.selector.listCheckedAndSelected()
-		;
 		return	!this.isZipFolder()
-				&& (!sharedParentFolder && this.selectedHasOwnItems() || !!sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
-				&& this.allSelectedFilesReady() && items.length > 0;
+				&& this.itemsToDeleteCount() > 0
+				&& this.allSelectedFilesReady();
 	}, this);
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, this.isDeleteAllowed);
 
@@ -1277,31 +1274,33 @@ CFilesView.prototype.refresh = function ()
 CFilesView.prototype.executeDelete = function ()
 {
 	var
+		sharedParentFolder = this.sharedParentFolder(),
+		allowDeleteSharedItems = !!sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite,
 		items = this.selector.listCheckedAndSelected() || [],
-		ownItems = this.selectedOwnItems(),
-		ownItemsCount = ownItems.length
+		itemsToDelete = allowDeleteSharedItems ? items : this.selectedOwnItems(),
+		itemsToDeleteCount = itemsToDelete.length
 	;
 
-	if (!this.bPublic && ownItemsCount > 0) {
+	if (!this.bPublic && itemsToDeleteCount > 0) {
 		var
-			hasShared = items.length !== ownItemsCount,
-			hasFolder = !!_.find(ownItems, function (item) { return !item.IS_FILE; }),
-			hasFile = !!_.find(ownItems, function (item) { return item.IS_FILE; }),
+			askAboutSharedItems = items.length !== itemsToDeleteCount,
+			hasFolder = !!_.find(itemsToDelete, function (item) { return !item.IS_FILE; }),
+			hasFile = !!_.find(itemsToDelete, function (item) { return item.IS_FILE; }),
 			confirmText = ''
 		;
 
-		if (hasShared) {
+		if (askAboutSharedItems) {
 			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_NOT_ALL_ITEMS_OWN');
 		} else if (hasFolder && hasFile) {
-			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_ITEMS_PLURAL', {'COUNT': ownItemsCount}, null, ownItemsCount);
+			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_ITEMS_PLURAL', {'COUNT': itemsToDeleteCount}, null, itemsToDeleteCount);
 		} else if (hasFolder) {
-			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FOLDERS_PLURAL', {'COUNT': ownItemsCount}, null, ownItemsCount);
+			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FOLDERS_PLURAL', {'COUNT': itemsToDeleteCount}, null, itemsToDeleteCount);
 		} else {
-			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FILES_PLURAL', {'COUNT': ownItemsCount}, null, ownItemsCount);
+			confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_DELETE_FILES_PLURAL', {'COUNT': itemsToDeleteCount}, null, itemsToDeleteCount);
 		}
 
 		this.selector.useKeyboardKeys(false);
-		Popups.showPopup(ConfirmPopup, [confirmText, _.bind(this.deleteItems, this, ownItems), '', TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE')]);
+		Popups.showPopup(ConfirmPopup, [confirmText, _.bind(this.deleteItems, this, itemsToDelete), '', TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE')]);
 	}
 };
 
