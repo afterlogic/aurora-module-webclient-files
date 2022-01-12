@@ -7,6 +7,7 @@ var
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	UrlUtils = require('%PathToCoreWebclientModule%/js/utils/Url.js'),
 
+	Api = require('%PathToCoreWebclientModule%/js/Api.js'),
 	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js'),
 	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
@@ -55,16 +56,16 @@ CSharePopup.prototype.onOpen = function (oItem)
 };
 
 /**
- * @param {Object} oResponse
- * @param {Object} oRequest
+ * @param {Object} response
  */
-CSharePopup.prototype.onCreatePublicLinkResponse = function (oResponse, oRequest)
+CSharePopup.prototype.onCreatePublicLinkResponse = function (response)
 {
-	if (oResponse.Result)
-	{
-		this.pub(UrlUtils.getAppPath() + oResponse.Result);
+	if (response.Result) {
+		this.pub(UrlUtils.getAppPath() + response.Result);
 		this.pubFocus(true);
 		this.item.published(true);
+	} else {
+		Api.showErrorByCode(response, TextUtils.i18n('%MODULENAME%/ERROR_CREATE_PUBLIC_LINK'));
 	}
 };
 
@@ -73,10 +74,16 @@ CSharePopup.prototype.onCancelSharingClick = function ()
 	if (this.item)
 	{
 		Ajax.send('DeletePublicLink', {
-				'Type': this.item.storageType(),
-				'Path': this.item.path(),
-				'Name': this.item.fileName()
-			}, this.closePopup, this);
+			'Type': this.item.storageType(),
+			'Path': this.item.path(),
+			'Name': this.item.fileName()
+		}, function (response) {
+			if (!response.Result) {
+				Api.showErrorByCode(response, TextUtils.i18n('%MODULENAME%/ERROR_DELETE_PUBLIC_LINK'));
+			} else {
+				this.closePopup();
+			}
+		}, this);
 		this.item.published(false);
 	}
 };
