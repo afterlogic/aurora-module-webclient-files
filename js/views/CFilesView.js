@@ -232,7 +232,7 @@ function CFilesView(bPopup)
 				&& this.allSelectedFilesReady()
 				&& oSelectedItem && !oSelectedItem.bIsLink
 				&& (oSelectedItem.IS_FILE || !this.isEncryptedStorage())
-				&& (!this.isSharedStorage() && !oSelectedItem.bSharedWithMe || oSelectedItem.bSharedWithMeAccessReshare);
+				&& !this.isSharedStorage() && !oSelectedItem.bSharedWithMe;
 	}, this);
 	this.shareCommand = Utils.createCommand(this, this.executeShare, this.isShareAllowed);
 
