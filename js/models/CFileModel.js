@@ -96,7 +96,6 @@ function CFileModel(oData, oParent)
 
 	this.iconAction('');
 	
-	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = _.bind(function () {
 		if (this.bSharedWithMe && this.sOwnerName) {
 			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
@@ -149,12 +148,7 @@ function CFileModel(oData, oParent)
 		{
 			aClasses.push('aslink');
 		}
-		if (this.bSharedWithMeAccessWrite) {
-			aClasses.push('shared');
-		} else if (this.bSharedWithMe) {
-			aClasses.push('shared_read_only');
-		}
-		
+
 		return aClasses.join(' ');
 	}, this);
 	

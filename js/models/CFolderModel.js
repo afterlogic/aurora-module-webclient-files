@@ -113,7 +113,6 @@ CFolderModel.prototype.parse = function (oData)
 		return this.fileName();
 	}, this);
 
-	this.sHeaderDenseText = this.bSharedWithMe ? TextUtils.i18n('%MODULENAME%/INFO_SHARED') : '';
 	this.sHeaderText = function () {
 		if (this.bSharedWithMe && this.sOwnerName) {
 			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {

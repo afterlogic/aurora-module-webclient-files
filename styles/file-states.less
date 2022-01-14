@@ -1,0 +1,101 @@
+.file_states {
+	margin-top: -23px;
+	position: absolute;
+
+	.folder & {
+		margin-top: -35px;
+		margin-left: 18px;
+	}
+
+	.file_encrypted_icon, .file_shared_icon, .file_published_icon {
+		border-radius: 3px;
+		color: #ffffff;
+		cursor: pointer;
+		display: block;
+		float: left;
+		margin-right: 4px;
+		height: 18px;
+		width: 18px;
+		overflow: hidden;
+		position: relative;
+
+		.init-icon-font();
+
+		&:before {
+			display: inline-block;
+			font-size: 18px;
+			height: 100%;
+			width: 100%;
+		}
+	}
+
+	.file_encrypted_icon {
+		background: #555555;
+
+		&:hover {
+			background: #3f3f3f;
+		}
+
+		&:before {
+			content: "\e90a";
+		}
+	}
+
+	.file_shared_icon,
+	.file_published_icon {
+		background: #64aedc;
+
+		&:hover {
+			background: #328dc5;
+		}
+	}
+
+	.file_shared_icon {
+		&:before {
+			content: "\e912";
+		}
+	}
+
+	.file_published_icon {
+		&:before {
+			content: "\e62c";
+		}
+	}
+}
+
+.file_shared_with_me_icon {
+	background: #ffffffb3;
+	border-radius: 31px;
+	height: 35px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 35px;
+
+	.init-icon-font();
+
+	&:before {
+		color: #64AEDC;
+		content: "\e912";
+		font-size: 25px;
+		line-height: 35px;
+		text-shadow: 0px 0px 1px, 0px 0px 1px;
+	}
+}
+
+.folder_shared_with_me_icon {
+	height: 30px;
+	left: 48%;
+	position: absolute;
+	top: 52%;
+	transform: translate(-50%, -50%);
+	width: 30px;
+
+	.init-icon-font();
+
+	&:before {
+		color: #ffffff;
+		content: "\e912";
+		font-size: 25px;
+	}
+}

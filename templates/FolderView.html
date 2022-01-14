@@ -3,8 +3,7 @@
 		draggablePlace: allowDrag() ? function (file, ctrlOrCmdUsed) { return $parent.dragAndDropHelper(file, ctrlOrCmdUsed); } : null,
 		draggableDragStartCallback: function() { if (allowDrag()) $root.dragover(true); },
 		draggableDragStopCallback: function() { if (allowDrag()) $root.dragover(false); },
-		css: { 'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete,
-				'shared': bSharedWithMeAccessWrite, 'shared_read_only': bSharedWithMe && !bSharedWithMeAccessWrite }">
+		css: { 'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete }">
 
 	<!-- ko if: (sHeaderText.length > 0) -->
 	<span class="header" data-bind="text: sHeaderText"></span>
@@ -15,11 +14,18 @@
 					droppable: {valueFunc: allowDrop() ? function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);} : null}">
 		<div class="image">
 			<span class="icon animGoal"></span>
+			<!-- ko if: bSharedWithMe -->
+			<span class="folder_shared_with_me_icon"></span>
+			<!-- /ko -->
 		</div>
-		<span class="published_icon" data-bind="click: function (oItem) { $root.onShareIconClick(oItem); }"></span>
-		<!-- ko if: (sharedWithOthers()) -->
-		<span class="shared-image" data-bind="click: function (oItem) { $root.onFileShareIconClick(oItem); }"></span>
-		<!-- /ko -->
+		<div class="file_states">
+			<!-- ko if: (sharedWithOthers()) -->
+			<span class="file_shared_icon" data-bind="click: function (oItem) { $root.onFileShareIconClick(oItem); }"></span>
+			<!-- /ko -->
+			<!-- ko if: (published()) -->
+			<span class="file_published_icon" data-bind="click: function (oItem) { $root.onShareIconClick(oItem); }"></span>
+			<!-- /ko -->
+		</div>
 		<span class="name" data-bind="text: displayName()"></span>
 		<div class="footer" data-bind="visible: isIncomplete">
 			<span class="progress">
@@ -29,8 +35,4 @@
 		</div>
 		<div class="separator"></div>
 	</div>
-
-	<!-- ko if: (sHeaderDenseText.length > 0) -->
-	<span class="header_dense" data-bind="text: sHeaderDenseText"></span>
-	<!-- /ko -->
 </div>
