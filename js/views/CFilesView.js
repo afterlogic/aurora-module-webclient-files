@@ -1600,8 +1600,9 @@ CFilesView.prototype.onPublicRoute = function (oParams)
 /**
  * @param {Array} aChecked
  * @param {boolean} bOkAnswer
+ * @param {string} methodName
  */
-CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
+CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer, methodName = 'Delete')
 {
 	var 
 		sStorageType = this.storageType(),
@@ -1615,7 +1616,7 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 				oItem.deleted(true);
 				sStorageType = oItem.storageType();
 				return {
-					'Path': oItem.path(),  
+					'Path': oItem.path(),
 					'Name': oItem.id(),
 					'IsFolder': !oItem.IS_FILE
 				};
@@ -1624,14 +1625,14 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer)
 		}));
 		if (aItems.length)
 		{
-			Ajax.send('Delete', {
+			Ajax.send(methodName, {
 					'Type': sStorageType,
 					'Path': sPath,
 					'Items': aItems
 				}, this.onDeleteResponse, this
 			);
 		}
-	}		
+	}
 };
 
 /**
