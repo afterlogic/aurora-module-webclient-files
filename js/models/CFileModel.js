@@ -84,7 +84,13 @@ function CFileModel(oData, oParent)
 	this.visibleCancelButton = ko.computed(function () {
 		return this.visibleProgress() && this.progressPercent() !== 100;
 	}, this);
-	
+
+	this.progressText = ko.computed(function () {
+		return TextUtils.i18n('COREWEBCLIENT/LABEL_UPLOADING_PERCENT', {
+			'PERCENT': this.progressPercent()
+		});
+	}, this);
+
 	this.oActionsData['list'] = {
 		'Text': TextUtils.i18n('COREWEBCLIENT/ACTION_VIEW_FILE'),
 		'Handler': _.bind(function () { App.broadcastEvent('Files::ShowList', {'Item': this}); }, this)
