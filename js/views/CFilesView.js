@@ -1420,12 +1420,11 @@ CFilesView.prototype.currentGetFiles = function ()
 {
 	var
 		iPathItemsCount = this.pathItems().length,
-		oLastPathItem = iPathItemsCount > 0 ? this.pathItems()[iPathItemsCount - 1] : null,
 		oParameters = {
 			'Type': this.storageType(),
 			'Path': this.currentPath(),
 			'Pattern': this.searchPattern(),
-			'PathRequired': this.currentPath() !== '' && this.pathItems().length === 0
+			'PathRequired': this.currentPath() !== '' && iPathItemsCount === 0
 		}
 	;
 	Ajax.send('GetFiles', oParameters, this.onGetFilesResponse, this);
@@ -1519,7 +1518,35 @@ CFilesView.prototype.onUserRoute = function (oParams)
 			return oStorage.type === oParams.Storage;
 		}),
 		sStorage = bStorageFound ? oParams.Storage : (this.storages().length > 0 ? this.storages()[0].type : ''),
-		sPath = oParams.Path,
+		sPath = oParams.Path
+	;
+
+	this.error(false);
+
+	this.storageType(sStorage);
+	this.currentPath(sPath);
+	this.searchPattern(Types.pString(oParams.Search));
+	this.loadedFiles(false);
+
+	this.populatePathItems(oParams);
+
+	if (this.bNotLoading && (this.files().length > 0 || this.folders().length > 0)) {
+		this.timerId = setTimeout(_.bind(function() {
+			if (!this.loadedFiles() && !this.error()) {
+				this.clearAndShowLoading();
+			}
+		}, this), 3000);
+	} else {
+		this.clearAndShowLoading();
+	}
+
+	this.currentGetFiles();
+};
+
+CFilesView.prototype.populatePathItems = function (oParams)
+{
+	var
+		sPath = this.currentPath(),
 		aPath = oParams.PathParts.reverse(),
 		oFolder = _.find(this.folders(), function (oFld) {
 			return oFld.fullPath() === sPath;
@@ -1528,38 +1555,42 @@ CFilesView.prototype.onUserRoute = function (oParams)
 			return oItem.fullPath() === sPath;
 		})
 	;
-	
-	this.error(false);
-	
-	this.storageType(sStorage);
-	this.currentPath(sPath);
-	this.searchPattern(Types.pString(oParams.Search));
-	this.loadedFiles(false);
-	
 	if (iPathItemIndex !== -1) {
 		this.pathItems(this.pathItems().slice(0, iPathItemIndex + 1));
 	} else if (oFolder) {
 		this.pathItems.push(oFolder);
-	} else if (sStorage !== 'google' || sPath === '') {
+	} else if (this.storageType() !== 'google' || sPath === '') {
 		this.pathItems.removeAll();
 		_.each(aPath, _.bind(function (sPathItem) {
 			var iItemPos = sPath.lastIndexOf(sPathItem);
-			this.addPathItems(sStorage, sPath, sPathItem);
+			this.addPathItems(this.storageType(), sPath, sPathItem);
 			sPath = sPath.substr(0, iItemPos);
 		}, this));
-	}
-	
-	if (this.bNotLoading && (this.files().length > 0 || this.folders().length > 0)) {
-		this.timerId = setTimeout(_.bind(function() {
-			if (!this.loadedFiles() && !this.error()) {
-				this.clearAndShowLoading();
+		var
+			oParameters = {
+				'Type': this.storageType(),
+				'Path': this.currentPath()
 			}
-		}, this), 3000);				
-	} else {
-		this.clearAndShowLoading();
+		;
+		Ajax.send('GetAccessInfoForPath', oParameters, function (response) {
+			if (response && response.Result) {
+				_.each(this.pathItems(), function (pathItem) {
+					var itemPath = pathItem.fullPath();
+					if (itemPath.substr(itemPath.length - 1, 1) === '/') {
+						itemPath = itemPath.substr(0, itemPath.length - 1);
+					}
+					if (response.Result[itemPath]) {
+						if (!pathItem.oExtendedProps) {
+							pathItem.oExtendedProps = {};
+						}
+						pathItem.oExtendedProps.SharedWithMeAccess = response.Result[itemPath];
+						pathItem.parseSharedWithMeAccess();
+					}
+				});
+				this.pathItems.valueHasMutated(); // for triggering sharedParentFolder computing
+			}
+		}, this);
 	}
-	
-	this.currentGetFiles();
 };
 
 /**
