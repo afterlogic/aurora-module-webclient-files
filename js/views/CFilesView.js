@@ -1099,8 +1099,8 @@ CFilesView.prototype.parseQuota = function (oQuota)
 {
 	if (oQuota)
 	{
-		this.quota(oQuota.Limit);
-		this.used(oQuota.Used);
+		this.quota(Types.pInt(oQuota.Limit));
+		this.used(Types.pInt(oQuota.Used));
 	}
 };
 
