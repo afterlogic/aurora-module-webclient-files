@@ -286,7 +286,7 @@ function CFilesView(bPopup)
 		var
 			iQuota = this.quota(),
 			iUsed = this.used(),
-			iProc = 0 < iQuota ? Math.ceil((iUsed / iQuota) * 100) : -1
+			iProc = 0 < iQuota ? Math.round((iUsed / iQuota) * 100) : -1
 		;
 
 		iProc = 100 < iProc ? 100 : iProc;
