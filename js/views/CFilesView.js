@@ -228,7 +228,7 @@ function CFilesView(bPopup)
 			aItems = this.selector.listCheckedAndSelected(),
 			oSelectedItem = aItems.length === 1 ? aItems[0] : null
 		;
-		return	!this.isZipFolder() && !this.sharedParentFolder()
+		return	!this.isZipFolder() && (!this.sharedParentFolder() || this.sharedParentFolder().bSharedWithMeAccessReshare)
 				&& this.allSelectedFilesReady()
 				&& oSelectedItem && !oSelectedItem.bIsLink
 				&& (oSelectedItem.IS_FILE || !this.isEncryptedStorage())
