@@ -150,8 +150,6 @@ export default {
 
   mounted() {
     this.populate()
-    console.log('isModuleAvailable', moduleManager.isModuleAvailable('CorporateFiles'))
-    console.log('isCorporateAvailable', this.isCorporateAvailable)
   },
 
   beforeRouteLeave (to, from, next) {
