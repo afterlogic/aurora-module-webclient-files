@@ -224,15 +224,18 @@ function CFilesView(bPopup)
 	}, this);
 
 	this.isShareAllowed = ko.computed(function () {
-		var
-			aItems = this.selector.listCheckedAndSelected(),
-			oSelectedItem = aItems.length === 1 ? aItems[0] : null
+		const
+			items = this.selector.listCheckedAndSelected(),
+			selectedItem = items.length === 1 ? items[0] : null,
+			extendedProps = selectedItem && selectedItem.oExtendedProps,
+			isSelectedFileEncrypted = !!(extendedProps && extendedProps.InitializationVector);
 		;
-		return	!this.isZipFolder() && (!this.sharedParentFolder() || this.sharedParentFolder().bSharedWithMeAccessReshare)
-				&& this.allSelectedFilesReady()
-				&& oSelectedItem && !oSelectedItem.bIsLink
-				&& (oSelectedItem.IS_FILE || !this.isEncryptedStorage())
-				&& (!oSelectedItem.bSharedWithMe || oSelectedItem.bSharedWithMeAccessReshare);
+		return !this.isZipFolder() &&
+				(!this.sharedParentFolder() || this.sharedParentFolder().bSharedWithMeAccessReshare) &&
+				this.allSelectedFilesReady() &&
+				selectedItem && !selectedItem.bIsLink &&
+				(selectedItem.IS_FILE && !isSelectedFileEncrypted || !selectedItem.IS_FILE && !this.isEncryptedStorage()) &&
+				(!selectedItem.bSharedWithMe || selectedItem.bSharedWithMeAccessReshare);
 	}, this);
 	this.shareCommand = Utils.createCommand(this, this.executeShare, this.isShareAllowed);
 
