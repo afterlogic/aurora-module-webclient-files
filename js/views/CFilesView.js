@@ -223,6 +223,7 @@ function CFilesView(bPopup)
 		return this.isCutAllowed() || this.needToCopyDraggedItems() && this.isCopyAllowed();
 	}, this);
 
+	// is used for share and simple public link
 	this.isShareAllowed = ko.computed(function () {
 		const
 			items = this.selector.listCheckedAndSelected(),
@@ -237,7 +238,7 @@ function CFilesView(bPopup)
 				(selectedItem.IS_FILE && !isSelectedFileEncrypted || !selectedItem.IS_FILE && !this.isEncryptedStorage()) &&
 				(!selectedItem.bSharedWithMe || selectedItem.bSharedWithMeAccessReshare);
 	}, this);
-	this.shareCommand = Utils.createCommand(this, this.executeShare, this.isShareAllowed);
+	this.createPublicLinkCommand = Utils.createCommand(this, this.createPublicLink, this.isShareAllowed);
 
 	// Create in general for all kind of items
 	this.isCreateAllowed = ko.computed(function () {
@@ -1188,7 +1189,7 @@ CFilesView.prototype.executeDownload = function ()
 	}
 };
 
-CFilesView.prototype.executeShare = function ()
+CFilesView.prototype.createPublicLink = function ()
 {
 	var oItem = _.first(this.selector.listCheckedAndSelected());
 	
