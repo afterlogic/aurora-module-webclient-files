@@ -33,6 +33,7 @@ Enums.FileStorageLinkType = {
  * @enum {number}
  */
 Enums.SharedFileAccess = {
+	'NoAccess': 0,
 	'Write': 1,
 	'Read': 2,
 	'Reshare': 3
