@@ -24,19 +24,19 @@
 			<!-- ko if: thumbnailSrc() === '' -->
 			<span class="icon" data-bind="css: extension().toLowerCase() + (bHasHtmlEmbed ? ' ' + sLinkType.toLowerCase() : '')"></span>
 			<!-- /ko -->
-			<!-- ko if: bSharedWithMe -->
+			<!-- ko if: sharedWithMe -->
 			<span class="file_shared_with_me_icon"></span>
 			<!-- /ko -->
 		</span>
 
 		<div class="file_states">
-			<!-- ko if: (bIsSecure()) -->
+			<!-- ko if: bIsSecure -->
 			<span class="file_encrypted_icon" data-bind="click: function (oItem) { $root.onSecureIconClick(oItem); }"></span>
 			<!-- /ko -->
-			<!-- ko if: (sharedWithOthers()) -->
+			<!-- ko if: sharedWithOthers -->
 			<span class="file_shared_icon" data-bind="click: function (oItem) { $root.onFileShareIconClick(oItem); }"></span>
 			<!-- /ko -->
-			<!-- ko if: (allowPublicLink() && published()) -->
+			<!-- ko if: allowPublicLink() && published() -->
 			<span class="file_published_icon" data-bind="click: function (oItem) { $root.onShareIconClick(oItem); }"></span>
 			<!-- /ko -->
 		</div>

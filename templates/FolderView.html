@@ -14,15 +14,15 @@
 					droppable: {valueFunc: allowDrop() ? function (oEvent, oUi) {$root.filesDrop($data, oEvent, oUi);} : null}">
 		<div class="image">
 			<span class="icon animGoal"></span>
-			<!-- ko if: bSharedWithMe -->
+			<!-- ko if: sharedWithMe -->
 			<span class="folder_shared_with_me_icon"></span>
 			<!-- /ko -->
 		</div>
 		<div class="file_states">
-			<!-- ko if: (sharedWithOthers()) -->
+			<!-- ko if: sharedWithOthers -->
 			<span class="file_shared_icon" data-bind="click: function (oItem) { $root.onFileShareIconClick(oItem); }"></span>
 			<!-- /ko -->
-			<!-- ko if: (published()) -->
+			<!-- ko if: published -->
 			<span class="file_published_icon" data-bind="click: function (oItem) { $root.onShareIconClick(oItem); }"></span>
 			<!-- /ko -->
 		</div>

@@ -1,13 +1,16 @@
 'use strict';
 
 var
+	_ = require('underscore'),
 	ko = require('knockout'),
 
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js'),
 
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
-	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js')
+	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js'),
+
+	ExtendedPropsPrototype = require('modules/%ModuleName%/js/models/ExtendedPropsPrototype.js')
 ;
 
 /**
@@ -25,7 +28,6 @@ function CFolderModel(oParent)
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 
 	this.published = ko.observable(false);
-	this.sharedWithOthers = ko.observable(false); // can be changed by other modules
 	this.fileName = ko.observable('');
 
 	//onDrop
@@ -39,12 +41,13 @@ function CFolderModel(oParent)
 	this.id = ko.observable('');
 
 	this.sMainAction = 'list';
-	this.oExtendedProps = null;
 
 	this.sOwnerName = '';
-	this.bSharedWithMeAccessReshare = false;
-	this.bSharedWithMeAccessWrite = false;
-	this.bSharedWithMe = false;
+	this.oExtendedProps = {};
+	this.sharedWithMeAccessReshare = ko.observable(false);
+	this.sharedWithMeAccessWrite = ko.observable(false);
+	this.sharedWithMe = ko.observable(false);
+	this.sharedWithOthers = ko.observable(false); // can be changed by other modules
 
 	// The folder can be uploading. Operations should be disabled for such a folder.
 	this.uploadingFilesCount = ko.observable(0);
@@ -71,10 +74,10 @@ function CFolderModel(oParent)
 		if (!this.oParent.bInPopup && !this.isIncomplete()) {
 			var sharedParentFolder = this.oParent.sharedParentFolder();
 			if (sharedParentFolder) {
-				return sharedParentFolder.bSharedWithMeAccessWrite;
+				return sharedParentFolder.sharedWithMeAccessWrite();
 			} else if (this.storageType() !== Enums.FileStorageType.Shared) {
-				return !this.bSharedWithMe
-						|| this.bSharedWithMeAccessWrite
+				return !this.sharedWithMe()
+						|| this.sharedWithMeAccessWrite()
 						&& (!this.oParent.selectedHasShared() || this.oParent.needToCopyDraggedItems());
 			}
 		}
@@ -82,12 +85,7 @@ function CFolderModel(oParent)
 	}, this);
 }
 
-CFolderModel.prototype.parseSharedWithMeAccess = function ()
-{
-	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
-	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
-	this.bSharedWithMe = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
-};
+_.extendOwn(CFolderModel.prototype, ExtendedPropsPrototype);
 
 CFolderModel.prototype.parse = function (oData)
 {
@@ -97,15 +95,15 @@ CFolderModel.prototype.parse = function (oData)
 	this.path(Types.pString(oData.Path));
 	this.storageType(Types.pString(oData.Type));
 	this.id(Types.pString(oData.Id));
-	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
 	if (oData.MainAction)
 	{
 		this.sMainAction = Types.pString(oData.MainAction);
 	}
 
 	this.sOwnerName = Types.pString(oData.Owner);
-	this.parseSharedWithMeAccess();
-	
+	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
+	this.parseExtendedProps();
+
 	this.displayName = ko.computed(function () {
 		if (this.storageType() === Enums.FileStorageType.Shared && !this.oParent.sharedParentFolder()) {
 			return this.fullPath().replace(/^\//, '');
@@ -114,7 +112,7 @@ CFolderModel.prototype.parse = function (oData)
 	}, this);
 
 	this.sHeaderText = function () {
-		if (this.bSharedWithMe && this.sOwnerName) {
+		if (this.sharedWithMe() && this.sOwnerName) {
 			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
 				'OWNER': this.sOwnerName
 			});

@@ -136,12 +136,12 @@ function CFilesView(bPopup)
 	}, this);
 	this.selectedOwnItems = ko.computed(function () {
 		return _.filter(this.selector.listCheckedAndSelected(), function(item) {
-			return !item.bSharedWithMe;
+			return !item.sharedWithMe();
 		});
 	}, this);
 	this.selectedHasShared = ko.computed(function () {
 		return !!_.find(this.selector.listCheckedAndSelected(), function(oItem) {
-			return oItem.bSharedWithMe;
+			return oItem.sharedWithMe();
 		});
 	}, this);
 
@@ -165,7 +165,7 @@ function CFilesView(bPopup)
 	}, this);
 	this.sharedParentFolder = ko.computed(function () {
 		return _.find(this.pathItems(), function (oParentFolder) {
-			return oParentFolder.bSharedWithMe;
+			return oParentFolder.sharedWithMe();
 		});
 	}, this);
 
@@ -187,14 +187,14 @@ function CFilesView(bPopup)
 			oSelectedItem = aItems.length === 1 ? aItems[0] : null
 		;
 		return	!this.isZipFolder()
-				&& (!oSharedParentFolder || oSharedParentFolder.bSharedWithMeAccessWrite)
+				&& (!oSharedParentFolder || oSharedParentFolder.sharedWithMeAccessWrite())
 				&& this.allSelectedFilesReady() && oSelectedItem;
 	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, this.isRenameAllowed);
 
 	this.itemsToDeleteCount = ko.computed(function () {
 		var sharedParentFolder = this.sharedParentFolder();
-		if (!!sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite) {
+		if (!!sharedParentFolder && sharedParentFolder.sharedWithMeAccessWrite()) {
 			return this.selector.listCheckedAndSelected().length;
 		}
 		return this.selectedOwnItems().length;
@@ -213,7 +213,7 @@ function CFilesView(bPopup)
 			aItems = this.selector.listCheckedAndSelected()
 		;
 		return	!this.isZipFolder()
-				&& (!oSharedParentFolder && !this.isSharedStorage() || !!oSharedParentFolder && oSharedParentFolder.bSharedWithMeAccessWrite)
+				&& (!oSharedParentFolder && !this.isSharedStorage() || !!oSharedParentFolder && oSharedParentFolder.sharedWithMeAccessWrite())
 				&& this.allSelectedFilesReady() && aItems.length > 0;
 	}, this);
 	this.isCopyAllowed = ko.computed(function () {
@@ -232,11 +232,11 @@ function CFilesView(bPopup)
 			isSelectedFileEncrypted = !!(extendedProps && extendedProps.InitializationVector);
 		;
 		return !this.isZipFolder() &&
-				(!this.sharedParentFolder() || this.sharedParentFolder().bSharedWithMeAccessReshare) &&
+				(!this.sharedParentFolder() || this.sharedParentFolder().sharedWithMeAccessReshare()) &&
 				this.allSelectedFilesReady() &&
 				selectedItem && !selectedItem.bIsLink &&
 				(selectedItem.IS_FILE && !isSelectedFileEncrypted || !selectedItem.IS_FILE && !this.isEncryptedStorage()) &&
-				(!selectedItem.bSharedWithMe || selectedItem.bSharedWithMeAccessReshare);
+				(!selectedItem.sharedWithMe() || selectedItem.sharedWithMeAccessReshare());
 	}, this);
 	this.createPublicLinkCommand = Utils.createCommand(this, this.createPublicLink, this.isShareAllowed);
 
@@ -244,7 +244,7 @@ function CFilesView(bPopup)
 	this.isCreateAllowed = ko.computed(function () {
 		var oSharedParentFolder = this.sharedParentFolder();
 		return	!this.isZipFolder()
-				&& (oSharedParentFolder && oSharedParentFolder.bSharedWithMeAccessWrite
+				&& (oSharedParentFolder && oSharedParentFolder.sharedWithMeAccessWrite()
 				|| !oSharedParentFolder && !this.isSharedStorage());
 	}, this);
 	this.createFolderCommand = Utils.createCommand(this, this.executeCreateFolder, this.isCreateAllowed);
@@ -1051,13 +1051,14 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 
 			//If the current path does not contain information about access, we obtain such information from the response, if possible
 			if (oResult.Access && this.pathItems().length > 0) {
-				var iLastIndex = this.pathItems().length - 1;
-				if (!this.pathItems()[iLastIndex].oExtendedProps) {
-					this.pathItems()[iLastIndex].oExtendedProps = {};
-				}
-				if (!this.pathItems()[iLastIndex].oExtendedProps.SharedWithMeAccess) {
-					this.pathItems()[iLastIndex].oExtendedProps.SharedWithMeAccess = oResult.Access;
-					this.pathItems()[iLastIndex].parseSharedWithMeAccess();
+				const
+					iLastIndex = this.pathItems().length - 1
+					lastItem = this.pathItems()[iLastIndex]
+				;
+				if (!lastItem.oExtendedProps || !lastItem.oExtendedProps.SharedWithMeAccess) {
+					this.pathItems()[iLastIndex].updateExtendedProps({
+						'SharedWithMeAccess': oResult.Access
+					});
 					this.pathItems.valueHasMutated(); // for triggering sharedParentFolder computing
 				}
 			}
@@ -1252,7 +1253,7 @@ CFilesView.prototype.onFileShareIconClick = function (oItem)
 {
 	if (FilesSharePopup && oItem)
 	{
-		Popups.showPopup(FilesSharePopup, [oItem]);
+		Popups.showPopup(FilesSharePopup, [oItem, this.expungeFileItems.bind(this)]);
 	}
 };
 
@@ -1279,7 +1280,7 @@ CFilesView.prototype.executeDelete = function ()
 {
 	var
 		sharedParentFolder = this.sharedParentFolder(),
-		allowDeleteSharedItems = !!sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite,
+		allowDeleteSharedItems = !!sharedParentFolder && sharedParentFolder.sharedWithMeAccessWrite(),
 		items = this.selector.listCheckedAndSelected() || [],
 		itemsToDelete = allowDeleteSharedItems ? items : this.selectedOwnItems(),
 		itemsToDeleteCount = itemsToDelete.length
@@ -1388,7 +1389,7 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 					droppable: ko.computed(function () {
 						return oStorage.IsDroppable && (!this.sharedParentFolder() && !this.selectedHasShared()
 								|| this.needToCopyDraggedItems()
-								|| this.sharedParentFolder() && this.sharedParentFolder().bSharedWithMeAccessWrite);
+								|| this.sharedParentFolder() && this.sharedParentFolder().sharedWithMeAccessWrite());
 					}, this)
 				});
 			}
@@ -1584,11 +1585,9 @@ CFilesView.prototype.populatePathItems = function (oParams)
 						itemPath = itemPath.substr(0, itemPath.length - 1);
 					}
 					if (response.Result[itemPath]) {
-						if (!pathItem.oExtendedProps) {
-							pathItem.oExtendedProps = {};
-						}
-						pathItem.oExtendedProps.SharedWithMeAccess = response.Result[itemPath];
-						pathItem.parseSharedWithMeAccess();
+						pathItem.updateExtendedProps({
+							'SharedWithMeAccess': response.Result[itemPath]
+						});
 					}
 				});
 				this.pathItems.valueHasMutated(); // for triggering sharedParentFolder computing

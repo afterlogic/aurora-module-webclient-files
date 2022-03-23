@@ -17,7 +17,9 @@ var
 	
 	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
 	EmbedHtmlPopup = require('%PathToCoreWebclientModule%/js/popups/EmbedHtmlPopup.js'),
-	
+
+	ExtendedPropsPrototype = require('modules/%ModuleName%/js/models/ExtendedPropsPrototype.js'),
+
 	Enums = window.Enums
 ;
 
@@ -44,22 +46,24 @@ function CFileModel(oData, oParent)
 	this.checked = ko.observable(false);
 	
 	this.bIsLink = !!oData.IsLink;
-	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
 	this.sLinkType = this.bIsLink ? Types.pString(oData.LinkType) : '';
 	this.sLinkUrl = this.bIsLink ? Types.pString(oData.LinkUrl) : '';
 	this.sThumbnailExternalLink = this.bIsLink ? Types.pString(oData.ThumbnailUrl) : '';
-	
-	this.bSharedWithMeAccessReshare = this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Reshare;
-	this.bSharedWithMeAccessWrite = this.bSharedWithMeAccessReshare || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Write;
-	this.bSharedWithMe = this.bSharedWithMeAccessWrite || this.oExtendedProps.SharedWithMeAccess === Enums.SharedFileAccess.Read;
-	
+
 	this.deleted = ko.observable(false); // temporary removal until it was confirmed from the server
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	this.published = ko.observable(false);
 	this.sOwnerName = Types.pString(oData.Owner);
-	
+
 	CAbstractFileModel.call(this);
-	
+
+	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
+	this.sharedWithMeAccessReshare = ko.observable(false);
+	this.sharedWithMeAccessWrite = ko.observable(false);
+	this.sharedWithMe = ko.observable(false);
+	this.sharedWithOthers = ko.observable(false); // can be changed by other modules
+	this.parseExtendedProps();
+
 	this.displayName = ko.computed(function () {
 		if (this.storageType() === Enums.FileStorageType.Shared && !!this.oParent.sharedParentFolder && !this.oParent.sharedParentFolder()) {
 			return this.fullPath().replace(/^\//, '');
@@ -103,7 +107,7 @@ function CFileModel(oData, oParent)
 	this.iconAction('');
 	
 	this.sHeaderText = _.bind(function () {
-		if (this.bSharedWithMe && this.sOwnerName) {
+		if (this.sharedWithMe() && this.sOwnerName) {
 			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
 				'OWNER': this.sOwnerName
 			});
@@ -162,6 +166,7 @@ function CFileModel(oData, oParent)
 }
 
 _.extendOwn(CFileModel.prototype, CAbstractFileModel.prototype);
+_.extendOwn(CFileModel.prototype, ExtendedPropsPrototype);
 
 /**
  * Parses date of last file modification.
