@@ -232,9 +232,9 @@ function CFilesView(bPopup)
 			isSelectedFileEncrypted = !!(extendedProps && extendedProps.InitializationVector);
 		;
 		return !this.isZipFolder() &&
-				(!this.sharedParentFolder() || this.sharedParentFolder().sharedWithMeAccessReshare()) &&
-				this.allSelectedFilesReady() &&
 				selectedItem && !selectedItem.bIsLink &&
+				(!this.sharedParentFolder() || this.sharedParentFolder().sharedWithMeAccessReshare() || selectedItem.sharedWithMeAccessReshare()) &&
+				this.allSelectedFilesReady() &&
 				(selectedItem.IS_FILE && !isSelectedFileEncrypted || !selectedItem.IS_FILE && !this.isEncryptedStorage()) &&
 				(!selectedItem.sharedWithMe() || selectedItem.sharedWithMeAccessReshare());
 	}, this);
