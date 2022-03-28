@@ -1052,7 +1052,7 @@ CFilesView.prototype.onGetFilesResponse = function (oResponse, oRequest)
 			//If the current path does not contain information about access, we obtain such information from the response, if possible
 			if (oResult.Access && this.pathItems().length > 0) {
 				const
-					iLastIndex = this.pathItems().length - 1
+					iLastIndex = this.pathItems().length - 1,
 					lastItem = this.pathItems()[iLastIndex]
 				;
 				if (!lastItem.oExtendedProps || !lastItem.oExtendedProps.SharedWithMeAccess) {
