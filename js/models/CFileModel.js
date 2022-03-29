@@ -54,6 +54,7 @@ function CFileModel(oData, oParent)
 	this.recivedAnim = ko.observable(false).extend({'autoResetToFalse': 500});
 	this.published = ko.observable(false);
 	this.sOwnerName = Types.pString(oData.Owner);
+	this.sInitiator = Types.pString(oData.Initiator, this.sOwnerName);
 
 	CAbstractFileModel.call(this);
 
@@ -107,9 +108,9 @@ function CFileModel(oData, oParent)
 	this.iconAction('');
 	
 	this.sHeaderText = _.bind(function () {
-		if (this.sharedWithMe() && this.sOwnerName) {
+		if (this.sharedWithMe() && this.sInitiator) {
 			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
-				'OWNER': this.sOwnerName
+				'OWNER': this.sInitiator
 			});
 		} else if (this.sLastModified) {
 			var sLangConstName = this.sOwnerName !== '' ? '%MODULENAME%/INFO_OWNER_AND_DATA' : '%MODULENAME%/INFO_DATA';

@@ -43,6 +43,7 @@ function CFolderModel(oParent)
 	this.sMainAction = 'list';
 
 	this.sOwnerName = '';
+	this.sInitiator = '';
 	this.oExtendedProps = {};
 	this.sharedWithMeAccessReshare = ko.observable(false);
 	this.sharedWithMeAccessWrite = ko.observable(false);
@@ -101,6 +102,7 @@ CFolderModel.prototype.parse = function (oData)
 	}
 
 	this.sOwnerName = Types.pString(oData.Owner);
+	this.sInitiator = Types.pString(oData.Initiator, this.sOwnerName);
 	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
 	this.parseExtendedProps();
 
@@ -112,9 +114,9 @@ CFolderModel.prototype.parse = function (oData)
 	}, this);
 
 	this.sHeaderText = function () {
-		if (this.sharedWithMe() && this.sOwnerName) {
+		if (this.sharedWithMe() && this.sInitiator) {
 			return TextUtils.i18n('%MODULENAME%/INFO_SHARED_BY', {
-				'OWNER': this.sOwnerName
+				'OWNER': this.sInitiator
 			});
 		}
 		return '';
