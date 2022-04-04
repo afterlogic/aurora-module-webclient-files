@@ -228,14 +228,13 @@ function CFilesView(bPopup)
 		const
 			items = this.selector.listCheckedAndSelected(),
 			selectedItem = items.length === 1 ? items[0] : null,
-			extendedProps = selectedItem && selectedItem.oExtendedProps,
-			isSelectedFileEncrypted = !!(extendedProps && extendedProps.InitializationVector);
+			extendedProps = selectedItem && selectedItem.oExtendedProps
 		;
 		return !this.isZipFolder() &&
 				selectedItem && !selectedItem.bIsLink &&
 				(!this.sharedParentFolder() || this.sharedParentFolder().sharedWithMeAccessReshare() || selectedItem.sharedWithMeAccessReshare()) &&
 				this.allSelectedFilesReady() &&
-				(selectedItem.IS_FILE && !isSelectedFileEncrypted || !selectedItem.IS_FILE && !this.isEncryptedStorage()) &&
+				(selectedItem.IS_FILE || !this.isEncryptedStorage()) &&
 				(!selectedItem.sharedWithMe() || selectedItem.sharedWithMeAccessReshare());
 	}, this);
 	this.createPublicLinkCommand = Utils.createCommand(this, this.createPublicLink, this.isShareAllowed);
