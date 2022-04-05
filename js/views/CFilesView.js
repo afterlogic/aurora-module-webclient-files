@@ -463,7 +463,7 @@ CFilesView.prototype.initUploader = function ()
 			.on('onBodyDragLeave', _.bind(this.bDragActive, this, false))
 			.on('onCancel', _.bind(this.onCancelUpload, this))
 			.on('onDialog', _.bind(function () {
-				setTimeout(_.bind(this.isNewItemsMenuOpened, this, false), 0);
+				setTimeout(_.bind(this.isNewItemsMenuOpened, this, false), 10);
 			}, this, false))
 		;
 		
