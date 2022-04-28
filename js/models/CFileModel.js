@@ -265,7 +265,7 @@ CFileModel.prepareUploadFileData = function (oFileData, sPath, sStorageType, fGe
 	
 	while (fGetFileByName(sFileName))
 	{
-		sFileName = sFileNameWoExt + '_' + iIndex + sFileNameExt;
+		sFileName = sFileNameWoExt + ' (' + iIndex + ')' + sFileNameExt;
 		iIndex++;
 	}
 	
