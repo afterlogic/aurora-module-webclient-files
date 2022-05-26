@@ -1,4 +1,8 @@
-import settings from '../../FilesWebclient/vue/settings'
+import settings from './settings'
+
+import FilesAdminSettingsPerTenant from './components/FilesAdminSettingsPerTenant'
+import FilesAdminSettingsPerUser from './components/FilesAdminSettingsPerUser'
+
 export default {
   moduleName: 'FilesWebclient',
 
@@ -12,10 +16,10 @@ export default {
     return [
       {
         tabName: 'files',
-        title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
-        component () {
-          return import('./components/FilesAdminSettingsSystemWide')
-        }
+        tabTitle: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
+        tabRouteChildren: [
+          { path: 'files', component: () => import('./components/FilesAdminSettingsSystemWide') },
+        ],
       }
     ]
   },
@@ -24,34 +28,29 @@ export default {
     return [
       {
         tabName: 'files',
-        paths: [
-          'id/:id/files',
-          'search/:search/id/:id/files',
-          'page/:page/id/:id/files',
-          'search/:search/page/:page/id/:id/files',
+        tabTitle: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
+        tabRouteChildren: [
+          { path: 'id/:id/files', component: FilesAdminSettingsPerUser },
+          { path: 'search/:search/id/:id/files', component: FilesAdminSettingsPerUser },
+          { path: 'page/:page/id/:id/files', component: FilesAdminSettingsPerUser },
+          { path: 'search/:search/page/:page/id/:id/files', component: FilesAdminSettingsPerUser },
         ],
-        title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
-        component () {
-          return import('./components/FilesAdminSettingsPerUser')
-        }
-      }
+      },
     ]
   },
+
   getAdminTenantTabs () {
     return [
       {
         tabName: 'files',
-        paths: [
-          'id/:id/files',
-          'search/:search/id/:id/files',
-          'page/:page/id/:id/files',
-          'search/:search/page/:page/id/:id/files',
+        tabTitle: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
+        tabRouteChildren: [
+          { path: 'id/:id/files', component: FilesAdminSettingsPerTenant },
+          { path: 'search/:search/id/:id/files', component: FilesAdminSettingsPerTenant },
+          { path: 'page/:page/id/:id/files', component: FilesAdminSettingsPerTenant },
+          { path: 'search/:search/page/:page/id/:id/files', component: FilesAdminSettingsPerTenant },
         ],
-        title: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
-        component () {
-          return import('./components/FilesAdminSettingsPerTenant')
-        }
-      }
+      },
     ]
   },
 }
