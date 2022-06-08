@@ -1,38 +1,76 @@
 {
-    "Disabled": [
-		false,
-		"bool"
-	],
-	"EditFileNameWithoutExtension": [
-		false,
-		"bool"
-	],
-	"ShowCommonSettings": [
-		false,
-		"bool"
-	],
-    "ServerUrlRewriteBase": [
-		false,
-		"bool"
-	],
-    "ServerUseUrlRewrite": [
-		false,
-		"bool"
-	],
-	"ShowFilesApps": [
-		true,
-		"bool"
-	],
-	"BottomLeftCornerLinks": [
-		[],
-		"array"
-	],
-    "AvailableFor": [
-		["MailWebclient"],
-		"array"
-	],
-	"PublicLinksEnabled": [
-		true,
-		"bool"
-	]
+  "Disabled": [
+    false,
+    "bool"
+  ],
+  "Disabled_Description": [
+    "",
+    "string"
+  ],
+  "EditFileNameWithoutExtension": [
+    false,
+    "bool"
+  ],
+  "EditFileNameWithoutExtension_Description": [
+    "",
+    "string"
+  ],
+  "ShowCommonSettings": [
+    false,
+    "bool"
+  ],
+  "ShowCommonSettings_Description": [
+    "",
+    "string"
+  ],
+  "ServerUrlRewriteBase": [
+    false,
+    "bool"
+  ],
+  "ServerUrlRewriteBase_Description": [
+    "",
+    "string"
+  ],
+  "ServerUseUrlRewrite": [
+    false,
+    "bool"
+  ],
+  "ServerUseUrlRewrite_Description": [
+    "",
+    "string"
+  ],
+  "ShowFilesApps": [
+    true,
+    "bool"
+  ],
+  "ShowFilesApps_Description": [
+    "",
+    "string"
+  ],
+  "BottomLeftCornerLinks": [
+    [],
+    "array"
+  ],
+  "BottomLeftCornerLinks_Description": [
+    "",
+    "string"
+  ],
+  "AvailableFor": [
+    [
+      "MailWebclient"
+    ],
+    "array"
+  ],
+  "AvailableFor_Description": [
+    "",
+    "string"
+  ],
+  "PublicLinksEnabled": [
+    true,
+    "bool"
+  ],
+  "PublicLinksEnabled_Description": [
+    "",
+    "string"
+  ]
 }
