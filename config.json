@@ -4,7 +4,7 @@
 		"bool"
 	],
 	"Disabled_Description": [
-		"",
+		"Setting to true disables the module",
 		"string"
 	],
 	"EditFileNameWithoutExtension": [
@@ -12,7 +12,7 @@
 		"bool"
 	],
 	"EditFileNameWithoutExtension_Description": [
-		"",
+		"If true, only filename can be changed when renaming file while extension is kept intact",
 		"string"
 	],
 	"ShowCommonSettings": [
@@ -20,7 +20,7 @@
 		"bool"
 	],
 	"ShowCommonSettings_Description": [
-		"",
+		"If true, allow for changing basic settings of files functionality, such as enabling table view and preview pane",
 		"string"
 	],
 	"ServerUrlRewriteBase": [
@@ -44,7 +44,7 @@
 		"bool"
 	],
 	"ShowFilesApps_Description": [
-		"",
+		"Enables displaying information on desktop and mobile file storage apps in Files tab of Settings screen",
 		"string"
 	],
 	"BottomLeftCornerLinks": [
@@ -62,7 +62,7 @@
 		"array"
 	],
 	"AvailableFor_Description": [
-		"",
+		"Automatically provide this feature if one of the listed modules is requested by the entry point",
 		"string"
 	],
 	"PublicLinksEnabled": [
@@ -70,7 +70,7 @@
 		"bool"
 	],
 	"PublicLinksEnabled_Description": [
-		"",
+		"If true, allows for creating basic Public links in addition to secure ones",
 		"string"
 	]
 }
