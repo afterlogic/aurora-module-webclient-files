@@ -49,6 +49,10 @@ function CFolderModel(oParent)
 	this.sharedWithMeAccessWrite = ko.observable(false);
 	this.sharedWithMe = ko.observable(false);
 	this.sharedWithOthers = ko.observable(false); // can be changed by other modules
+	this.readOnly = ko.computed(function () {
+		// save mail attachment to files functionality needs this CSS class
+		return this.sharedWithMe() && !this.sharedWithMeAccessWrite();
+	}, this);
 
 	// The folder can be uploading. Operations should be disabled for such a folder.
 	this.uploadingFilesCount = ko.observable(0);

@@ -280,10 +280,22 @@
 
 .popup.files {
 	.popup_panel {
-		height: 400px;
+		min-height: 400px;
+		min-width: 700px;
+		height: 60%;
 		max-width: 100%;
-		padding-bottom: 62px; //own padding + buttons height;
-		width: 840px;
+		padding-bottom: 58px; //own padding + buttons height;
+		width: 80%;
+
+		.image {
+			border-bottom: 0;
+		}
+
+		.popup_select_from_files& .panel.files .items_list .item {
+			.file_shared_icon, .file_published_icon {
+				display: none;
+			}
+		}
 
 		.panels {
 			border: 1px solid #cccccc;
@@ -328,8 +340,4 @@
 			border-bottom: 0;
 		}
 	}
-}
-
-.popup.files .popup_panel .image {
-	border-bottom: 0;
 }

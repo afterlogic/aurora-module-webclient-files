@@ -1,13 +1,11 @@
 'use strict';
 
-var
+const
 	_ = require('underscore'),
-	$ = require('jquery'),
-	
+
 	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js'),
-	
-	CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js'),
-	CFileModel = require('modules/%ModuleName%/js/models/CFileModel.js')
+
+	CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js')
 ;
 
 /**
@@ -16,10 +14,11 @@ var
 function CSelectFilesPopup()
 {
 	CAbstractPopup.call(this);
-	
-	this.oFilesView = new CFilesView(true);
-	this.oFilesView.onSelectClickPopupBound = _.bind(this.onSelectClick, this);
-	this.fCallback = null;
+
+	this.callbackHandler = () => {};
+
+	this.filesView = new CFilesView(true);
+	this.filesView.onSelectClickPopupBound = _.bind(this.selectFiles, this);
 }
 
 _.extendOwn(CSelectFilesPopup.prototype, CAbstractPopup.prototype);
@@ -27,36 +26,27 @@ _.extendOwn(CSelectFilesPopup.prototype, CAbstractPopup.prototype);
 CSelectFilesPopup.prototype.PopupTemplate = '%ModuleName%_SelectFilesPopup';
 
 /**
- * @param {Function} fCallback
+ * @param {Function} callbackHandler
  */
-CSelectFilesPopup.prototype.onOpen = function (fCallback)
+CSelectFilesPopup.prototype.onOpen = function (callbackHandler)
 {
-	if ($.isFunction(fCallback))
-	{
-		this.fCallback = fCallback;
-	}
-	this.oFilesView.onShow();
+	this.callbackHandler = _.isFunction(callbackHandler) ? callbackHandler : () => {};
+
+	this.filesView.onShow();
 };
 
 CSelectFilesPopup.prototype.onBind = function ()
 {
-	this.oFilesView.onBind(this.$popupDom);
+	this.filesView.onBind(this.$popupDom);
 };
 
-CSelectFilesPopup.prototype.onSelectClick = function ()
+CSelectFilesPopup.prototype.selectFiles = function ()
 {
-	var
-		aItems = this.oFilesView.selector.listCheckedAndSelected(),
-		aFileItems = _.filter(aItems, function (oItem) {
-			return oItem instanceof CFileModel;
-		}, this)
+	const
+		selectedItems = this.filesView.selector.listCheckedAndSelected(),
+		selectedFiles = selectedItems.filter(item => item.IS_FILE)
 	;
-	
-	if (this.fCallback)
-	{
-		this.fCallback(aFileItems);
-	}
-	
+	this.callbackHandler(selectedFiles);
 	this.closePopup();
 };
 

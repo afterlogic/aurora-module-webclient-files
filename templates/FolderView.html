@@ -3,7 +3,8 @@
 		draggablePlace: allowDrag() ? function (file, ctrlOrCmdUsed) { return $parent.dragAndDropHelper(file, ctrlOrCmdUsed); } : null,
 		draggableDragStartCallback: function() { if (allowDrag()) $root.dragover(true); },
 		draggableDragStopCallback: function() { if (allowDrag()) $root.dragover(false); },
-		css: { 'selected': selected, 'checked': checked, 'deleted': deleted, 'published': published, 'incomplete': isIncomplete }">
+		css: { 'selected': selected, 'checked': checked, 'deleted': deleted,
+		'published': published, 'incomplete': isIncomplete, 'readonly': readOnly }">
 
 	<!-- ko if: (sHeaderText.length > 0) -->
 	<span class="header" data-bind="text: sHeaderText"></span>

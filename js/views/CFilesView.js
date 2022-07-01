@@ -46,7 +46,7 @@ var
 * @constructor
 * @param {boolean=} bPopup = false
 */
-function CFilesView(bPopup)
+function CFilesView(bPopup, allowSelect = true)
 {
 	CAbstractScreenView.call(this, '%ModuleName%');
 	
@@ -127,8 +127,9 @@ function CFilesView(bPopup)
 	this.columnCount = ko.observable(1);
 	
 	this.selector = new CSelector(this.collection, _.bind(this.onItemSelect, this),
-		_.bind(this.onItemDelete, this), _.bind(this.onItemDblClick, this), _.bind(this.onEnter, this), this.columnCount, true, true, true);
-		
+		_.bind(this.onItemDelete, this), _.bind(this.onItemDblClick, this), _.bind(this.onEnter, this),
+		this.columnCount, true, true, true, false, allowSelect);
+
 	this.firstSelectedFile = ko.computed(function () {
 		return _.find(this.selector.listCheckedAndSelected(), function (oItem) {
 			return oItem.IS_FILE;
