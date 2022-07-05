@@ -50,6 +50,8 @@ function CFilesView(bPopup, allowSelect = true)
 {
 	CAbstractScreenView.call(this, '%ModuleName%');
 	
+	this.disableRoute = false; // can be changed outside
+	
 	this.browserTitle = ko.observable(TextUtils.i18n('%MODULENAME%/HEADING_BROWSER_TAB'));
 	
 	this.bAllowSendEmails = _.isFunction(ComposeMessageWithAttachments);
@@ -473,12 +475,11 @@ CFilesView.prototype.initUploader = function ()
 };
 
 /**
- * Creates new attachment for upload.
+ * Checks if the file size less than upload limit
  *
- * @param {string} sFileUid
  * @param {Object} oFileData
  */
-CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
+CFilesView.prototype.isFileSizeLessThanUploadLimit = function (oFileData)
 {
 	if (Settings.EnableUploadSizeLimit && oFileData.Size/(1024*1024) > Settings.UploadSizeLimitMb)
 	{
@@ -487,7 +488,20 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 		]);
 		return false;
 	}
-	
+	return true;
+};
+
+/**
+ * Checks if the file can be uploaded
+ *
+ * @param {Object} oFileData
+ */
+CFilesView.prototype.isFileCanBeUploaded = function (oFileData)
+{
+	if (!this.isFileSizeLessThanUploadLimit(oFileData)) {
+		return false;
+	}
+
 	if (this.storageType() === Enums.FileStorageType.Personal && Types.isPositiveNumber(this.quota()))
 	{
 		if (this.quota() > 0 && this.used() + oFileData.Size > this.quota())
@@ -498,7 +512,22 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 			return false;
 		}
 	}
-	
+
+	return true;
+};
+
+/**
+ * Creates new attachment for upload.
+ *
+ * @param {string} sFileUid
+ * @param {Object} oFileData
+ */
+CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
+{
+	if (!this.isFileCanBeUploaded(oFileData)) {
+		return false;
+	}
+
 	if (this.searchPattern() === '')
 	{
 		var 
@@ -519,7 +548,10 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 		oFile.onUploadSelect(sFileUid, oFileData, true);
 		this.uploadingFiles.push(oFile);
 		this.onFileFromSubfolderUploadSelect(oFileData);
+
+		return true;
 	}
+	return false;
 };
 
 /**
@@ -1444,6 +1476,10 @@ CFilesView.prototype.currentGetFiles = function ()
  */
 CFilesView.prototype.routeFiles = function (sStorage, sFullPath, sSearch, bNotLoading)
 {
+	if (this.disableRoute) {
+		return;
+	}
+
 	var bSame = false;
 	
 	if (this.bPublic)
