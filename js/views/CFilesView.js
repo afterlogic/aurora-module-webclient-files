@@ -475,30 +475,17 @@ CFilesView.prototype.initUploader = function ()
 };
 
 /**
- * Checks if the file size less than upload limit
- *
- * @param {Object} oFileData
- */
-CFilesView.prototype.isFileSizeLessThanUploadLimit = function (oFileData)
-{
-	if (Settings.EnableUploadSizeLimit && oFileData.Size/(1024*1024) > Settings.UploadSizeLimitMb)
-	{
-		Popups.showPopup(AlertPopup, [
-			TextUtils.i18n('%MODULENAME%/ERROR_SIZE_LIMIT', {'FILENAME': oFileData.FileName, 'SIZE': Settings.UploadSizeLimitMb})
-		]);
-		return false;
-	}
-	return true;
-};
-
-/**
  * Checks if the file can be uploaded
  *
  * @param {Object} oFileData
  */
 CFilesView.prototype.isFileCanBeUploaded = function (oFileData)
 {
-	if (!this.isFileSizeLessThanUploadLimit(oFileData)) {
+	if (Settings.EnableUploadSizeLimit && oFileData.Size/(1024*1024) > Settings.UploadSizeLimitMb)
+	{
+		Popups.showPopup(AlertPopup, [
+			TextUtils.i18n('%MODULENAME%/ERROR_SIZE_LIMIT', {'FILENAME': oFileData.FileName, 'SIZE': Settings.UploadSizeLimitMb})
+		]);
 		return false;
 	}
 
@@ -530,8 +517,9 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 
 	if (this.searchPattern() === '')
 	{
-		var 
-			oData = CFileModel.prepareUploadFileData(oFileData, this.currentPath(), this.storageType(), _.bind(function (sFileName) {
+		let oFile = this.getUploadFileByUid(sFileUid);
+		if (!oFile) {
+			const oData = CFileModel.prepareUploadFileData(oFileData, this.currentPath(), this.storageType(), _.bind(function (sFileName) {
 				if (this.getFileByName(sFileName))
 				{
 					return true;
@@ -542,9 +530,9 @@ CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
 						return oItem.fileName() === sFileName;
 					});
 				}
-			}, this)),
-			oFile = new CFileModel(oData, this)
-		;
+			}, this));
+			oFile = new CFileModel(oData, this);
+		}
 		oFile.onUploadSelect(sFileUid, oFileData, true);
 		this.uploadingFiles.push(oFile);
 		this.onFileFromSubfolderUploadSelect(oFileData);
