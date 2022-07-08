@@ -507,35 +507,39 @@ CFilesView.prototype.isFileCanBeUploaded = function (oFileData)
  * Creates new attachment for upload.
  *
  * @param {string} sFileUid
- * @param {Object} oFileData
+ * @param {Object} fileData
  */
-CFilesView.prototype.onFileUploadSelect = function (sFileUid, oFileData)
+CFilesView.prototype.onFileUploadSelect = function (sFileUid, fileData)
 {
-	if (!this.isFileCanBeUploaded(oFileData)) {
+	if (!this.isFileCanBeUploaded(fileData)) {
 		return false;
 	}
 
-	if (this.searchPattern() === '')
-	{
-		let oFile = this.getUploadFileByUid(sFileUid);
-		if (!oFile) {
-			const oData = CFileModel.prepareUploadFileData(oFileData, this.currentPath(), this.storageType(), _.bind(function (sFileName) {
-				if (this.getFileByName(sFileName))
-				{
+	if (this.searchPattern() === '') {
+		const
+			getFileByName = fileName => {
+				if (this.getFileByName(fileName)) {
 					return true;
-				}
-				else
-				{
+				} else {
 					return !!_.find(this.getUploadingFiles(), function (oItem) {
-						return oItem.fileName() === sFileName;
+						return oItem.fileName() === fileName;
 					});
 				}
-			}, this));
-			oFile = new CFileModel(oData, this);
+			},
+			storage = this.storageType(),
+			path = this.currentPath(),
+			correctedData = CFileModel.prepareUploadFileData(fileData, path, storage, getFileByName)
+		;
+		let file = this.getUploadFileByUid(sFileUid);
+		if (file) {
+			file.fileName(correctedData.Name);
+			file.fullPath(correctedData.FullPath);
+		} else {
+			file = new CFileModel(correctedData, this);
 		}
-		oFile.onUploadSelect(sFileUid, oFileData, true);
-		this.uploadingFiles.push(oFile);
-		this.onFileFromSubfolderUploadSelect(oFileData);
+		file.onUploadSelect(sFileUid, fileData, true);
+		this.uploadingFiles.push(file);
+		this.onFileFromSubfolderUploadSelect(fileData);
 
 		return true;
 	}
