@@ -28,7 +28,7 @@
 		"bool"
 	],
 	"ServerUrlRewriteBase_Description": [
-		"",
+		"Used for providing short URLs e.g. for file downloads, requires supplying rewrite rules in webserver config",
 		"string"
 	],
 	"ServerUseUrlRewrite": [
@@ -36,7 +36,7 @@
 		"bool"
 	],
 	"ServerUseUrlRewrite_Description": [
-		"",
+		"Rewrite base for short URLs",
 		"string"
 	],
 	"ShowFilesApps": [
@@ -52,7 +52,7 @@
 		"array"
 	],
 	"BottomLeftCornerLinks_Description": [
-		"",
+		"Defines custom links shown at the bottom of left pane in Files",
 		"string"
 	],
 	"AvailableFor": [
