@@ -1,5 +1,5 @@
 <div class="screen FileStorageLayout no-public" style="display: none;">
-	<div class="panels" data-bind="splitterFlex: {name: 'files_list', sizes: [20, 80]}">
+	<div class="panels" data-bind="splitterFlex: {storagePrefix: 'aurora_files_', sizes: [20, 80]}">
 		<div class="panel left_panel storages_panel">
 			<div class="panel_content">
 				<span class="buttons big_single_button" data-bind="dropdown: { close: isNewItemsMenuOpened }, css: { 'disabled': !isCreateAllowed() }">
