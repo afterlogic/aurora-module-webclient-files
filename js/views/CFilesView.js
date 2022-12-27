@@ -461,6 +461,7 @@ CFilesView.prototype.initUploader = function ()
 			.on('onSelect', _.bind(this.onFileUploadSelect, this))
 			.on('onStart', _.bind(this.onFileUploadStart, this))
 			.on('onDrop', _.bind(this.onDrop, this))
+			.on('onEmptyFolderDrop', this.onEmptyFolderDrop.bind(this))
 			.on('onComplete', _.bind(this.onFileUploadComplete, this))
 			.on('onBodyDragEnter', _.bind(this.bDragActive, this, true))
 			.on('onBodyDragLeave', _.bind(this.bDragActive, this, false))
@@ -700,6 +701,19 @@ CFilesView.prototype.onFileWithSubfolderUploadComplete = function (oFile)
 		{
 			oFolder.increaseUploadedFiles();
 		}
+	}
+};
+
+CFilesView.prototype.onEmptyFolderDrop = function (folderData)
+{
+	if (folderData && folderData.fullPath) {
+		const folderName = folderData.fullPath.charAt(0) === '/' ? folderData.fullPath.substr(1) : folderData.fullPath;
+		Ajax.send('CreateFolder', {
+				'Type': this.storageType(),
+				'Path': this.currentPath(),
+				'FolderName': folderData.fullPath
+			}, this.onCreateFolderResponse, this
+		);
 	}
 };
 
