@@ -389,7 +389,6 @@ function CFilesView(bPopup, allowSelect = true)
 	this.PublicLinksEnabled = Settings.PublicLinksEnabled;
 
 	this.currentFolderStatsString = ko.computed(function () {
-		console.log('currentFolderStats');
 		let
 			iSizeSelected = 0,
 			iSizeOveral = 0
