@@ -152,6 +152,12 @@ function CFilesView(bPopup, allowSelect = true)
 	this.newSearchPattern = ko.observable('');
 	this.isSearchFocused = ko.observable(false);
 
+	this.selectedFolders = ko.computed(function () {
+		return _.filter(this.selector.listCheckedAndSelected(), function (oItem) {
+			return oItem.IS_FOLDER;
+		}, this);
+	}, this);
+
 	this.selectedFiles = ko.computed(function () {
 		return _.filter(this.selector.listCheckedAndSelected(), function (oItem) {
 			return oItem.IS_FILE;
@@ -381,6 +387,28 @@ function CFilesView(bPopup, allowSelect = true)
 	}, this));
 	
 	this.PublicLinksEnabled = Settings.PublicLinksEnabled;
+
+	this.currentFolderStatsString = ko.computed(function () {
+		console.log('currentFolderStats');
+		let
+			iSizeSelected = 0,
+			iSizeOveral = 0
+		;
+		this.files().forEach((oFile) => {
+			iSizeSelected += (oFile.selected() || oFile.checked() ? oFile.size() : 0);
+			iSizeOveral += oFile.size();
+		});
+
+		return this.files().length === 0 && this.folders().length == 0 ?
+			'' : TextUtils.i18n('%MODULENAME%/CURRENT_FOLDER_STATS', {
+				'SIZE_SELECTED': TextUtils.getFriendlySize(iSizeSelected),
+				'SIZE_OVERAL': TextUtils.getFriendlySize(iSizeOveral),
+				'FILES_SELECTED': this.selectedFiles().length,
+				'FILES_OVERAL': this.files().length,
+				'FOLDERS_SELECTED': this.selectedFolders().length,
+				'FOLDERS_OVERAL': this.folders().length
+			});
+	}, this).extend({ rateLimit: { timeout: 100, method: "notifyWhenChangesStop" } });
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);

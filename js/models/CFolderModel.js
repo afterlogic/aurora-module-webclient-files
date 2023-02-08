@@ -20,6 +20,8 @@ var
 function CFolderModel(oParent)
 {
 	this.oParent = oParent;
+	// the constant is used instead of constructor.name because constructor.name can not be used in minified JS
+	this.IS_FOLDER = true;
 
 	//template
 	this.selected = ko.observable(false);
