@@ -72,13 +72,15 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
         $sName = isset($aHash['Name']) ? $aHash['Name'] : '';
         $sFullPath = \ltrim($sPath, '/') . '/' . \ltrim($sName, '/');
         $sResourceId = $sType . '/' . \ltrim($sFullPath, '/');
-        $aArgs = [
-            'UserId' => $aHash['UserId'],
-            'ResourceType' => 'file',
-            'ResourceId' => $sResourceId,
-            'Action' => $sAction
-        ];
-        $this->broadcastEvent('AddToActivityHistory', $aArgs);
+        if (isset($aHash['UserId'])) {
+            $aArgs = [
+                'UserId' => $aHash['UserId'],
+                'ResourceType' => 'file',
+                'ResourceId' => $sResourceId,
+                'Action' => $sAction
+            ];
+            $this->broadcastEvent('AddToActivityHistory', $aArgs);
+        }
 
         if ($bList) {
             $sResult = '';
