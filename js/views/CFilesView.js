@@ -368,16 +368,13 @@ function CFilesView(bPopup, allowSelect = true)
 	};
 	this.itemsViewTemplate = ko.observable(oParams.TemplateName);
 	App.broadcastEvent('Files::ChangeItemsView', oParams);
-	
-	this.addToolbarButtons = ko.observableArray([]);
-	
+
 	App.subscribeEvent('Files::ShowList', _.bind(function (oParams) {
 		if (this.shown() && oParams.Item)
 		{
 			this.routeFiles(oParams.Item.storageType(), oParams.Item.fullPath());
 		}
 	}, this));
-	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
 	
 	ConfirmPopup.opened.subscribe(_.bind(function() {
 		if (this.shown())
@@ -398,7 +395,7 @@ function CFilesView(bPopup, allowSelect = true)
 			iSizeOveral += oFile.size();
 		});
 
-		return this.files().length === 0 && this.folders().length == 0 ?
+		return this.files().length === 0 && this.folders().length === 0 ?
 			'' : TextUtils.i18n('%MODULENAME%/CURRENT_FOLDER_STATS', {
 				'SIZE_SELECTED': TextUtils.getFriendlySize(iSizeSelected),
 				'SIZE_OVERAL': TextUtils.getFriendlySize(iSizeOveral),
@@ -408,6 +405,18 @@ function CFilesView(bPopup, allowSelect = true)
 				'FOLDERS_OVERAL': this.folders().length
 			});
 	}, this).extend({ rateLimit: { timeout: 100, method: "notifyWhenChangesStop" } });
+
+	this.addToolbarButtons = ko.observableArray([]);
+	this.storageControllers = ko.observableArray();
+	this.controllers = ko.computed(() => {
+		return [...this.addToolbarButtons(), ...this.storageControllers()];
+	})
+
+	App.broadcastEvent('%ModuleName%::RegisterFilesController', (controller, place) => {
+		this.registerController(controller, place);
+	});
+
+	App.broadcastEvent('%ModuleName%::ConstructView::after', {'Name': this.ViewConstructorName, 'View': this});
 }
 
 _.extendOwn(CFilesView.prototype, CAbstractScreenView.prototype);
@@ -1388,6 +1397,12 @@ CFilesView.prototype.onShow = function ()
 	{
 		this.oJua.setDragAndDropEnabledStatus(true);
 	}
+
+	this.controllers().forEach(controller => {
+		if (typeof controller.onShow === 'function') {
+			controller.onShow();
+		}
+	});
 };
 
 CFilesView.prototype.onHide = function ()
@@ -1578,6 +1593,12 @@ CFilesView.prototype.onRoute = function (aParams)
 	{
 		this.onUserRoute(oParams);
 	}
+
+	this.controllers().forEach(controller => {
+		if (typeof controller.onRoute === 'function') {
+			controller.onRoute(oParams);
+		}
+	});
 };
 
 /**
@@ -1945,6 +1966,18 @@ CFilesView.prototype.registerToolbarButtons = function (aToolbarButtons)
 			}
 		}, this));
 		this.addToolbarButtons(_.union(this.addToolbarButtons(), aToolbarButtons));
+	}
+};
+
+/**
+ * @param {Object} controller
+ * @param {string} placeName
+ */
+CFilesView.prototype.registerController = function (controller, placeName) {
+	switch (placeName) {
+		case 'Storage':
+			this.storageControllers.push(controller);
+			break;
 	}
 };
 

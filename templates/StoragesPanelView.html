@@ -1,6 +1,6 @@
 <div class="panel_center" data-bind="customScrollbar: {x: false}">
 	<div class="scroll-inner">
-		<div class="items_list">
+		<div class="items_list collapsible">
 			<!-- ko foreach: storages -->
 			<div class="item canSelect" data-bind="css: {'selected': type === $parent.storageType()}">
 				<a href="javascript: void(0);" class="title" data-bind="
@@ -12,6 +12,11 @@
 					</span>
 				</a>
 			</div>
+			<!-- /ko -->
+			<!-- ko foreach: storageControllers -->
+				<!-- ko if: $data.ViewTemplate -->
+					<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->
+				<!-- /ko -->
 			<!-- /ko -->
 		</div>
 	</div>
