@@ -37,9 +37,10 @@ function IsSearchParam(sTemp)
  * @param {string=} sStorage
  * @param {string=} sPath
  * @param {string=} sSearch
+ * @param {object=} custom
  * @returns {Array}
  */
-LinksUtils.getFiles = function (sStorage, sPath, sSearch)
+LinksUtils.getFiles = function (sStorage, sPath, sSearch, custom = null)
 {
 	var aParams = [Settings.HashModuleName];
 	
@@ -57,7 +58,11 @@ LinksUtils.getFiles = function (sStorage, sPath, sSearch)
 	{
 		aParams.push(sSrchPref + sSearch);
 	}
-	
+
+	if (custom && custom.prefix) {
+		aParams.push(custom.prefix + custom.value);
+	}
+
 	return aParams;
 };
 
@@ -92,13 +97,14 @@ LinksUtils.parseFiles = function (aParam)
 		if (aParam.length > iIndex && IsSearchParam(aParam[iIndex]))
 		{
 			sSearch = Types.pString(aParam[iIndex].substr(sSrchPref.length));
+			iIndex++;
 		}
 	}
 	
-	return LinksUtils.getParsedParams(sStorage, sPath, sSearch);
+	return LinksUtils.getParsedParams(sStorage, sPath, sSearch, aParam[iIndex]);
 };
 
-LinksUtils.getParsedParams = function (sStorage, sPath, sSearch)
+LinksUtils.getParsedParams = function (sStorage, sPath, sSearch, custom = null)
 {
 	var
 		aPath = [],
@@ -120,7 +126,8 @@ LinksUtils.getParsedParams = function (sStorage, sPath, sSearch)
 		'Path': sPath,
 		'PathParts': aPath,
 		'Name': sName,
-		'Search': sSearch
+		'Search': sSearch,
+		'Custom': custom
 	};
 };
 
