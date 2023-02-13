@@ -1465,6 +1465,7 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 					isExternal: oStorage.IsExternal,
 					type: oStorage.Type,
 					displayName: oStorage.DisplayName,
+					hideInList: !!oStorage.HideInList,
 					droppable: ko.computed(function () {
 						return oStorage.IsDroppable && (!this.sharedParentFolder()
 								|| this.needToCopyDraggedItems()
