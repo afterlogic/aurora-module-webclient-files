@@ -32,6 +32,8 @@ module.exports = {
 	ShowCorporateFilesAdminSection: false,
 	PublicLinksEnabled: true,
 
+	Sorting: { Allow: false },
+
 	/**
 	 * Initializes settings from AppData object sections.
 	 *
@@ -57,6 +59,8 @@ module.exports = {
 
 			this.UserSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UserSpaceLimitMb, this.UserSpaceLimitMb);
 			this.TenantSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.TenantSpaceLimitMb, this.TenantSpaceLimitMb);
+
+			// this.EFilesSortField = Types.pObject(oAppDataFilesSection.SortField);
 		}
 
 		// if (!_.isEmpty(oAppDataPersonalFilesSection))
@@ -77,6 +81,7 @@ module.exports = {
 			this.ShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.ShowFilesApps);
 			this.BottomLeftCornerLinks = Types.pArray(oAppDataFilesWebclientSection.BottomLeftCornerLinks, this.BottomLeftCornerLinks);
 			this.PublicLinksEnabled = Types.pBool(oAppDataFilesWebclientSection.PublicLinksEnabled, this.PublicLinksEnabled);
+			this.Sorting = this.getSortConfig(Types.pObject(oAppDataFilesWebclientSection.FilesSortBy));
 		}
 	},
 
@@ -100,5 +105,15 @@ module.exports = {
 	updateAdminCorporate: function (iSpaceLimitMb)
 	{
 		this.CorporateSpaceLimitMb = iSpaceLimitMb;
+	},
+
+	getSortConfig: function (config)
+	{
+		return {
+			Allow: config.Allow ? true : false,
+			DisplayOptions: config.DisplayOptions || [],
+			DefaultSortBy: config.DefaultSortBy && config.Allow ? config.DefaultSortBy : 'Filename',
+			DefaultSortOrder: config.DefaultSortOrder && config.Allow ? config.DefaultSortOrder : 'Desc'
+		};
 	}
 };

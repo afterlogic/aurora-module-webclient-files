@@ -112,18 +112,61 @@ function CFilesView(bPopup, allowSelect = true)
 		return (this.currentStorage() && this.currentStorage().isExternal);
 	}, this);
 	
+	this.foldersCollection = ko.computed(function () {
+		var aFolders = this.folders();
+		
+		aFolders.sort((left, right) => {
+			let sortValue;
+			switch (this.sortBy()) {
+				case Enums.FilesSortField.Filename:
+				case Enums.FilesSortField.Size:
+					sortValue = left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1);
+					break;
+				case Enums.FilesSortField.Modified:
+					sortValue = left.iLastModified === right.iLastModified ? 0 : (left.iLastModified < right.iLastModified ? -1 : 1)
+					break;
+			}
+
+			if (this.sortBy() !== Enums.FilesSortField.Size) {
+				sortValue *= (this.sortOrder() === Enums.SortOrder.Desc ? -1 : 1);
+			}
+
+			return sortValue;
+		});
+
+		return aFolders;
+	}, this);
+
 	this.filesCollection = ko.computed(function () {
 		var aFiles = _.union(this.files(), this.getUploadingFiles());
 		
-		aFiles.sort(function(left, right) {
-			return left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1);
+		aFiles.sort((left, right) => {
+			let sortValue;
+			switch (this.sortBy()) {
+				case Enums.FilesSortField.Filename:
+					sortValue = left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1);
+					break;
+				case Enums.FilesSortField.Size:
+					sortValue = left.size() === right.size() ? 0 : (left.size() < right.size() ? -1 : 1)
+					break;
+				case Enums.FilesSortField.Modified:
+					sortValue = left.iLastModified === right.iLastModified ? 0 : (left.iLastModified < right.iLastModified ? -1 : 1)
+					break;
+			}
+
+			return sortValue * (this.sortOrder() === Enums.SortOrder.Desc ? -1 : 1);
+			// return left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1);
 		});
-		
+
+		// if (this.sortOrder() === Enums.SortOrder.Asc) {
+		// 	aFolderList = aFolderList.reverse();
+		// }
+
 		return aFiles;
 	}, this);
 	
 	this.collection = ko.computed(function () {
-		return _.union(this.folders(), this.filesCollection());
+		return _.union(this.foldersCollection(), this.filesCollection());
 	}, this);
 	
 	this.columnCount = ko.observable(1);
@@ -200,6 +243,28 @@ function CFilesView(bPopup, allowSelect = true)
 				&& this.allSelectedFilesReady() && oSelectedItem;
 	}, this);
 	this.renameCommand = Utils.createCommand(this, this.executeRename, this.isRenameAllowed);
+
+	this.bSortEnabled = Settings.Sorting && Settings.Sorting.Allow 
+		&& Settings.Sorting.DisplayOptions && Settings.Sorting.DisplayOptions.length > 0;
+
+	// Had to set it here because in Setting.init not all Enums are defined
+	Settings.Sorting.DefaultSortBy = Enums.FilesSortField[Settings.Sorting.DefaultSortBy];
+	Settings.Sorting.DefaultSortOrder = Enums.SortOrder[Settings.Sorting.DefaultSortOrder];
+
+	this.sortBy = ko.observable(Settings.Sorting.DefaultSortBy);
+	this.sortOrder = ko.observable(Settings.Sorting.DefaultSortOrder);
+
+	this.aSortList = [];
+	if (this.bSortEnabled) {
+		_.each(Enums.FilesSortField, function (iValue, sName) {
+			if (Settings.Sorting.DisplayOptions.indexOf(sName) >= 0) {
+				this.aSortList.push({
+					sText: TextUtils.i18n('%MODULENAME%/SORT_OPTION_' + sName.toUpperCase()),
+					sSortBy: iValue
+				});
+			}
+		}.bind(this));
+	}
 
 	this.itemsToDeleteCount = ko.computed(function () {
 		var sharedParentFolder = this.sharedParentFolder();
@@ -1248,6 +1313,18 @@ CFilesView.prototype.renameItem = function (sExtension, sNamePart)
 	
 	return '';
 };
+
+CFilesView.prototype.executeSort = function (sValue)
+{
+	const sCurrentSort = this.sortBy();
+	this.sortBy(sValue);
+
+	if (sCurrentSort === sValue) {
+		this.sortOrder(this.sortOrder() === Enums.SortOrder.Asc ? Enums.SortOrder.Desc : Enums.SortOrder.Asc); // Asc: 0, Desc: 1
+	} else {
+		this.sortOrder(Settings.Sorting.DefaultSortOrder);
+	}
+}
 
 CFilesView.prototype.getFileIfOnlyOneSelected = function ()
 {

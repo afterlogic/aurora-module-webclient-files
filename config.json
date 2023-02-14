@@ -72,5 +72,22 @@
 	"PublicLinksEnabled_Description": [
 		"If true, allows for creating basic Public links in addition to secure ones",
 		"string"
-	]
+	],
+    "FilesSortBy": [
+        {
+            "Allow": false,
+            "DisplayOptions": [
+                "Filename",
+                "Size",
+                "Modified"
+            ],
+            "DefaultSortBy": "Modified",
+            "DefaultSortOrder": "Asc"
+        },
+        "array"
+    ],
+    "FilesSortBy_Description": [
+        "Defines a set of rules for sorting files and folders. Filename|Size|Modified. DefaultSortOrder - Asc|Desc",
+        "string"
+    ]
 }

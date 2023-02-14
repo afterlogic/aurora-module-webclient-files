@@ -5,7 +5,7 @@
 			<input class="field" spellcheck="false" type="text" data-bind="hasfocus: isSearchFocused, value: newSearchPattern, onEnter: onSearch, valueUpdate: 'afterkeydown'" />
 		</span>
 	</span>
-	<!-- ko template: { name: '%ModuleName%_DownloadButtonView'} --><!-- /ko -->
+	<!-- ko template: { name: '%ModuleName%_Toolbar_DownloadButtonView'} --><!-- /ko -->
 	<span class="item send_files command" data-bind="visible: bAllowSendEmails, command: sendCommand, customTooltip: '%MODULENAME%/ACTION_SEND_FILES'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_SEND_FILES'}"></span>
@@ -23,6 +23,7 @@
 		<span class="hint" data-bind="text: itemsToDeleteCount, visible: isDeleteAllowed()"></span>
 		<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
 	</span>
+	<!-- ko template: {name: '%ModuleName%_Toolbar_SortButtonView', if: bSortEnabled,} --><!-- /ko -->
 	<!-- ko foreach: addToolbarButtons -->
 		<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->
 	<!-- /ko -->

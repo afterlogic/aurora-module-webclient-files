@@ -9,6 +9,7 @@ var
 
 	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	CAbstractFileModel = require('%PathToCoreWebclientModule%/js/models/CAbstractFileModel.js'),
+	CDateModel = require('%PathToCoreWebclientModule%/js/models/CDateModel.js'),
 
 	ExtendedPropsPrototype = require('modules/%ModuleName%/js/models/ExtendedPropsPrototype.js')
 ;
@@ -31,6 +32,9 @@ function CFolderModel(oParent)
 
 	this.published = ko.observable(false);
 	this.fileName = ko.observable('');
+
+	this.sLastModified = 0;
+	this.iLastModified = 0;
 
 	//onDrop
 	this.fullPath = ko.observable('');
@@ -107,6 +111,9 @@ CFolderModel.prototype.parse = function (oData)
 		this.sMainAction = Types.pString(oData.MainAction);
 	}
 
+	this.sLastModified = CFolderModel.parseLastModified(oData.LastModified);
+	this.iLastModified = Types.pInt(oData.LastModified);
+
 	this.sOwnerName = Types.pString(oData.Owner);
 	this.sInitiator = Types.pString(oData.Initiator, this.sOwnerName);
 	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
@@ -129,6 +136,22 @@ CFolderModel.prototype.parse = function (oData)
 	}.bind(this)();
 
 	App.broadcastEvent('%ModuleName%::ParseFolder::after', [this, oData]);
+};
+
+/**
+ * Parses date of last file modification.
+ * @param {number} iLastModified Date in unix fomat
+ * @returns {String}
+ */
+CFolderModel.parseLastModified = function (iLastModified)
+{
+	var oDateModel = new CDateModel();
+	if (iLastModified)
+	{
+		oDateModel.parse(iLastModified);
+		return oDateModel.getShortDate();
+	}
+	return '';
 };
 
 CFolderModel.prototype.getMainAction = function ()

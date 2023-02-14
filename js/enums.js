@@ -39,6 +39,16 @@ Enums.SharedFileAccess = {
 	'Reshare': 3
 };
 
+/**
+ * @enum {number}
+ */
+Enums.FilesSortField = {
+	'Filename': 0,
+	'Size': 1,
+	'Modified': 2
+};
+
+
 if (typeof window.Enums === 'undefined')
 {
 	window.Enums = {};
