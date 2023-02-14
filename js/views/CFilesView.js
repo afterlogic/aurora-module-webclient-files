@@ -48,6 +48,7 @@ var
 */
 function CFilesView(bPopup, allowSelect = true)
 {
+	console.log('init CFilesView');
 	CAbstractScreenView.call(this, '%ModuleName%');
 	
 	this.disableRoute = false; // can be changed outside
@@ -246,10 +247,6 @@ function CFilesView(bPopup, allowSelect = true)
 
 	this.bSortEnabled = Settings.Sorting && Settings.Sorting.Allow 
 		&& Settings.Sorting.DisplayOptions && Settings.Sorting.DisplayOptions.length > 0;
-
-	// Had to set it here because in Setting.init not all Enums are defined
-	Settings.Sorting.DefaultSortBy = Enums.FilesSortField[Settings.Sorting.DefaultSortBy];
-	Settings.Sorting.DefaultSortOrder = Enums.SortOrder[Settings.Sorting.DefaultSortOrder];
 
 	this.sortBy = ko.observable(Settings.Sorting.DefaultSortBy);
 	this.sortOrder = ko.observable(Settings.Sorting.DefaultSortOrder);

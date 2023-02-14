@@ -112,8 +112,8 @@ module.exports = {
 		return {
 			Allow: config.Allow ? true : false,
 			DisplayOptions: config.DisplayOptions || [],
-			DefaultSortBy: config.DefaultSortBy && config.Allow ? config.DefaultSortBy : 'Filename',
-			DefaultSortOrder: config.DefaultSortOrder && config.Allow ? config.DefaultSortOrder : 'Desc'
+			DefaultSortBy: config.DefaultSortBy && config.Allow ? Enums.FilesSortField[config.DefaultSortBy] : 'Filename',
+			DefaultSortOrder: config.DefaultSortOrder && config.Allow ? Enums.SortOrder[config.DefaultSortOrder] : 'Desc'
 		};
 	}
 };
