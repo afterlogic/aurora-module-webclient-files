@@ -81,7 +81,7 @@
                 "Size",
                 "Modified"
             ],
-            "DefaultSortBy": "Modified",
+            "DefaultSortBy": "Filename",
             "DefaultSortOrder": "Asc"
         },
         "array"
