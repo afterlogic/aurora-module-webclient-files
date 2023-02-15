@@ -48,7 +48,6 @@ var
 */
 function CFilesView(bPopup, allowSelect = true)
 {
-	console.log('init CFilesView');
 	CAbstractScreenView.call(this, '%ModuleName%');
 	
 	this.disableRoute = false; // can be changed outside
