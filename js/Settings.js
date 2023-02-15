@@ -112,8 +112,12 @@ module.exports = {
 		return {
 			Allow: config.Allow ? true : false,
 			DisplayOptions: config.DisplayOptions || [],
-			DefaultSortBy: config.DefaultSortBy && config.Allow ? Enums.FilesSortField[config.DefaultSortBy] : 'Filename',
-			DefaultSortOrder: config.DefaultSortOrder && config.Allow ? Enums.SortOrder[config.DefaultSortOrder] : 'Desc'
+			DefaultSortBy: config.Allow ?
+				Types.pEnum(Enums.FilesSortField[config.DefaultSortBy], Enums.FilesSortField, Enums.FilesSortField.Filename) :
+				Enums.FilesSortField.Filename,
+			DefaultSortOrder: config.Allow ?
+				Types.pEnum(Enums.SortOrder[config.DefaultSortOrder], Enums.SortOrder, Enums.SortOrder.Desc) :
+				Enums.SortOrder.Desc
 		};
 	}
 };
