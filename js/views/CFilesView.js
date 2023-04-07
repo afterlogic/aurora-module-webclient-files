@@ -45,8 +45,9 @@ var
 /**
 * @constructor
 * @param {boolean=} bPopup = false
+* @param {boolean=} allowSelect = true
 */
-function CFilesView(bPopup, allowSelect = true)
+function CFilesView(bPopup = false, allowSelect = true)
 {
 	CAbstractScreenView.call(this, '%ModuleName%');
 	
@@ -123,7 +124,7 @@ function CFilesView(bPopup, allowSelect = true)
 					sortValue = left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1);
 					break;
 				case Enums.FilesSortField.Modified:
-					sortValue = left.iLastModified === right.iLastModified ? 0 : (left.iLastModified < right.iLastModified ? -1 : 1)
+					sortValue = left.iLastModified === right.iLastModified ? 0 : (left.iLastModified < right.iLastModified ? -1 : 1);
 					break;
 			}
 
@@ -147,10 +148,10 @@ function CFilesView(bPopup, allowSelect = true)
 					sortValue = left.fileName() === right.fileName() ? 0 : (left.fileName() < right.fileName() ? -1 : 1);
 					break;
 				case Enums.FilesSortField.Size:
-					sortValue = left.size() === right.size() ? 0 : (left.size() < right.size() ? -1 : 1)
+					sortValue = left.size() === right.size() ? 0 : (left.size() < right.size() ? -1 : 1);
 					break;
 				case Enums.FilesSortField.Modified:
-					sortValue = left.iLastModified === right.iLastModified ? 0 : (left.iLastModified < right.iLastModified ? -1 : 1)
+					sortValue = left.iLastModified === right.iLastModified ? 0 : (left.iLastModified < right.iLastModified ? -1 : 1);
 					break;
 			}
 
@@ -277,6 +278,11 @@ function CFilesView(bPopup, allowSelect = true)
 	this.deleteCommand = Utils.createCommand(this, this.executeDelete, this.isDeleteAllowed);
 
 	this.needToCopyDraggedItems = ko.observable(false);
+	this.isCurrentStorageDroppable = ko.computed(function () {
+		return  !this.sharedParentFolder()
+				|| this.needToCopyDraggedItems()
+				|| this.sharedParentFolder() && this.sharedParentFolder().sharedWithMeAccessWrite();
+	}, this);
 	this.isCutAllowed = ko.computed(function () {
 		var
 			oSharedParentFolder = this.sharedParentFolder(),
@@ -471,7 +477,7 @@ function CFilesView(bPopup, allowSelect = true)
 	this.storageControllers = ko.observableArray();
 	this.controllers = ko.computed(() => {
 		return [...this.addToolbarButtons(), ...this.storageControllers()];
-	})
+	});
 
 	App.broadcastEvent('%ModuleName%::RegisterFilesController', (controller, place) => {
 		this.registerController(controller, place);
@@ -1320,7 +1326,7 @@ CFilesView.prototype.executeSort = function (sValue)
 	} else {
 		this.sortOrder(Settings.Sorting.DefaultSortOrder);
 	}
-}
+};
 
 CFilesView.prototype.getFileIfOnlyOneSelected = function ()
 {
@@ -1485,6 +1491,12 @@ CFilesView.prototype.onHide = function ()
 	{
 		this.oJua.setDragAndDropEnabledStatus(false);
 	}
+
+	this.controllers().forEach(controller => {
+		if (typeof controller.onHide === 'function') {
+			controller.onHide();
+		}
+	});
 };
 
 CFilesView.prototype.getQuota = function ()
@@ -1540,9 +1552,7 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest)
 					displayName: oStorage.DisplayName,
 					hideInList: !!oStorage.HideInList,
 					droppable: ko.computed(function () {
-						return oStorage.IsDroppable && (!this.sharedParentFolder()
-								|| this.needToCopyDraggedItems()
-								|| this.sharedParentFolder() && this.sharedParentFolder().sharedWithMeAccessWrite());
+						return oStorage.IsDroppable && this.isCurrentStorageDroppable();
 					}, this)
 				});
 			}
@@ -2029,17 +2039,12 @@ CFilesView.prototype.getCurrentFolder = function ()
 	return oFolder;
 };
 
-CFilesView.prototype.registerToolbarButtons = function (aToolbarButtons)
+CFilesView.prototype.registerToolbarButtons = function (toolbarButtonsControllers)
 {
-	if (Types.isNonEmptyArray(aToolbarButtons))
-	{
-		_.each(aToolbarButtons, _.bind(function (oToolbarButtons) {
-			if (_.isFunction(oToolbarButtons.useFilesViewData))
-			{
-				oToolbarButtons.useFilesViewData(this);
-			}
-		}, this));
-		this.addToolbarButtons(_.union(this.addToolbarButtons(), aToolbarButtons));
+	if (Types.isNonEmptyArray(toolbarButtonsControllers)) {
+		toolbarButtonsControllers.forEach(toolbarButtonsController => {
+			this.registerController(toolbarButtonsController, 'ToolbarButton');
+		});
 	}
 };
 
@@ -2048,10 +2053,20 @@ CFilesView.prototype.registerToolbarButtons = function (aToolbarButtons)
  * @param {string} placeName
  */
 CFilesView.prototype.registerController = function (controller, placeName) {
+	let isRegistered = false;
 	switch (placeName) {
 		case 'Storage':
 			this.storageControllers.push(controller);
+			isRegistered = true;
 			break;
+		case 'ToolbarButton':
+			this.addToolbarButtons.push(controller);
+			console.log('this.addToolbarButtons', this.addToolbarButtons());
+			isRegistered = true;
+			break;
+	}
+	if (isRegistered && typeof controller.useFilesViewData === 'function') {
+		controller.useFilesViewData(this);
 	}
 };
 
