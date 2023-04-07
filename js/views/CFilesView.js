@@ -449,22 +449,32 @@ function CFilesView(bPopup, allowSelect = true)
 	this.currentFolderStatsString = ko.computed(function () {
 		let
 			iSizeSelected = 0,
-			iSizeOveral = 0
+			iSizeOveral = 0,
+			sOUtput = ''
 		;
 		this.files().forEach((oFile) => {
 			iSizeSelected += (oFile.selected() || oFile.checked() ? oFile.size() : 0);
 			iSizeOveral += oFile.size();
 		});
+		sOUtput = this.files().length === 0 && this.folders().length === 0 ?
+		'' : TextUtils.i18n('%MODULENAME%/CURRENT_FOLDER_STATS', {
+			'SIZE_OVERAL': TextUtils.getFriendlySize(iSizeOveral),
+			'FILES_OVERAL': this.files().length,
+			'FOLDERS_OVERAL': this.folders().length
+		});
 
-		return this.files().length === 0 && this.folders().length === 0 ?
-			'' : TextUtils.i18n('%MODULENAME%/CURRENT_FOLDER_STATS', {
-				'SIZE_SELECTED': TextUtils.getFriendlySize(iSizeSelected),
-				'SIZE_OVERAL': TextUtils.getFriendlySize(iSizeOveral),
-				'FILES_SELECTED': this.selectedFiles().length,
-				'FILES_OVERAL': this.files().length,
-				'FOLDERS_SELECTED': this.selectedFolders().length,
-				'FOLDERS_OVERAL': this.folders().length
-			});
+		sOUtput += this.selectedFiles().length === 0 ?
+		'' : ' | ' + TextUtils.i18n('%MODULENAME%/CURRENT_FOLDER_STATS_SELECTED_FILES', {
+			'SIZE_SELECTED': TextUtils.getFriendlySize(iSizeSelected),
+			'FILES_SELECTED': this.selectedFiles().length,
+		});	
+
+		sOUtput += this.selectedFolders().length === 0 ?
+		'' : ' | ' + TextUtils.i18n('%MODULENAME%/CURRENT_FOLDER_STATS_SELECTED_FOLDERS', {
+			'FOLDERS_SELECTED': this.selectedFolders().length,
+		});
+
+		return sOUtput;
 	}, this).extend({ rateLimit: { timeout: 100, method: "notifyWhenChangesStop" } });
 
 	this.addToolbarButtons = ko.observableArray([]);
