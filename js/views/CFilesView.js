@@ -2071,7 +2071,6 @@ CFilesView.prototype.registerController = function (controller, placeName) {
 			break;
 		case 'ToolbarButton':
 			this.addToolbarButtons.push(controller);
-			console.log('this.addToolbarButtons', this.addToolbarButtons());
 			isRegistered = true;
 			break;
 	}
