@@ -7,6 +7,8 @@
 
 namespace Aurora\Modules\FilesWebclient;
 
+use Aurora\System\Application;
+
 /**
  * This module displays the web interface for managing files.
  *
@@ -20,13 +22,13 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 {
     /**
      *
-     * @var \CApiModuleDecorator
+     * @var \Aurora\Modules\Min\Module
      */
     protected $oMinModuleDecorator = null;
 
     /**
      *
-     * @var \CApiModuleDecorator
+     * @var \Aurora\Modules\Files\Module
      */
     protected $oFilesModuleDecorator = null;
 
@@ -114,7 +116,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                                     );
 
                                     $sResult = \strtr($sResult, array(
-                                        '{{AppVersion}}' => AU_APP_VERSION,
+                                        '{{AppVersion}}' => Application::GetVersion(),
                                         '{{IntegratorDir}}' => $oApiIntegrator->isRtl() ? 'rtl' : 'ltr',
                                         '{{IntegratorLinks}}' => $oApiIntegrator->buildHeadersLink(),
                                         '{{IntegratorBody}}' => $oApiIntegrator->buildBody($aConfig)
@@ -175,7 +177,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                     && isset($aHash['Type']) && isset($aHash['Path']) && isset($aHash['Name'])
                 ) {
                     $bskipCheckUserRoleStatus = \Aurora\Api::skipCheckUserRole(true);
-                    echo $this->oFilesModuleDecorator->getRawFile(
+                    $this->oFilesModuleDecorator->getRawFile(
                         null,
                         $aHash['Type'],
                         $aHash['Path'],
