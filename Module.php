@@ -51,6 +51,15 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
         $this->AddEntry('files-pub', 'EntryPub');
     }
 
+    /**
+     *
+     * @return Module
+     */
+    public static function Decorator()
+    {
+        return parent::Decorator();
+    }
+
     /***** private functions *****/
 
     /***** public functions *****/
