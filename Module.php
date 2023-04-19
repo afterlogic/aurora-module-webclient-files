@@ -16,6 +16,8 @@ use Aurora\System\Application;
  * @license https://afterlogic.com/products/common-licensing Afterlogic Software License
  * @copyright Copyright (c) 2023, Afterlogic Corp.
  *
+ * @property Settings $oModuleSettings
+ *
  * @package Modules
  */
 class Module extends \Aurora\System\Module\AbstractWebclientModule
@@ -143,9 +145,9 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                             }
                         }
                     } elseif ($aHash && isset($aHash['__hash__'], $aHash['Name'], $aHash['Size'])) {
-                        $sUrl = (bool) $this->getConfig('ServerUseUrlRewrite', false) ? '/download/' : '?/files-pub/';
+                        $sUrl = (bool) $this->oModuleSettings->ServerUseUrlRewrite ? '/download/' : '?/files-pub/';
 
-                        $sUrlRewriteBase = (string) $this->getConfig('ServerUrlRewriteBase', '');
+                        $sUrlRewriteBase = (string) $this->oModuleSettings->ServerUrlRewriteBase;
                         if (!empty($sUrlRewriteBase)) {
                             $sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
                         }
@@ -237,14 +239,14 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
         \Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
 
         $aModuleSettings = array(
-            'EditFileNameWithoutExtension' => $this->getConfig('EditFileNameWithoutExtension', false),
-            'ShowCommonSettings' => $this->getConfig('ShowCommonSettings', false),
-            'ServerUrlRewriteBase' => $this->getConfig('ServerUrlRewriteBase', false),
-            'ServerUseUrlRewrite' => $this->getConfig('ServerUseUrlRewrite', false),
-            'ShowFilesApps' => $this->getConfig('ShowFilesApps', true),
-            'BottomLeftCornerLinks' => $this->getConfig('BottomLeftCornerLinks', []),
-            'PublicLinksEnabled' => $this->getConfig('PublicLinksEnabled', true),
-            'FilesSortBy' => $this->getConfig('FilesSortBy', [])
+            'EditFileNameWithoutExtension' => $this->oModuleSettings->EditFileNameWithoutExtension,
+            'ShowCommonSettings' => $this->oModuleSettings->ShowCommonSettings,
+            'ServerUrlRewriteBase' => $this->oModuleSettings->ServerUrlRewriteBase,
+            'ServerUseUrlRewrite' => $this->oModuleSettings->ServerUseUrlRewrite,
+            'ShowFilesApps' => $this->oModuleSettings->ShowFilesApps,
+            'BottomLeftCornerLinks' => $this->oModuleSettings->BottomLeftCornerLinks,
+            'PublicLinksEnabled' => $this->oModuleSettings->PublicLinksEnabled,
+            'FilesSortBy' => $this->oModuleSettings->FilesSortBy
         );
 
         return $aModuleSettings;
