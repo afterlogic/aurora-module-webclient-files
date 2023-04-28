@@ -536,6 +536,17 @@ CFilesView.prototype.onBind = function ($popupDom) {
     $('.panel.files .items_list .files_scroll.scroll-inner', $dom)
   )
 
+  $('.files_scroll').on('click', (event) => {
+    const targetClassName = event.target?.className || ''
+    if (
+      targetClassName.includes('files_scroll') ||
+      targetClassName.includes('items_list') ||
+      targetClassName.includes('items_sub_list')
+    ) {
+      this.selector.listCheckedAndSelected(false)
+    }
+  })
+
   this.initUploader()
 
   this.hotKeysBind()
