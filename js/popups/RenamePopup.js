@@ -2,7 +2,6 @@
 
 var
 	_ = require('underscore'),
-	$ = require('jquery'),
 	ko = require('knockout'),
 	
 	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js')
@@ -46,7 +45,7 @@ CRenamePopup.prototype.onOKClick = function ()
 {
 	this.error('');
 	
-	if ($.isFunction(this.fCallback))
+	if (_.isFunction(this.fCallback))
 	{
 		var sError = this.fCallback(this.name());
 		if (sError)

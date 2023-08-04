@@ -2,7 +2,6 @@
 
 var
 	_ = require('underscore'),
-	$ = require('jquery'),
 	ko = require('knockout'),
 	
 	CAbstractPopup = require('%PathToCoreWebclientModule%/js/popups/CAbstractPopup.js')
@@ -38,7 +37,7 @@ CCreateFolderPopup.prototype.onOpen = function (fCallback)
 	this.folderName.focus(true);
 	this.folderName.error('');
 	
-	if ($.isFunction(fCallback))
+	if (_.isFunction(fCallback))
 	{
 		this.fCallback = fCallback;
 	}

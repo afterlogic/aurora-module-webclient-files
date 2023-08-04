@@ -2,7 +2,6 @@
 
 var
 	_ = require('underscore'),
-	$ = require('jquery'),
 	ko = require('knockout'),
 	
 	Utils = require('%PathToCoreWebclientModule%/js/utils/Common.js'),
@@ -77,7 +76,7 @@ CCreateLinkPopup.prototype.onCheckUrlResponse = function (oResponse, oRequest)
 
 CCreateLinkPopup.prototype.executeSave = function ()
 {
-	if ($.isFunction(this.fCallback))
+	if (_.isFunction(this.fCallback))
 	{
 		this.fCallback(this.fileItem());
 		this.link('');
