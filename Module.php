@@ -128,12 +128,12 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                         if ($oApiIntegrator) {
                             $oCoreClientModule = \Aurora\System\Api::GetModule('CoreWebclient');
                             if ($oCoreClientModule instanceof \Aurora\System\Module\AbstractModule) {
-                                $sResult = \file_get_contents($oCoreClientModule->GetPath().'/templates/Index.html');
+                                $sResult = \file_get_contents($oCoreClientModule->GetPath() . '/templates/Index.html');
                                 if (\is_string($sResult)) {
-                                    $oSettings =& \Aurora\System\Api::GetSettings();
+                                    $oSettings = &\Aurora\System\Api::GetSettings();
                                     $sFrameOptions = $oSettings->XFrameOptions;
                                     if (0 < \strlen($sFrameOptions)) {
-                                        @\header('X-Frame-Options: '.$sFrameOptions);
+                                        @\header('X-Frame-Options: ' . $sFrameOptions);
                                     }
 
                                     $aConfig = array(
@@ -155,15 +155,15 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 
                         $sUrlRewriteBase = (string) $this->oModuleSettings->ServerUrlRewriteBase;
                         if (!empty($sUrlRewriteBase)) {
-                            $sUrlRewriteBase = '<base href="'.$sUrlRewriteBase.'" />';
+                            $sUrlRewriteBase = '<base href="' . $sUrlRewriteBase . '" />';
                         }
 
                         $oModuleManager = \Aurora\System\Api::GetModuleManager();
                         $sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
-                        $sResult = \file_get_contents($this->GetPath().'/templates/FilesPub.html');
+                        $sResult = \file_get_contents($this->GetPath() . '/templates/FilesPub.html');
                         if (\is_string($sResult)) {
                             $sResult = \strtr($sResult, array(
-                                '{{Url}}' => $sUrl.$aHash['__hash__'],
+                                '{{Url}}' => $sUrl . $aHash['__hash__'],
                                 '{{FileName}}' => $aHash['Name'],
                                 '{{FileSize}}' => \Aurora\System\Utils::GetFriendlySize($aHash['Size']),
                                 '{{FileType}}' => \Aurora\System\Utils::GetFileExtension($aHash['Name']),
@@ -176,7 +176,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                     } else {
                         $oModuleManager = \Aurora\System\Api::GetModuleManager();
                         $sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
-                        $sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
+                        $sResult = \file_get_contents($this->GetPath() . '/templates/NotFound.html');
                         $sResult = \strtr($sResult, array(
                             '{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND'),
                             '{{Theme}}' => $sTheme,
@@ -228,7 +228,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                     ];
                     $this->broadcastEvent('AddToActivityHistory', $aArgs);
 
-                    $sResult = \file_get_contents($this->GetPath().'/templates/NotFound.html');
+                    $sResult = \file_get_contents($this->GetPath() . '/templates/NotFound.html');
                     $sResult = \strtr($sResult, array(
                         '{{NotFound}}' => $this->oFilesModuleDecorator->i18N('INFO_NOTFOUND')
                     ));
