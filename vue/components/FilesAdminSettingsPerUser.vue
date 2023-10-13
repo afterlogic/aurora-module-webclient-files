@@ -12,9 +12,9 @@
                 {{ $t('FILESWEBCLIENT.LABEL_USER_SPACE_LIMIT') }}
               </div>
             </div>
-            <div class="col-4">
+            <div class="col-5">
               <div class="row">
-                <q-input outlined dense class="col-4" bg-color="white" v-model="userSpaceLimitMb"/>
+                <q-input outlined dense class="col-5" bg-color="white" v-model="userSpaceLimitMb" />
                 <div class="q-ma-sm col-1" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'"></div>
               </div>
             </div>
