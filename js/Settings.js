@@ -1,7 +1,6 @@
 'use strict';
 
 var
-	ko = require('knockout'),
 	_ = require('underscore'),
 
 	Types = require('%PathToCoreWebclientModule%/js/utils/Types.js')
@@ -110,14 +109,10 @@ module.exports = {
 	getSortConfig: function (config)
 	{
 		return {
-			Allow: config.Allow ? true : false,
-			DisplayOptions: config.DisplayOptions || [],
-			DefaultSortBy: config.Allow ?
-				Types.pEnum(Enums.FilesSortField[config.DefaultSortBy], Enums.FilesSortField, Enums.FilesSortField.Filename) :
-				Enums.FilesSortField.Filename,
-			DefaultSortOrder: config.Allow ?
-				Types.pEnum(Enums.SortOrder[config.DefaultSortOrder], Enums.SortOrder, Enums.SortOrder.Desc) :
-				Enums.SortOrder.Desc
-		};
+			Allow: Types.pBool(config?.Allow),
+			DisplayOptions: config?.DisplayOptions || [],
+			DefaultSortBy: Types.pEnum(Enums.FilesSortField[config?.DefaultSortBy], Enums.FilesSortField, Enums.FilesSortField.Filename),
+			DefaultSortOrder: Types.pEnum(Enums.SortOrder[config?.DefaultSortOrder], Enums.SortOrder, Enums.SortOrder.Desc),
+		}
 	}
 };
