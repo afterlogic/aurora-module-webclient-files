@@ -89,6 +89,9 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
         \Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::Anonymous);
         $sResult = '';
         try {
+            /** @var \Aurora\Modules\Files\Module */
+            $oFilesModule = \Aurora\Api::GetModule('Files');
+
             $sHash = (string) \Aurora\System\Router::getItemByIndex(1, '');
             $sAction = (string) \Aurora\System\Router::getItemByIndex(2, 'download');
             $bSecure = \Aurora\System\Router::getItemByIndex(3, '') === 'secure';
@@ -124,9 +127,13 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                     if ($mResult) {
                         $sResult = $mResult;
                     } else {
-                        if (\is_array($aHash) && isset($aHash['IsFolder']) && $aHash['IsFolder']) {
-                            $oApiIntegrator = \Aurora\System\Managers\Integrator::getInstance();
 
+                        if (\is_array($aHash) && isset($aHash['IsFolder']) && $aHash['IsFolder']) {
+
+                            //executing this method to check access to the Files module methods
+                            $oFilesModule->GetPublicFiles($sHash, $sPath);
+
+                            $oApiIntegrator = \Aurora\System\Managers\Integrator::getInstance();
                             if ($oApiIntegrator) {
                                 $oCoreClientModule = \Aurora\System\Api::GetModule('CoreWebclient');
                                 if ($oCoreClientModule instanceof \Aurora\System\Module\AbstractModule) {
@@ -227,7 +234,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
             $sTheme = $oModuleManager->getModuleConfigValue('CoreWebclient', 'Theme');
             $sResult = \file_get_contents($this->GetPath() . '/templates/NotFound.html');
             $sResult = \strtr($sResult, array(
-                '{{NotFound}}' => $this->i18N('INFO_NOTFOUND'),
+                '{{NotFound}}' => $oFilesModule->i18N('INFO_NOTFOUND'),
                 '{{Theme}}' => $sTheme,
             ));
 
