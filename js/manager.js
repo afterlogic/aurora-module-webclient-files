@@ -81,7 +81,8 @@ module.exports = function (oAppData) {
 							'hash': Settings.HashModuleName
 						},
 						'name': '%ModuleName%_NewFile',
-						'order': '1'
+						'order': 1,
+                        'column': 2
 					});
 
 					App.broadcastEvent('RegisterNewItemElement', {
@@ -97,7 +98,8 @@ module.exports = function (oAppData) {
 							'hash': Settings.HashModuleName
 						},
 						'name': '%ModuleName%_NewFolder',
-						'order': '2'
+						'order': 5,
+                        'column': 2
 					});
 				},
 				getScreens: function () {
