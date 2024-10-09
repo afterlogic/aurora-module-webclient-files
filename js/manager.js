@@ -16,6 +16,20 @@ module.exports = function (oAppData) {
 		aToolbarButtons = [],
 		oFilesView = null
 	;
+	let filesViewInstance = null;
+	
+	const getFilesViewInstance = () => {
+		if(!filesViewInstance) {
+			const CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js');
+			filesViewInstance = new CFilesView();
+			
+			if (!App.isPublic()) {
+				filesViewInstance.registerToolbarButtons(aToolbarButtons);
+				aToolbarButtons = [];
+			}
+		}
+		return filesViewInstance;
+	};
 	
 	Settings.init(oAppData);
 
@@ -29,10 +43,7 @@ module.exports = function (oAppData) {
 		return {
 			getScreens: function () {
 				var oScreens = {};
-				oScreens[Settings.HashModuleName] = function () {
-					var CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js');
-					return new CFilesView();
-				};
+				oScreens[Settings.HashModuleName] = getFilesViewInstance;
 				return oScreens;
 			}
 		};
@@ -59,16 +70,39 @@ module.exports = function (oAppData) {
 							TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
 						]);
 					}
+
+					App.broadcastEvent('RegisterNewItemElement', {
+						'item': {
+							'title': TextUtils.i18n('%MODULENAME%/ACTION_UPLOAD_FILES'),
+							'handler': () => {
+								const filesViewInstance = getFilesViewInstance();
+								filesViewInstance.uploaderButton().find('input')[0].click();
+							},
+							'hash': Settings.HashModuleName
+						},
+						'name': '%ModuleName%_NewFile',
+						'order': '1'
+					});
+
+					App.broadcastEvent('RegisterNewItemElement', {
+						'item': {
+							'title': TextUtils.i18n('%MODULENAME%/ACTION_NEW_FOLDER'),
+							'handler': () => {
+								const filesViewInstance = getFilesViewInstance();
+								const command = filesViewInstance.createFolderCommand
+								if (command.enabled()) {
+									command();
+								}
+							},
+							'hash': Settings.HashModuleName
+						},
+						'name': '%ModuleName%_NewFolder',
+						'order': '2'
+					});
 				},
 				getScreens: function () {
 					var oScreens = {};
-					oScreens[Settings.HashModuleName] = function () {
-						var CFilesView = require('modules/%ModuleName%/js/views/CFilesView.js');
-						oFilesView = new CFilesView();
-						oFilesView.registerToolbarButtons(aToolbarButtons);
-						aToolbarButtons = [];
-						return oFilesView;
-					};
+					oScreens[Settings.HashModuleName] = getFilesViewInstance;
 					return oScreens;
 				},
 				getHeaderItem: function () {
