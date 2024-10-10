@@ -72,34 +72,32 @@ module.exports = function (oAppData) {
 					}
 
 					App.broadcastEvent('RegisterNewItemElement', {
-						'item': {
-							'title': TextUtils.i18n('%MODULENAME%/ACTION_UPLOAD_FILES'),
-							'handler': () => {
+						'title': TextUtils.i18n('%MODULENAME%/ACTION_UPLOAD_FILES'),
+						'handler': () => {
+							window.location.hash = Settings.HashModuleName;
+							setTimeout(() => {
 								const filesViewInstance = getFilesViewInstance();
 								filesViewInstance.uploaderButton().find('input')[0].click();
-							},
-							'hash': Settings.HashModuleName
+							}, 500)
 						},
-						'name': '%ModuleName%_NewFile',
+						'className': 'item_files',
 						'order': 1,
-                        'column': 2
+						'column': 2
 					});
 
 					App.broadcastEvent('RegisterNewItemElement', {
-						'item': {
-							'title': TextUtils.i18n('%MODULENAME%/ACTION_NEW_FOLDER'),
-							'handler': () => {
-								const filesViewInstance = getFilesViewInstance();
-								const command = filesViewInstance.createFolderCommand
-								if (command.enabled()) {
-									command();
-								}
-							},
-							'hash': Settings.HashModuleName
+						'title': TextUtils.i18n('%MODULENAME%/ACTION_NEW_FOLDER'),
+						'handler': () => {
+							window.location.hash = Settings.HashModuleName;
+							const filesViewInstance = getFilesViewInstance();
+							const command = filesViewInstance.createFolderCommand
+							if (command.enabled()) {
+								command();
+							}
 						},
-						'name': '%ModuleName%_NewFolder',
+						'className': 'item_files',
 						'order': 5,
-                        'column': 2
+						'column': 2
 					});
 				},
 				getScreens: function () {
