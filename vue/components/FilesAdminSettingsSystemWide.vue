@@ -14,7 +14,7 @@
                 </q-checkbox>
               </div>
             </div>
-            <div class="row">
+            <div class="row q-mb-sm">
               <div class="col-2">
                 <div class="q-my-sm">{{ $t('FILESWEBCLIENT.LABEL_UPLOAD_SIZE_LIMIT') }}</div>
               </div>
@@ -23,6 +23,14 @@
                   <q-input outlined dense class="col-4" bg-color="white" v-model="uploadSizeLimitMb"/>
                   <div class="q-ma-sm col-1" style="margin-top: 10px" v-t="'COREWEBCLIENT.LABEL_MEGABYTES'" />
                 </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2"></div>
+              <div class="col-8">
+               <q-item-label caption>
+                 {{ $t('FILESWEBCLIENT.HINT_UPLOAD_SIZE_LIMIT') }}
+               </q-item-label>
               </div>
             </div>
           </q-card-section>
