@@ -1,9 +1,12 @@
 'use strict';
 
 module.exports = function (oAppData) {
+	
 	require('modules/%ModuleName%/js/enums.js');
 
 	var
+		$ = require('jquery'),
+
 		App = require('%PathToCoreWebclientModule%/js/App.js'),
 		ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 
@@ -74,25 +77,35 @@ module.exports = function (oAppData) {
 					App.broadcastEvent('RegisterNewItemElement', {
 						'title': TextUtils.i18n('%MODULENAME%/ACTION_UPLOAD_FILES'),
 						'handler': () => {
-							window.location.hash = Settings.HashModuleName;
+							// check if we are on contacts screen or not
+							if (!window.location.hash.startsWith('#' + Settings.HashModuleName)) {
+								window.location.hash = Settings.HashModuleName
+							}
+
 							const filesViewInstance = getFilesViewInstance();
 							function clickUploaderButton() {
 								const input = filesViewInstance.uploaderButton().find('input')[0];
 								if (input) {
 									input.click();
+									// in case of Upload Button it's needed to emulate click on the button to close the menu
+									setTimeout(function () {
+										$('.tabsbar .new_button_panel')[0].click()
+									}, 0);
 								}
 							}
 
-							if(filesViewInstance.uploaderButton() && filesViewInstance.uploaderButton().find('input').length){
-								clickUploaderButton();
-							} else {
-								const uploaderButtonSubscription = filesViewInstance.uploaderButton.subscribe(() => {
-									// Using setTimeout to ensure the DOM is updated before triggering the click
-									setTimeout(() => {
-										clickUploaderButton();
-										uploaderButtonSubscription.dispose();
-									}, 0)
-								})
+							if (filesViewInstance.isCreateAllowed()) {
+								if(filesViewInstance.uploaderButton() && filesViewInstance.uploaderButton().find('input').length){
+									clickUploaderButton();
+								} else {
+									const uploaderButtonSubscription = filesViewInstance.uploaderButton.subscribe(() => {
+										// Using setTimeout to ensure the DOM is updated before triggering the click
+										setTimeout(() => {
+											clickUploaderButton();
+											uploaderButtonSubscription.dispose();
+										}, 0)
+									})
+								}
 							}
 						},
 						'className': 'item_files',
@@ -103,11 +116,15 @@ module.exports = function (oAppData) {
 					App.broadcastEvent('RegisterNewItemElement', {
 						'title': TextUtils.i18n('%MODULENAME%/ACTION_NEW_FOLDER'),
 						'handler': () => {
-							window.location.hash = Settings.HashModuleName;
+							// check if we are on contacts screen or not
+							if (!window.location.hash.startsWith('#' + Settings.HashModuleName)) {
+								window.location.hash = Settings.HashModuleName
+							}
+
 							const filesViewInstance = getFilesViewInstance();
 							const command = filesViewInstance.createFolderCommand
-							if (command.enabled()) {
-								command();
+							if (command.canExecute()) {
+								command()
 							}
 						},
 						'className': 'item_files',
