@@ -127,7 +127,7 @@ module.exports = function (oAppData) {
 								command()
 							}
 						},
-						'className': 'item_files',
+						'className': 'item_folder',
 						'order': 5,
 						'column': 2
 					});
