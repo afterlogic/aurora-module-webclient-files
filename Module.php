@@ -257,7 +257,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
             'ShowFilesApps' => $this->oModuleSettings->ShowFilesApps,
             'BottomLeftCornerLinks' => $this->oModuleSettings->BottomLeftCornerLinks,
             'PublicLinksEnabled' => $this->oModuleSettings->PublicLinksEnabled,
-            'FilesSortBy' => $this->oModuleSettings->FilesSortBy
+            'FilesSortBy' => $this->oModuleSettings->FilesSortBy,
+            'CustomTabTitle' => $this->oModuleSettings->CustomTabTitle,
         );
 
         return $aModuleSettings;

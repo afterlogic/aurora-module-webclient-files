@@ -12,7 +12,6 @@ module.exports = {
 	PersonalServerModuleName: 'PersonalFiles',
 	HashModuleName: 'files',
 
-	CustomTabTitle: '',
 	Storages: [],
 	EnableUploadSizeLimit: false,
 	PublicFolderName: '',
@@ -21,11 +20,12 @@ module.exports = {
 	UserSpaceLimitMb: 0,
 	TenantSpaceLimitMb: 0,
 	CorporateSpaceLimitMb: 0,
-
+	
 	EditFileNameWithoutExtension: false,
 	ShowCommonSettings: true,
 	ShowFilesApps: true,
 	BottomLeftCornerLinks: [],
+	CustomTabTitle: '',
 
 	ShowPersonalFilesAdminSection: false,
 	ShowCorporateFilesAdminSection: false,
@@ -49,7 +49,6 @@ module.exports = {
 
 		if (!_.isEmpty(oAppDataFilesSection))
 		{
-			this.CustomTabTitle = Types.pString(oAppDataFilesSection.CustomTabTitle, this.CustomTabTitle);
 			this.Storages = Types.pArray(oAppDataFilesSection.Storages, this.Storages);
 			this.EnableUploadSizeLimit = Types.pBool(oAppDataFilesSection.EnableUploadSizeLimit, this.EnableUploadSizeLimit);
 			this.PublicFolderName = Types.pString(oAppDataFilesSection.PublicFolderName, this.PublicFolderName);
@@ -81,6 +80,7 @@ module.exports = {
 			this.BottomLeftCornerLinks = Types.pArray(oAppDataFilesWebclientSection.BottomLeftCornerLinks, this.BottomLeftCornerLinks);
 			this.PublicLinksEnabled = Types.pBool(oAppDataFilesWebclientSection.PublicLinksEnabled, this.PublicLinksEnabled);
 			this.Sorting = this.getSortConfig(Types.pObject(oAppDataFilesWebclientSection.FilesSortBy));
+			this.CustomTabTitle = Types.pString(oAppDataFilesWebclientSection.CustomTabTitle, this.CustomTabTitle);
 		}
 	},
 

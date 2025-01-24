@@ -20,6 +20,7 @@ use Aurora\System\SettingsProperty;
  * @property array $AvailableFor
  * @property bool $PublicLinksEnabled
  * @property array $FilesSortBy
+ * @property string $CustomTabTitle
  */
 
 class Settings extends \Aurora\System\Module\Settings
@@ -97,6 +98,12 @@ class Settings extends \Aurora\System\Module\Settings
                 "array",
                 null,
                 "Defines a set of rules for sorting files and folders. Filename|Size|Modified. DefaultSortOrder - Asc|Desc"
+            ),
+            "CustomTabTitle" => new SettingsProperty(
+                "",
+                "string",
+                null,
+                "The value will be used as the tab title in the web UI",
             ),
         ];
     }
