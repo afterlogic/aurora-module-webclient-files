@@ -4,22 +4,20 @@ module.exports = function (oAppData) {
 	
 	require('modules/%ModuleName%/js/enums.js');
 
-	var
+	const
 		$ = require('jquery'),
 
 		App = require('%PathToCoreWebclientModule%/js/App.js'),
 		ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
-
 		TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 
-		Settings = require('modules/%ModuleName%/js/Settings.js'),
-
-		HeaderItemView = null,
-		
-		aToolbarButtons = [],
-		oFilesView = null
+		Settings = require('modules/%ModuleName%/js/Settings.js')
 	;
-	let filesViewInstance = null;
+	let 
+		HeaderItemView = null,
+		aToolbarButtons = [],
+		filesViewInstance = null
+	;
 	
 	const getFilesViewInstance = () => {
 		if(!filesViewInstance) {
@@ -163,24 +161,19 @@ module.exports = function (oAppData) {
 					return require('modules/%ModuleName%/js/models/CFileModel.js');
 				},
 				addFileToCurrentFolder: function (oFile) {
-					if (oFilesView)
-					{
-						oFilesView.addFileToCurrentFolder(oFile);
+					if (filesViewInstance) {
+						filesViewInstance.addFileToCurrentFolder(oFile);
 					}
 				},
 				refresh: function () {
-					if (oFilesView)
-					{
-						oFilesView.refresh();
+					if (filesViewInstance) {
+						filesViewInstance.refresh();
 					}
 				},
 				registerToolbarButtons: function (oToolbarButtons) {
-					if (oFilesView)
-					{
-						oFilesView.registerToolbarButtons([oToolbarButtons]);
-					}
-					else
-					{
+					if (filesViewInstance) {
+						filesViewInstance.registerToolbarButtons([oToolbarButtons]);
+					} else {
 						aToolbarButtons.push(oToolbarButtons);
 					}
 				}
