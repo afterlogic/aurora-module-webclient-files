@@ -436,12 +436,7 @@ function CFilesView(bPopup = false, allowSelect = true) {
   this.bInPopup = !!bPopup
   this.timerId = null
 
-  var oParams = {
-    View: this,
-    TemplateName: '%ModuleName%_ItemsView',
-  }
-  this.itemsViewTemplate = ko.observable(oParams.TemplateName)
-  App.broadcastEvent('Files::ChangeItemsView', oParams)
+  this.itemsViewTemplate = ko.observable('%ModuleName%_ItemsView')
 
   App.subscribeEvent(
     'Files::ShowList',
