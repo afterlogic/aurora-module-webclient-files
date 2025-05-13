@@ -55,6 +55,7 @@ function CFolderModel(oParent)
 	this.sharedWithMeAccessWrite = ko.observable(false);
 	this.sharedWithMe = ko.observable(false);
 	this.sharedWithOthers = ko.observable(false); // can be changed by other modules
+	this.favorite = ko.observable(false);
 	this.readOnly = ko.computed(function () {
 		// save mail attachment to files functionality needs this CSS class
 		return this.sharedWithMe() && !this.sharedWithMeAccessWrite();
@@ -106,6 +107,7 @@ CFolderModel.prototype.parse = function (oData)
 	this.path(Types.pString(oData.Path));
 	this.storageType(Types.pString(oData.Type));
 	this.id(Types.pString(oData.Id));
+	this.favorite(Types.pBool(oData.IsFavorite));
 	if (oData.MainAction)
 	{
 		this.sMainAction = Types.pString(oData.MainAction);

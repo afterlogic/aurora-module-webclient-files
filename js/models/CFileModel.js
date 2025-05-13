@@ -58,6 +58,7 @@ function CFileModel(oData, oParent)
 
 	CAbstractFileModel.call(this);
 
+	this.favorite = ko.observable(false);
 	this.oExtendedProps = Types.pObject(oData.ExtendedProps);
 	this.sharedWithMeAccessReshare = ko.observable(false);
 	this.sharedWithMeAccessWrite = ko.observable(false);
@@ -219,7 +220,8 @@ CFileModel.prototype.parse = function (oData, bPopup)
 	this.fileName(Types.pString(oData.Name));
 	this.content(Types.pString(oData.Content));
 	this.id(Types.pString(oData.Id));
-	this.published(!!oData.Published);
+	this.published(Types.pBool(oData.Published));
+	this.favorite(Types.pBool(oData.IsFavorite));
 
 	this.size(Types.pInt(oData.Size));
 	this.hash(Types.pString(oData.Hash));

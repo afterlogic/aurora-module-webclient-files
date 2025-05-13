@@ -1333,6 +1333,34 @@ CFilesView.prototype.executeSend = function () {
   }
 }
 
+CFilesView.prototype.onFavoriteClick = function (oItem) {
+  if (oItem) {
+    const methodname = oItem.favorite() ? 'RemoveFromFavorites' : 'AddToFavorites'
+    oItem.favorite(!oItem.favorite())
+    Ajax.send(
+      methodname,
+      {
+        Items: [
+          {
+            Type: 'personal',
+            Path: oItem.path(),
+            Name: oItem.fileName()
+          }
+        ]
+      },
+      function (oResponse) {
+        if (oResponse.Result) {
+          oItem.favorite(true)
+        } else {
+          oItem.favorite(false)
+          Screens.showError(TextUtils.i18n('%MODULENAME%/ERROR_FAVORITE_NOT_SET'))
+        }
+      },
+      this
+    )
+  }
+}
+
 /**
  * @param {Object} oItem
  */

@@ -1,14 +1,19 @@
 .file_states {
 	margin-top: -23px;
 	position: absolute;
-	z-index: 1;
+	right: 8px;
+	left: 8px;
+	z-index: 2;
 
-	.folder & {
-		margin-top: -35px;
-		margin-left: 18px;
-	}
+	// .folder & {
+		// margin-top: -35px;
+		// margin-left: 18px;
+	// }
 
-	.file_encrypted_icon, .file_shared_icon, .file_published_icon {
+	.file_encrypted_icon,
+	.file_shared_icon,
+	.file_published_icon,
+	.file_favorite_icon {
 		border-radius: 3px;
 		color: #ffffff;
 		cursor: pointer;
@@ -60,6 +65,40 @@
 	.file_published_icon {
 		&:before {
 			content: "\e62c";
+		}
+	}
+
+	.file_favorite_icon {
+
+		display: none;
+		color: #ccc;
+		position: absolute;
+		right: 0;
+		top: -75px;
+
+		.folder & {
+			top: -65px;
+		}
+		
+		.item:hover & {
+			display: block;
+		}
+
+		&:hover {
+			color: #ffb736;
+		}
+
+		&:before {	
+			content: "\e652";
+		}
+
+		&.favorite_set {
+			display: block;
+			color: #ffb736;
+
+			&:before {
+				content: "\e61f";
+			}
 		}
 	}
 }

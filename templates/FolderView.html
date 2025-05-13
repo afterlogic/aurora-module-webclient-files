@@ -26,6 +26,9 @@
 			<!-- ko if: published() -->
 			<span class="file_published_icon" data-bind="click: function (oItem) { $root.onShareIconClick(oItem); }"></span>
 			<!-- /ko -->
+			<!-- ko if: !$root.bPublic -->
+			<span class="file_favorite_icon" data-bind="css: {'favorite_set': favorite }, click: function (oItem) { $root.onFavoriteClick(oItem); }"></span>
+			<!-- /ko -->
 		</div>
 		<span class="name" data-bind="text: displayName()"></span>
 		<div class="footer" data-bind="visible: isIncomplete">
