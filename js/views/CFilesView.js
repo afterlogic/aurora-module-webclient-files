@@ -1349,10 +1349,12 @@ CFilesView.prototype.onFavoriteClick = function (oItem) {
         ]
       },
       function (oResponse) {
-        if (oResponse.Result) {
-          oItem.favorite(true)
+        if (oItem.favorite()) {
+          oItem.favorite(!oResponse.Result)
         } else {
-          oItem.favorite(false)
+          oItem.favorite(!!oResponse.Result)
+        }
+        if (!oResponse.Result) {
           Screens.showError(TextUtils.i18n('%MODULENAME%/ERROR_FAVORITE_NOT_SET'))
         }
       },
