@@ -1335,10 +1335,10 @@ CFilesView.prototype.executeSend = function () {
 
 CFilesView.prototype.onFavoriteClick = function (oItem) {
   if (oItem) {
-    const methodname = oItem.favorite() ? 'RemoveFromFavorites' : 'AddToFavorites'
+    const originalState = oItem.favorite()
     oItem.favorite(!oItem.favorite())
     Ajax.send(
-      methodname,
+      originalState ? 'RemoveFromFavorites' : 'AddToFavorites',
       {
         Items: [
           {
@@ -1349,7 +1349,7 @@ CFilesView.prototype.onFavoriteClick = function (oItem) {
         ]
       },
       function (oResponse) {
-        if (oItem.favorite()) {
+        if (originalState) {
           oItem.favorite(!oResponse.Result)
         } else {
           oItem.favorite(!!oResponse.Result)
