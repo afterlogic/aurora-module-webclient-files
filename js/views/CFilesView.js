@@ -351,6 +351,8 @@ function CFilesView(bPopup = false, allowSelect = true) {
     return this.isCreateAllowed() && !this.isExternalStorage() && !this.isEncryptedStorage()
   }, this)
   this.createShortcutCommand = Utils.createCommand(this, this.executeCreateShortcut, this.isCreateShortcutAllowed)
+  
+  this.checkstateCommand = Utils.createCommand(this, this.executeCheckstate)
 
   this.uploaderButton = ko.observable(null)
   this.uploaderArea = ko.observable(null)
@@ -1588,7 +1590,7 @@ CFilesView.prototype.clearAndShowLoading = function () {
   this.loading(true)
 }
 
-CFilesView.prototype.currentGetFiles = function () {
+CFilesView.prototype.currentGetFiles = function () { 
   var iPathItemsCount = this.pathItems().length,
     oParameters = {
       Type: this.storageType(),
@@ -2036,6 +2038,10 @@ CFilesView.prototype.onSearch = function () {
 
 CFilesView.prototype.clearSearch = function () {
   this.routeFiles(this.storageType(), this.currentPath())
+}
+
+CFilesView.prototype.executeCheckstate = function () {
+  this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern())
 }
 
 CFilesView.prototype.getCurrentFolder = function () {
