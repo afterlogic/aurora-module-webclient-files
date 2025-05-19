@@ -16,6 +16,7 @@ Enums.FileStorageType = {
 	'Dropbox': 'dropbox',
 	'Encrypted': 'encrypted',
 	'Trash': 'trash',
+	'Favorites': 'favorites',
 };
 
 /**

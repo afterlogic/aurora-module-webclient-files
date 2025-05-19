@@ -21,6 +21,7 @@ module.exports = {
 	TenantSpaceLimitMb: 0,
 	CorporateSpaceLimitMb: 0,
 	AllowTrash: false,
+	AllowFavorites: false,
 	
 	EditFileNameWithoutExtension: false,
 	ShowCommonSettings: true,
@@ -58,7 +59,8 @@ module.exports = {
 
 			this.UserSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UserSpaceLimitMb, this.UserSpaceLimitMb);
 			this.TenantSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.TenantSpaceLimitMb, this.TenantSpaceLimitMb);
-			this.AllowTrash =  Types.pBool(oAppDataFilesSection.AllowTrash, this.AllowTrash);
+			this.AllowTrash = Types.pBool(oAppDataFilesSection.AllowTrash, this.AllowTrash);
+			this.AllowFavorites = Types.pBool(oAppDataFilesSection.AllowFavorites, this.AllowFavorites);
 			// this.EFilesSortField = Types.pObject(oAppDataFilesSection.SortField);
 		}
 

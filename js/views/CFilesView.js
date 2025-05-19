@@ -456,6 +456,7 @@ function CFilesView(bPopup = false, allowSelect = true) {
   )
 
   this.PublicLinksEnabled = Settings.PublicLinksEnabled
+  this.bAllowFavorites = Settings.AllowFavorites
 
   this.currentFolderStatsString = ko
     .computed(function () {
