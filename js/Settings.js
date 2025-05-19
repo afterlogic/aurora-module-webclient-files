@@ -20,6 +20,7 @@ module.exports = {
 	UserSpaceLimitMb: 0,
 	TenantSpaceLimitMb: 0,
 	CorporateSpaceLimitMb: 0,
+	AllowTrash: false,
 	
 	EditFileNameWithoutExtension: false,
 	ShowCommonSettings: true,
@@ -57,7 +58,7 @@ module.exports = {
 
 			this.UserSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.UserSpaceLimitMb, this.UserSpaceLimitMb);
 			this.TenantSpaceLimitMb = Types.pNonNegativeInt(oAppDataFilesSection.TenantSpaceLimitMb, this.TenantSpaceLimitMb);
-
+			this.AllowTrash =  Types.pBool(oAppDataFilesSection.AllowTrash, this.AllowTrash);
 			// this.EFilesSortField = Types.pObject(oAppDataFilesSection.SortField);
 		}
 

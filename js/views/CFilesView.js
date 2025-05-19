@@ -1413,46 +1413,57 @@ CFilesView.prototype.executeDelete = function () {
     itemsToDelete = allowDeleteSharedItems ? items : this.selectedOwnItems(),
     itemsToDeleteCount = itemsToDelete.length
   if (!this.bPublic && itemsToDeleteCount > 0) {
-    var askAboutSharedItems = items.length !== itemsToDeleteCount,
-      hasFolder = !!_.find(itemsToDelete, function (item) {
-        return !item.IS_FILE
-      }),
-      hasFile = !!_.find(itemsToDelete, function (item) {
-        return item.IS_FILE
-      }),
-      confirmText = ''
-    if (askAboutSharedItems) {
-      confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_NOT_ALL_ITEMS_OWN')
-    } else if (hasFolder && hasFile) {
-      confirmText = TextUtils.i18n(
-        '%MODULENAME%/CONFIRM_DELETE_ITEMS_PLURAL',
-        { COUNT: itemsToDeleteCount },
-        null,
-        itemsToDeleteCount
-      )
-    } else if (hasFolder) {
-      confirmText = TextUtils.i18n(
-        '%MODULENAME%/CONFIRM_DELETE_FOLDERS_PLURAL',
-        { COUNT: itemsToDeleteCount },
-        null,
-        itemsToDeleteCount
-      )
-    } else {
-      confirmText = TextUtils.i18n(
-        '%MODULENAME%/CONFIRM_DELETE_FILES_PLURAL',
-        { COUNT: itemsToDeleteCount },
-        null,
-        itemsToDeleteCount
-      )
-    }
 
-    this.selector.useKeyboardKeys(false)
-    Popups.showPopup(ConfirmPopup, [
-      confirmText,
-      _.bind(this.deleteItems, this, itemsToDelete),
-      '',
-      TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE'),
-    ])
+    const storagesThatSupportsTrash = [
+      Enums.FileStorageType.Personal,
+      Enums.FileStorageType.Shared,
+      Enums.FileStorageType.Corporate,
+      Enums.FileStorageType.Encrypted,
+    ]      
+
+    if(Settings.AllowTrash && storagesThatSupportsTrash.indexOf(this.storageType()) !== -1) {
+      this.deleteItems(itemsToDelete, true);
+    } else {
+      var askAboutSharedItems = items.length !== itemsToDeleteCount,
+        hasFolder = !!_.find(itemsToDelete, function (item) {
+          return !item.IS_FILE
+        }),
+        hasFile = !!_.find(itemsToDelete, function (item) {
+          return item.IS_FILE
+        }),
+        confirmText = ''
+      if (askAboutSharedItems) {
+        confirmText = TextUtils.i18n('%MODULENAME%/CONFIRM_NOT_ALL_ITEMS_OWN')
+      } else if (hasFolder && hasFile) {
+        confirmText = TextUtils.i18n(
+          '%MODULENAME%/CONFIRM_DELETE_ITEMS_PLURAL',
+          { COUNT: itemsToDeleteCount },
+          null,
+          itemsToDeleteCount
+        )
+      } else if (hasFolder) {
+        confirmText = TextUtils.i18n(
+          '%MODULENAME%/CONFIRM_DELETE_FOLDERS_PLURAL',
+          { COUNT: itemsToDeleteCount },
+          null,
+          itemsToDeleteCount
+        )
+      } else {
+        confirmText = TextUtils.i18n(
+          '%MODULENAME%/CONFIRM_DELETE_FILES_PLURAL',
+          { COUNT: itemsToDeleteCount },
+          null,
+          itemsToDeleteCount
+        )
+      }
+      this.selector.useKeyboardKeys(false)
+      Popups.showPopup(ConfirmPopup, [
+        confirmText,
+        _.bind(this.deleteItems, this, itemsToDelete),
+        '',
+        TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE'),
+      ])
+    }
   }
 }
 
