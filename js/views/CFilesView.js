@@ -105,6 +105,9 @@ function CFilesView(bPopup = false, allowSelect = true) {
   this.isExternalStorage = ko.computed(function () {
     return this.currentStorage() && this.currentStorage().isExternal
   }, this)
+  this.isTrashStorage = ko.computed(function () {
+    return this.storageType() === Enums.FileStorageType.Trash
+  }, this)
 
   this.foldersCollection = ko.computed(function () {
     var aFolders = this.folders()
@@ -340,7 +343,7 @@ function CFilesView(bPopup = false, allowSelect = true) {
   this.isCreateAllowed = ko.computed(function () {
     var oSharedParentFolder = this.sharedParentFolder()
     return (
-      !this.isZipFolder() &&
+      !this.isTrashStorage() && !this.isZipFolder() &&
       ((oSharedParentFolder && oSharedParentFolder.sharedWithMeAccessWrite()) ||
         (!oSharedParentFolder && !this.isSharedStorage()))
     )
