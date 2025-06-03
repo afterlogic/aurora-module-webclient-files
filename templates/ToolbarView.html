@@ -24,8 +24,8 @@
 	</span>
 	<span class="item delete" data-bind="command: deleteCommand, customTooltip: 'COREWEBCLIENT/ACTION_DELETE'">
 		<span class="icon"></span>
-		<span class="hint" data-bind="text: itemsToDeleteCount, visible: isDeleteAllowed()"></span>
 		<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
+		<span class="hint" data-bind="text: itemsToDeleteCount, visible: isDeleteAllowed()"></span>
 	</span>
 	<!-- ko template: {name: '%ModuleName%_Toolbar_SortButtonView', if: bSortEnabled,} --><!-- /ko -->
 	<!-- ko foreach: addToolbarButtons -->
