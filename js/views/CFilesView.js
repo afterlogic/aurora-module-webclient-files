@@ -1428,7 +1428,20 @@ CFilesView.prototype.executeDelete = function () {
     ]      
 
     if(Settings.AllowTrash && storagesThatSupportsTrash.indexOf(this.storageType()) !== -1) {
-      this.deleteItems(itemsToDelete, true);
+      var hasSharedWithOthers = !!_.find(itemsToDelete, function (item) {
+        return item.sharedWithOthers();
+      })
+      if (hasSharedWithOthers) {
+        this.selector.useKeyboardKeys(false)
+        Popups.showPopup(ConfirmPopup, [
+          TextUtils.i18n('%MODULENAME%/CONFIRM_SOME_ITEMS_SHARED_WITH_OTHERS'),
+          _.bind(this.deleteItems, this, itemsToDelete),
+          '',
+          TextUtils.i18n('COREWEBCLIENT/ACTION_DELETE'),
+        ])
+      } else {
+        this.deleteItems(itemsToDelete, true)
+      }
     } else {
       var askAboutSharedItems = items.length !== itemsToDeleteCount,
         hasFolder = !!_.find(itemsToDelete, function (item) {
