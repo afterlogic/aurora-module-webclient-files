@@ -27,6 +27,11 @@
 		<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
 		<span class="hint" data-bind="text: itemsToDeleteCount, visible: isDeleteAllowed()"></span>
 	</span>
+	<span class="item restore" data-bind="command: restoreCommand, customTooltip: '%MODULENAME%/ACTION_RESTORE'">
+		<span class="icon"></span>
+		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_RESTORE'}"></span>
+		<span class="hint" data-bind="text: itemsToRestoreCount, visible: isRestoreAllowed()"></span>
+	</span>
 	<!-- ko template: {name: '%ModuleName%_Toolbar_SortButtonView', if: bSortEnabled,} --><!-- /ko -->
 	<!-- ko foreach: addToolbarButtons -->
 		<!-- ko template: { name: $data.ViewTemplate, data: $data} --><!-- /ko -->

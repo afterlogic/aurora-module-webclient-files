@@ -294,6 +294,15 @@ function CFilesView(bPopup = false, allowSelect = true) {
   }, this)
   this.deleteCommand = Utils.createCommand(this, this.executeDelete, this.isDeleteAllowed)
 
+  this.itemsToRestoreCount = ko.computed(function () {
+      return this.selector.listCheckedAndSelected().length
+  }, this)
+
+  this.isRestoreAllowed = ko.computed(function () {
+    return this.isTrashStorage() && this.itemsToRestoreCount() > 0 && this.allSelectedFilesReady()
+  }, this)
+  this.restoreCommand = Utils.createCommand(this, this.executeRestore, this.isRestoreAllowed)
+
   this.needToCopyDraggedItems = ko.observable(false)
   this.isCurrentStorageDroppable = ko.computed(function () {
     return (
@@ -1486,6 +1495,44 @@ CFilesView.prototype.executeDelete = function () {
   }
 }
 
+CFilesView.prototype.executeRestore = function () {
+  var
+    itemsToRestore = this.selector.listCheckedAndSelected() || [],
+    itemsToRestoreCount = itemsToRestore.length,
+    confirmText = TextUtils.i18n(
+      '%MODULENAME%/CONFIRM_RESTORE_ITEMS_PLURAL',
+      { COUNT: itemsToRestoreCount },
+      null,
+      itemsToRestoreCount
+    ),
+    originalPaths = [],
+    originalPathsLength = 0
+  ;
+
+  _.each(itemsToRestore, function(fileItem) {
+    if (fileItem && fileItem.oExtendedProps && fileItem.oExtendedProps.TrashOriginalPath) {
+      originalPaths.push(TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE') + fileItem.oExtendedProps.TrashOriginalPath)
+    }
+  })
+  originalPathsLength = originalPaths.length
+  originalPaths = _.first(originalPaths, 3)
+
+  if (originalPathsLength > 0) {
+    confirmText = confirmText + '<br><br>' + originalPaths.join('<br>')
+    if (originalPathsLength > 3) {
+      confirmText = confirmText + '<br>...'
+    }
+  }
+
+  this.selector.useKeyboardKeys(false)
+  Popups.showPopup(ConfirmPopup, [
+    confirmText,
+    _.bind(this.restoreItems, this, itemsToRestore),
+    '',
+    TextUtils.i18n('%MODULENAME%/ACTION_RESTORE'),
+  ])
+}
+
 CFilesView.prototype.onShow = function () {
   this.loaded(true)
 
@@ -1848,6 +1895,34 @@ CFilesView.prototype.deleteItems = function (aChecked, bOkAnswer, methodName = '
         {
           Type: sStorageType,
           Path: sPath,
+          Items: aItems,
+        },
+        this.onDeleteResponse,
+        this
+      )
+    }
+  }
+}
+
+/**
+ * @param {Array} aChecked
+ * @param {boolean} bOkAnswer
+ */
+CFilesView.prototype.restoreItems = function (aChecked, bOkAnswer) {
+  if (bOkAnswer && 0 < aChecked.length) {
+    var aItems = _.compact(
+      _.map(aChecked, function (oItem) {
+        if (oItem.id() !== '') {
+          oItem.deleted(true)
+          return oItem.id()
+        }
+        return null
+      })
+    )
+    if (aItems.length) {
+      Ajax.send(
+        'Restore',
+        {
           Items: aItems,
         },
         this.onDeleteResponse,
