@@ -1617,6 +1617,9 @@ CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest) {
             droppable: ko.computed(function () {
               return oStorage.IsDroppable && this.isCurrentStorageDroppable()
             }, this),
+            droppableDisabled: ko.computed(function () {
+              return !(oStorage.IsDroppable && this.isCurrentStorageDroppable())
+            }, this),
           })
         }
       },

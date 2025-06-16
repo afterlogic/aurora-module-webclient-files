@@ -54,10 +54,10 @@
 			</span>
 		</div>
 	</span>
-	
-	<span class="main_action" data-bind="visible: firstAction().length > 0">
+	<span class="main_action dragHandle" data-bind="visible: firstAction().length > 0">
 		<a class="button view" href="javascript: void(0)" data-bind="click: function () { executeAction(firstAction()); }, text: getActionText(firstAction()), clickBubble: false"></a>
 	</span>
+	
 	<div class="buttons" data-bind="visible: allowActions() && uploaded() && !uploadError() && statusText().length === 0 && !downloading() && !visibleProgress()">
 		<a class="button download" href="javascript: void(0)" data-bind="visible: secondAction().length > 0, 
 			click: function () { executeAction(secondAction()); }, text: getActionText(secondAction()), clickBubble: false"></a>

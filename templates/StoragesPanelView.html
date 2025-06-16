@@ -5,7 +5,12 @@
 				<!-- ko if: !hideInList -->
 				<div class="item canSelect" data-bind="css: {'selected': type === $parent.storageType()}">
 					<a href="javascript: void(0);" class="title" data-bind="
-						droppable: {valueFunc: droppable() ? function (oEvent, oUi) {$parent.filesDrop($data, oEvent, oUi);} : null},
+						droppable: {
+							valueFunc: function (oEvent, oUi) {
+								$parent.filesDrop($data, oEvent, oUi);
+							},
+							switchObserv: droppableDisabled
+						},
 						click: function () { $parent.routeFiles(type); }">
 						<span class="name">
 							<span class="icon" data-bind="css: 'type' + type"></span>
