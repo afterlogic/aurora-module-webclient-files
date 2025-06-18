@@ -28,7 +28,8 @@ const CreateFolderPopup = require('modules/%ModuleName%/js/popups/CreateFolderPo
   Ajax = require('modules/%ModuleName%/js/Ajax.js'),
   Settings = require('modules/%ModuleName%/js/Settings.js'),
   CFileModel = require('modules/%ModuleName%/js/models/CFileModel.js'),
-  CFolderModel = require('modules/%ModuleName%/js/models/CFolderModel.js')
+  CFolderModel = require('modules/%ModuleName%/js/models/CFolderModel.js'),
+  CStorageModel = require('modules/%ModuleName%/js/models/CStorageModel.js')
 
 const FilesSharePopup = ModulesManager.run('SharedFiles', 'getFilesSharePopup'),
   ComposeMessageWithAttachments = ModulesManager.run('MailWebclient', 'getComposeMessageWithAttachments')
@@ -1605,26 +1606,13 @@ CFilesView.prototype.requestStorages = function () {
 CFilesView.prototype.onGetStoragesResponse = function (oResponse, oRequest) {
   var oResult = oResponse.Result
   if (oResult) {
-    _.each(
-      oResult,
-      function (oStorage) {
-        if (oStorage.Type && !this.getStorageByType(oStorage.Type)) {
-          this.storages.push({
-            isExternal: oStorage.IsExternal,
-            type: oStorage.Type,
-            displayName: oStorage.DisplayName,
-            hideInList: !!oStorage.HideInList,
-            droppable: ko.computed(function () {
-              return oStorage.IsDroppable && this.isCurrentStorageDroppable()
-            }, this),
-            droppableDisabled: ko.computed(function () {
-              return !(oStorage.IsDroppable && this.isCurrentStorageDroppable())
-            }, this),
-          })
-        }
-      },
-      this
-    )
+    _.each(oResult, function (oStorage) {
+      if (oStorage.Type && !this.getStorageByType(oStorage.Type)) {
+        var oStorageModel = new CStorageModel(this.isCurrentStorageDroppable);
+        oStorageModel.parse(oStorage)
+        this.storages.push(oStorageModel);
+      }
+    }, this)
 
     this.expungeExternalStorages(
       _.map(
