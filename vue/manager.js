@@ -25,7 +25,7 @@ export default {
   },
 
   getAdminUserTabs () {
-    return [
+    return settings.getFilesSettings().showUserSpaceLimit ? [
       {
         tabName: 'files',
         tabTitle: 'FILESWEBCLIENT.HEADING_BROWSER_TAB',
@@ -36,7 +36,7 @@ export default {
           { path: 'search/:search/page/:page/id/:id/files', component: FilesAdminSettingsPerUser },
         ],
       },
-    ]
+    ] : []
   },
 
   getAdminTenantTabs () {

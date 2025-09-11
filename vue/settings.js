@@ -7,6 +7,7 @@ class FilesSettings {
     const corporateFilesData = typesUtils.pObject(appData.CorporateFiles)
     this.enableUploadSizeLimit = typesUtils.pBool(filesData.EnableUploadSizeLimit)
     this.uploadSizeLimitMb = typesUtils.pNonNegativeInt(filesData.UploadSizeLimitMb)
+    this.showUserSpaceLimit = typesUtils.pBool(filesData.ShowUserSpaceLimit)
     this.userSpaceLimitMb = typesUtils.pNonNegativeInt(filesData.UserSpaceLimitMb)
     this.tenantSpaceLimitMb = typesUtils.pNonNegativeInt(filesData.TenantSpaceLimitMb)
     this.showCorporateFilesAdminSection = true
@@ -41,6 +42,7 @@ export default {
       enableUploadSizeLimit: settings.enableUploadSizeLimit,
       uploadSizeLimitMb: settings.uploadSizeLimitMb,
       tenantSpaceLimitMb: settings.tenantSpaceLimitMb,
+      showUserSpaceLimit: settings.showUserSpaceLimit,
       userSpaceLimitMb: settings.userSpaceLimitMb,
       corporateSpaceLimitMb: settings.corporateSpaceLimitMb,
     }
