@@ -63,14 +63,11 @@ module.exports = function (oAppData) {
 		{
 			return {
 				start: function (ModulesManager) {
-					if (Settings.ShowCommonSettings || Settings.ShowFilesApps)
-					{
-						ModulesManager.run('SettingsWebclient', 'registerSettingsTab', [
-							function () { return require('modules/%ModuleName%/js/views/FilesSettingsFormView.js'); },
-							Settings.HashModuleName,
-							TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
-						]);
-					}
+					ModulesManager.run('SettingsWebclient', 'registerSettingsTab', [
+						function () { return require('modules/%ModuleName%/js/views/FilesSettingsFormView.js'); },
+						Settings.HashModuleName,
+						TextUtils.i18n('%MODULENAME%/LABEL_SETTINGS_TAB')
+					]);
 
 					App.broadcastEvent('RegisterNewItemElement', {
 						'title': TextUtils.i18n('%MODULENAME%/ACTION_UPLOAD_FILES'),

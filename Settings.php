@@ -12,10 +12,8 @@ use Aurora\System\SettingsProperty;
 /**
  * @property bool $Disabled
  * @property bool $EditFileNameWithoutExtension
- * @property bool $ShowCommonSettings
  * @property bool $ServerUrlRewriteBase
  * @property bool $ServerUseUrlRewrite
- * @property bool $ShowFilesApps
  * @property array $BottomLeftCornerLinks
  * @property array $AvailableFor
  * @property bool $PublicLinksEnabled
@@ -40,12 +38,6 @@ class Settings extends \Aurora\System\Module\Settings
                 null,
                 "If true, only filename can be changed when renaming file while extension is kept intact",
             ),
-            "ShowCommonSettings" => new SettingsProperty(
-                false,
-                "bool",
-                null,
-                "If true, allow for changing basic settings of files functionality, such as enabling table view and preview pane",
-            ),
             "ServerUrlRewriteBase" => new SettingsProperty(
                 false,
                 "bool",
@@ -57,12 +49,6 @@ class Settings extends \Aurora\System\Module\Settings
                 "bool",
                 null,
                 "Rewrite base for short URLs",
-            ),
-            "ShowFilesApps" => new SettingsProperty(
-                true,
-                "bool",
-                null,
-                "Enables displaying information on desktop and mobile file storage apps in Files tab of Settings screen",
             ),
             "BottomLeftCornerLinks" => new SettingsProperty(
                 [],

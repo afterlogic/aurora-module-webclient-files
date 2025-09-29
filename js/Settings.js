@@ -24,8 +24,6 @@ module.exports = {
 	AllowFavorites: false,
 	
 	EditFileNameWithoutExtension: false,
-	ShowCommonSettings: true,
-	ShowFilesApps: true,
 	BottomLeftCornerLinks: [],
 	CustomTabTitle: '',
 
@@ -78,8 +76,6 @@ module.exports = {
 		if (!_.isEmpty(oAppDataFilesWebclientSection))
 		{
 			this.EditFileNameWithoutExtension = Types.pBool(oAppDataFilesWebclientSection.EditFileNameWithoutExtension, this.EditFileNameWithoutExtension);
-			this.ShowCommonSettings = Types.pBool(oAppDataFilesWebclientSection.ShowCommonSettings, this.ShowCommonSettings);
-			this.ShowFilesApps = Types.pBool(oAppDataFilesWebclientSection.ShowFilesApps, this.ShowFilesApps);
 			this.BottomLeftCornerLinks = Types.pArray(oAppDataFilesWebclientSection.BottomLeftCornerLinks, this.BottomLeftCornerLinks);
 			this.PublicLinksEnabled = Types.pBool(oAppDataFilesWebclientSection.PublicLinksEnabled, this.PublicLinksEnabled);
 			this.Sorting = this.getSortConfig(Types.pObject(oAppDataFilesWebclientSection.FilesSortBy));

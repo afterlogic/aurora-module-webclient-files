@@ -251,10 +251,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 
         $aModuleSettings = array(
             'EditFileNameWithoutExtension' => $this->oModuleSettings->EditFileNameWithoutExtension,
-            'ShowCommonSettings' => $this->oModuleSettings->ShowCommonSettings,
             'ServerUrlRewriteBase' => $this->oModuleSettings->ServerUrlRewriteBase,
             'ServerUseUrlRewrite' => $this->oModuleSettings->ServerUseUrlRewrite,
-            'ShowFilesApps' => $this->oModuleSettings->ShowFilesApps,
             'BottomLeftCornerLinks' => $this->oModuleSettings->BottomLeftCornerLinks,
             'PublicLinksEnabled' => $this->oModuleSettings->PublicLinksEnabled,
             'FilesSortBy' => $this->oModuleSettings->FilesSortBy,
