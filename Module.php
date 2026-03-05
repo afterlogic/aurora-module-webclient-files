@@ -9,6 +9,7 @@ namespace Aurora\Modules\FilesWebclient;
 
 use Aurora\System\Application;
 use Aurora\System\Utils;
+use Aurora\System\Facades\Route;
 
 /**
  * This module displays the web interface for managing files.
@@ -51,7 +52,12 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
         $this->oFilesModuleDecorator = \Aurora\Modules\Files\Module::Decorator();
         $this->oMinModuleDecorator = \Aurora\Modules\Min\Module::Decorator();
 
-        $this->AddEntry('files-pub', 'EntryPub');
+        Route::add(
+            $this,
+            [
+                'files-pub' => 'EntryPub',
+            ]
+        );
     }
 
     /**
