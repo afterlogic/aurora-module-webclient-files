@@ -60,6 +60,7 @@ module.exports = {
 			this.AllowTrash = Types.pBool(oAppDataFilesSection.AllowTrash, this.AllowTrash);
 			this.AllowFavorites = Types.pBool(oAppDataFilesSection.AllowFavorites, this.AllowFavorites);
 			// this.EFilesSortField = Types.pObject(oAppDataFilesSection.SortField);
+			this.DisableShortcuts = Types.pBool(oAppDataFilesSection.DisableShortcuts, false);
 		}
 
 		// if (!_.isEmpty(oAppDataPersonalFilesSection))

@@ -518,6 +518,8 @@ function CFilesView(bPopup = false, allowSelect = true) {
     return [...this.addToolbarButtons(), ...this.storageControllers()]
   })
 
+  this.isShortcutsDisabled = ko.observable(Settings.DisableShortcuts);
+
   App.broadcastEvent('%ModuleName%::RegisterFilesController', (controller, place) => {
     this.registerController(controller, place)
   })
