@@ -1263,7 +1263,9 @@ CFilesView.prototype.executeRename = function () {
     sName = bSeparateExtension ? Utils.getFileNameWithoutExtension(oItem.fileName()) : oItem.fileName(),
     sExtension = bSeparateExtension ? Utils.getFileExtension(oItem.fileName()) : ''
   if (!this.bPublic && oItem) {
-    Popups.showPopup(RenamePopup, [sName, _.bind(this.renameItem, this, sExtension)])
+    const sSanitizedName = TextUtils.htmlToPlain(sName);
+
+    Popups.showPopup(RenamePopup, [sSanitizedName, _.bind(this.renameItem, this, sExtension)])
   }
 }
 
@@ -1514,7 +1516,7 @@ CFilesView.prototype.executeRestore = function () {
 
   _.each(itemsToRestore, function(fileItem) {
     if (fileItem && fileItem.oExtendedProps && fileItem.oExtendedProps.TrashOriginalPath) {
-      originalPaths.push(TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE') + fileItem.oExtendedProps.TrashOriginalPath)
+      originalPaths.push(TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE') + TextUtils.htmlToPlain(fileItem.oExtendedProps.TrashOriginalPath))
     }
   })
   originalPathsLength = originalPaths.length
