@@ -24,9 +24,7 @@ function CCreateLinkPopup()
 	this.linkFocus = ko.observable(false);
 	this.checkTimeout = null;
 	this.urlChecked = ko.observable(false);
-	this.saveCommand = Utils.createCommand(this, this.executeSave, function () {
-		return (this.urlChecked());
-	});
+	this.saveCommand = Utils.createCommand(this, this.executeSave, this.urlChecked);
 	this.fileItem = ko.observable(null);
 }
 
