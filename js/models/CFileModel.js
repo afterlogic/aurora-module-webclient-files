@@ -257,7 +257,7 @@ CFileModel.prepareUploadFileData = function (oFileData, sPath, sStorageType, fGe
 		sFileName = oFileData.FileName,
 		sFileNameExt = Utils.getFileExtension(sFileName),
 		sFileNameWoExt = Utils.getFileNameWithoutExtension(sFileName),
-		iIndex = 0
+		iIndex = 1
 	;
 	
 	if (sFileNameExt !== '')
