@@ -1,8 +1,8 @@
 <span class="content">
-	<span class="search_block">
+	<span class="search_block" data-test-id="files-search">
 		<span class="input" data-bind="css: {'focus': isSearchFocused}">
 			<span class="icon search" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_SEARCH'}"></span>
-			<input class="field" spellcheck="false" type="text" data-bind="hasfocus: isSearchFocused, value: newSearchPattern, onEnter: onSearch, valueUpdate: 'afterkeydown'" />
+			<input class="field" spellcheck="false" type="text" data-test-id="files-search-input" data-bind="hasfocus: isSearchFocused, value: newSearchPattern, onEnter: onSearch, valueUpdate: 'afterkeydown'" />
 		</span>
 	</span>
 	<!-- ko template: { name: '%ModuleName%_Toolbar_DownloadButtonView'} --><!-- /ko -->
@@ -14,15 +14,15 @@
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_SEND_FILES'}"></span>
 	</span>
-	<span class="item edit" data-bind="command: renameCommand, customTooltip: '%MODULENAME%/ACTION_RENAME'">
+	<span class="item edit" data-test-id="files-menu-rename" data-bind="command: renameCommand, customTooltip: '%MODULENAME%/ACTION_RENAME'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_RENAME'}"></span>
 	</span>
-	<span class="item publish" data-bind="visible: !isExternalStorage() && PublicLinksEnabled, command: createPublicLinkCommand, customTooltip: '%MODULENAME%/ACTION_CREATE_PUBLIC_LINK'">
+	<span class="item publish" data-test-id="files-menu-public-link" data-bind="visible: !isExternalStorage() && PublicLinksEnabled, command: createPublicLinkCommand, customTooltip: '%MODULENAME%/ACTION_CREATE_PUBLIC_LINK'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_CREATE_PUBLIC_LINK'}"></span>
 	</span>
-	<span class="item delete" data-bind="command: deleteCommand, customTooltip: 'COREWEBCLIENT/ACTION_DELETE'">
+	<span class="item delete" data-test-id="files-delete" data-bind="command: deleteCommand, customTooltip: 'COREWEBCLIENT/ACTION_DELETE'">
 		<span class="icon"></span>
 		<span class="text" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_DELETE'}"></span>
 		<span class="hint" data-bind="text: itemsToDeleteCount, visible: isDeleteAllowed()"></span>

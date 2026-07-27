@@ -23,8 +23,8 @@
 			<div class="inner"></div>
 		</div>
 		<div class="files_scroll scroll-inner">
-			<div class="items_list">
-				<span class="list_notification" data-bind="visible: fileListInfoText()!==''">
+			<div class="items_list" data-test-id="files-list">
+				<span class="list_notification" data-test-id="files-empty" data-bind="visible: fileListInfoText()!==''">
 					<span class="description" data-bind="text: fileListInfoText()"></span>
 				</span>
 				<!-- ko template: {name: itemsViewTemplate} --><!-- /ko -->

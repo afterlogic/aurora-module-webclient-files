@@ -1,5 +1,5 @@
 <!-- ko if: !bIsHidden -->
-<div class="item file attachment" data-bind="
+<div class="item file attachment" data-test-id="files-item" data-bind="
 	css: cssClasses,
 	event: allowDrag() ? { 'dragstart': eventDragStart } : null,
 	draggablePlace: allowDrag() ? function (file, ctrlOrCmdUsed) { return $parent.dragAndDropHelper(file, ctrlOrCmdUsed); } : null,

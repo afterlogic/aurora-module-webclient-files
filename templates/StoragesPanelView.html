@@ -3,7 +3,7 @@
 		<div class="items_list collapsible">
 			<!-- ko foreach: storages -->
 				<!-- ko if: !hideInList -->
-				<div class="item canSelect" data-bind="css: {'selected': type === $parent.storageType()}">
+				<div class="item canSelect" data-test-id="files-storage-item" data-bind="css: {'selected': type === $parent.storageType()}, attr: {'data-storage-type': type}">
 					<a href="javascript: void(0);" class="title" data-bind="
 						droppable: {
 							valueFunc: function (oEvent, oUi) {

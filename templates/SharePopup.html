@@ -1,4 +1,4 @@
-<div class="popup files_popup share_popup" style="display: none;">
+<div class="popup files_popup share_popup" style="display: none;" data-test-id="files-share-link-dialog">
 	<div class="mask" data-bind="click: cancelPopup"></div>
 	<div class="popup_panel">
 		<span class="close" data-bind="click: cancelPopup"></span>
@@ -7,13 +7,13 @@
 			<div class="fieldset">
 				<div class="row">
 					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_PUBLIC_LINK'}"></span>
-					<input readonly="readonly" spellcheck="false" class="value input" type="text" maxlength="255" data-bind="hasfocus: pubFocus, value: pub, click: function () {$element.select();}" />
+					<input readonly="readonly" spellcheck="false" class="value input" type="text" maxlength="255" data-test-id="files-share-link-url" data-bind="hasfocus: pubFocus, value: pub, click: function () {$element.select();}" />
 				</div>
 			</div>
 
 			<div class="buttons">
 				<span class="button contour_button" data-bind="i18n: {'key': '%MODULENAME%/ACTION_SHOW_HISTORY'}, click: showHistory, visible: bAllowShowHistory"></span>
-				<span class="button remove" data-bind="i18n: {'key': '%MODULENAME%/ACTION_REMOVE_PUBLIC_LINK'}, click: onCancelSharingClick"></span>
+				<span class="button remove" data-test-id="files-share-link-remove" data-bind="i18n: {'key': '%MODULENAME%/ACTION_REMOVE_PUBLIC_LINK'}, click: onCancelSharingClick"></span>
 				<span class="button secondary_button" data-bind="i18n: {'key': 'COREWEBCLIENT/ACTION_CLOSE'}, click: cancelPopup"></span>
 			</div>
 		</div>
