@@ -1272,7 +1272,7 @@ CFilesView.prototype.executeRename = function () {
 /**
  * @param {string} sExtension
  * @param {string} sNamePart
- * @returns {string}
+ * @returns {string|Promise<string>}
  */
 CFilesView.prototype.renameItem = function (sExtension, sNamePart) {
   var sName = sExtension === '' ? sNamePart : sNamePart + '.' + sExtension,
@@ -1281,7 +1281,10 @@ CFilesView.prototype.renameItem = function (sExtension, sNamePart) {
     return oItem instanceof CFolderModel
       ? TextUtils.i18n('%MODULENAME%/ERROR_INVALID_FOLDER_NAME')
       : TextUtils.i18n('%MODULENAME%/ERROR_INVALID_FILE_NAME')
-  } else {
+  }
+
+  var oView = this
+  return new Promise(function (resolve) {
     Ajax.send(
       'Rename',
       {
@@ -1292,12 +1295,17 @@ CFilesView.prototype.renameItem = function (sExtension, sNamePart) {
         IsLink: oItem.bIsLink,
         IsFolder: !oItem.IS_FILE,
       },
-      this.onRenameResponse,
-      this
+      function (oResponse, oRequest) {
+        if (!oResponse.Result) {
+          resolve(Api.getErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILE_RENAME')))
+        } else {
+          oView.routeFiles(oView.storageType(), oView.currentPath(), oView.searchPattern(), true)
+          resolve('')
+        }
+      },
+      oView
     )
-  }
-
-  return ''
+  })
 }
 
 CFilesView.prototype.executeSort = function (sValue) {
@@ -1408,18 +1416,6 @@ CFilesView.prototype.onFileShareIconClick = function (oItem) {
   if (FilesSharePopup && oItem) {
     Popups.showPopup(FilesSharePopup, [oItem, this.expungeFileItems.bind(this)])
   }
-}
-
-/**
- * @param {Object} oResponse
- * @param {Object} oRequest
- */
-CFilesView.prototype.onRenameResponse = function (oResponse, oRequest) {
-  if (!oResponse.Result) {
-    Api.showErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_FILE_RENAME'))
-  }
-
-  this.routeFiles(this.storageType(), this.currentPath(), this.searchPattern(), true)
 }
 
 CFilesView.prototype.refresh = function () {
@@ -2067,20 +2063,28 @@ CFilesView.prototype.createFolder = function (sFolderName) {
   sFolderName = $.trim(sFolderName)
   if (!Utils.validateFileOrFolderName(sFolderName)) {
     return TextUtils.i18n('%MODULENAME%/ERROR_INVALID_FOLDER_NAME')
-  } else {
+  }
+
+  var oView = this
+  return new Promise(function (resolve) {
     Ajax.send(
       'CreateFolder',
       {
-        Type: this.storageType(),
-        Path: this.currentPath(),
+        Type: oView.storageType(),
+        Path: oView.currentPath(),
         FolderName: sFolderName,
       },
-      this.onCreateFolderResponse,
-      this
+      function (oResponse, oRequest) {
+        if (!oResponse.Result) {
+          resolve(Api.getErrorByCode(oResponse, TextUtils.i18n('%MODULENAME%/ERROR_INVALID_FOLDER_NAME')))
+        } else {
+          oView.routeFiles(oView.storageType(), oView.currentPath(), oView.searchPattern(), true)
+          resolve('')
+        }
+      },
+      oView
     )
-  }
-
-  return ''
+  })
 }
 
 CFilesView.prototype.executeCreateFolder = function () {

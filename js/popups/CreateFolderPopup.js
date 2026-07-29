@@ -18,6 +18,7 @@ function CCreateFolderPopup()
 	this.folderName = ko.observable('');
 	this.folderName.focus = ko.observable(false);
 	this.folderName.error = ko.observable('');
+	this.requestInProgress = ko.observable(false);
 
 	this.folderName.subscribe(function () {
 		this.folderName.error('');
@@ -36,6 +37,7 @@ CCreateFolderPopup.prototype.onOpen = function (fCallback)
 	this.folderName('');
 	this.folderName.focus(true);
 	this.folderName.error('');
+	this.requestInProgress(false);
 	
 	if (_.isFunction(fCallback))
 	{
@@ -45,20 +47,47 @@ CCreateFolderPopup.prototype.onOpen = function (fCallback)
 
 CCreateFolderPopup.prototype.onOKClick = function ()
 {
+	if (this.requestInProgress())
+	{
+		return;
+	}
+
 	this.folderName.error('');
 	
 	if (this.fCallback)
 	{
-		var sError = this.fCallback(this.folderName());
-		if (sError)
-		{
-			this.folderName.error('' + sError);
-		}
-		else
-		{
-			// delay is necessary to avoid viewing an image on enter pressed here
-			setTimeout(function () { this.closePopup(); }.bind(this));
-		}
+		this.handleCallbackResult(this.fCallback(this.folderName()));
+	}
+	else
+	{
+		setTimeout(function () { this.closePopup(); }.bind(this));
+	}
+};
+
+/**
+ * @param {string|Promise<string>} oResult Sync error text or Promise resolved with error text (empty on success).
+ */
+CCreateFolderPopup.prototype.handleCallbackResult = function (oResult)
+{
+	if (oResult && _.isFunction(oResult.then))
+	{
+		this.requestInProgress(true);
+		oResult.then(function (sError) {
+			this.requestInProgress(false);
+			if (sError)
+			{
+				this.folderName.error('' + sError);
+			}
+			else
+			{
+				// delay is necessary to avoid viewing an image on enter pressed here
+				setTimeout(function () { this.closePopup(); }.bind(this));
+			}
+		}.bind(this));
+	}
+	else if (oResult)
+	{
+		this.folderName.error('' + oResult);
 	}
 	else
 	{
