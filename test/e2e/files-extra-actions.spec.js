@@ -4,6 +4,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
   'helpers/paths'
 ))
 const { test, expect } = require('@playwright/test')
+const { T } = sharedHelper('timeouts')
 const { loginAsTestUser, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
@@ -25,7 +26,7 @@ test.describe('Desktop files select-copy and download', () => {
   test.skip(!hasCredentials(), 'Set E2E_LOGIN_0/E2E_PASSWORD_0 (or E2E_LOGIN/E2E_PASSWORD) in .env.e2e')
 
   test('multi-select copy into a folder', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -81,7 +82,7 @@ test.describe('Desktop files select-copy and download', () => {
         .filter({ hasText: uniqueName })
         .first()
       try {
-        await expect(copied).toBeVisible({ timeout: 30000 })
+        await expect(copied).toBeVisible({ timeout: T(30000) })
       } catch {
         test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
       }
@@ -107,7 +108,7 @@ test.describe('Desktop files select-copy and download', () => {
   test('download button on selected file triggers download', async ({
     page,
   }) => {
-    test.setTimeout(180000)
+    test.setTimeout(T(180000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -128,7 +129,7 @@ test.describe('Desktop files select-copy and download', () => {
       let gotDownload = false
       try {
         const [download] = await Promise.all([
-          page.waitForEvent('download', { timeout: 20000 }),
+          page.waitForEvent('download', { timeout: T(20000) }),
           clickReady(downloadBtn),
         ])
         const suggested = download.suggestedFilename()
@@ -149,7 +150,7 @@ test.describe('Desktop files select-copy and download', () => {
   })
 
   test('renames folder via toolbar', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -162,7 +163,7 @@ test.describe('Desktop files select-copy and download', () => {
       await createFolder(page, folderName)
       await expect(
         page.getByTestId('files-item').filter({ hasText: folderName }).first()
-      ).toBeVisible({ timeout: 60000 })
+      ).toBeVisible({ timeout: T(60000) })
     })
 
     await step('Select folder → Rename', async () => {
@@ -182,11 +183,11 @@ test.describe('Desktop files select-copy and download', () => {
             '[data-test-id="files-rename-dialog"], .files_popup.rename_popup, .rename_popup'
           )
           .first()
-      ).toBeHidden({ timeout: 45000 })
+      ).toBeHidden({ timeout: T(45000) })
       await waitForFilesList(page)
       await expect(
         page.getByTestId('files-item').filter({ hasText: renamed }).first()
-      ).toBeVisible({ timeout: 60000 })
+      ).toBeVisible({ timeout: T(60000) })
       console.log(`  → Folder renamed: ${folderName} → ${renamed}`)
       await attachScreenshot(page, 'files-folder-rename-01')
     })

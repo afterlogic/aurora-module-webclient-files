@@ -4,6 +4,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
   'helpers/paths'
 ))
 const { test, expect } = require('@playwright/test')
+const { T } = sharedHelper('timeouts')
 const { loginAsTestUser, step, attachScreenshot, hasCredentials } = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
@@ -30,7 +31,7 @@ test.describe('Desktop files copy, select, share', () => {
   test('copies uploaded file into a folder (original remains)', async ({
     page,
   }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -85,7 +86,7 @@ test.describe('Desktop files copy, select, share', () => {
         .filter({ hasText: uniqueName })
         .first()
       try {
-        await expect(copied).toBeVisible({ timeout: 30000 })
+        await expect(copied).toBeVisible({ timeout: T(30000) })
       } catch {
         test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
       }
@@ -97,7 +98,7 @@ test.describe('Desktop files copy, select, share', () => {
       await openPersonalStorage(page)
       await expect(
         page.getByTestId('files-item').filter({ hasText: uniqueName }).first()
-      ).toBeVisible({ timeout: 30000 })
+      ).toBeVisible({ timeout: T(30000) })
       console.log('  → Original still in source')
       await attachScreenshot(page, 'files-copy-03-original')
     })
@@ -109,7 +110,7 @@ test.describe('Desktop files copy, select, share', () => {
   })
 
   test('multi-select bulk deletes uploaded files', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -142,17 +143,17 @@ test.describe('Desktop files copy, select, share', () => {
       await waitForFilesList(page)
       await expect(
         page.getByTestId('files-item').filter({ hasText: nameA })
-      ).toHaveCount(0, { timeout: 30000 })
+      ).toHaveCount(0, { timeout: T(30000) })
       await expect(
         page.getByTestId('files-item').filter({ hasText: nameB })
-      ).toHaveCount(0, { timeout: 30000 })
+      ).toHaveCount(0, { timeout: T(30000) })
       console.log('  → Both files deleted')
       await attachScreenshot(page, 'files-select-02-deleted')
     })
   })
 
   test('opens Share with teammates dialog', async ({ page }) => {
-    test.setTimeout(180000)
+    test.setTimeout(T(180000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -173,7 +174,7 @@ test.describe('Desktop files copy, select, share', () => {
       )
       await clickReady(shareMenu)
       const dialog = page.getByTestId('files-share-dialog')
-      if (!(await dialog.isVisible({ timeout: 5000 }).catch(() => false))) {
+      if (!(await dialog.isVisible({ timeout: T(5000) }).catch(() => false))) {
         test.skip(true, 'Share dialog not available')
       }
       await expect(dialog).toBeVisible()
@@ -191,7 +192,7 @@ test.describe('Desktop files copy, select, share', () => {
           await clickReady(close)
         }
       }
-      await expect(dialog).toBeHidden({ timeout: 30000 }).catch(() => undefined)
+      await expect(dialog).toBeHidden({ timeout: T(30000) }).catch(() => undefined)
     })
 
     await step('Cleanup', async () => {
@@ -201,7 +202,7 @@ test.describe('Desktop files copy, select, share', () => {
   })
 
   test('leave share action when shared item is available', async ({ page }) => {
-    test.setTimeout(180000)
+    test.setTimeout(T(180000))
     await loginAsTestUser(page)
     await openFiles(page)
 

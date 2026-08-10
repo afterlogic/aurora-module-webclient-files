@@ -7,6 +7,7 @@ const fs = require('fs')
 const { expect } = require('@playwright/test')
 const { step, attachScreenshot, fieldControl } = sharedHelper('login')
 const { waitForListReady, clickReady, clickNav, confirmOkIfVisible } = sharedHelper('ready')
+const { T } = sharedHelper('timeouts')
 
 const listReadyOptions = {
   itemTestIds: 'files-item',
@@ -21,7 +22,7 @@ async function openFiles(page) {
   await step('Open Files', async () => {
     await clickNav(page, 'nav-files')
     await expect(page.getByTestId('files-list')).toBeVisible({
-      timeout: 60000,
+      timeout: T(60000),
     })
     await waitForListReady(page, listReadyOptions)
   })
@@ -29,7 +30,7 @@ async function openFiles(page) {
 
 async function waitForFilesList(page) {
   await expect(page.getByTestId('files-list')).toBeVisible({
-    timeout: 30000,
+    timeout: T(30000),
   })
   await waitForListReady(page, listReadyOptions)
 }
@@ -48,12 +49,12 @@ async function createFolder(page, folderName) {
     await openNewItemsMenu(page)
     await clickReady(page.getByTestId('files-create-folder'))
     await expect(page.getByTestId('files-create-folder-dialog')).toBeVisible({
-      timeout: 15000,
+      timeout: T(15000),
     })
     await fieldControl(page, 'files-create-folder-name').fill(folderName)
     await clickReady(page.getByTestId('files-create-folder-ok'))
     await expect(page.getByTestId('files-create-folder-dialog')).toBeHidden({
-      timeout: 30000,
+      timeout: T(30000),
     })
     await waitForListReady(page, listReadyOptions)
   })
@@ -111,16 +112,23 @@ async function uploadFileViaFab(
     .getByTestId('files-item')
     .filter({ hasText: uniqueName })
     .first()
-  await expect(item).toBeVisible({ timeout: 90000 })
+  await expect(item).toBeVisible({ timeout: T(90000) })
+  // The item renders as soon as upload starts, before it actually finishes
+  // (progress bar still showing e.g. "99%" — visibleProgress in both apps).
+  // Interacting with (selecting/deleting) a file mid-upload can silently
+  // no-op server-side. Wait for the per-item progress indicator to clear.
+  await item
+    .locator('.progress')
+    .waitFor({ state: 'hidden', timeout: T(90000) })
   return item
 }
 
 async function openFileByName(page, name) {
   const item = page.getByTestId('files-item').filter({ hasText: name }).first()
-  await expect(item).toBeVisible({ timeout: 30000 })
+  await expect(item).toBeVisible({ timeout: T(30000) })
   await clickReady(item)
   await expect(item)
-    .toHaveClass(/selected|checked/, { timeout: 10000 })
+    .toHaveClass(/selected|checked/, { timeout: T(10000) })
     .catch(() => undefined)
   return item
 }
@@ -132,7 +140,7 @@ async function deleteOpenedFile(page, name) {
   await waitForFilesList(page)
   await expect(
     page.getByTestId('files-item').filter({ hasText: name })
-  ).toHaveCount(0, { timeout: 60000 })
+  ).toHaveCount(0, { timeout: T(60000) })
 }
 
 async function deleteItemByName(page, name) {
@@ -197,18 +205,11 @@ async function openRenameDialog(page) {
     return null
   }
   await clickReady(renameControl)
-  const dialog = page
-    .locator(
-      '[data-test-id="files-rename-dialog"], .files_popup.rename_popup, .rename_popup'
-    )
-    .first()
-  if (!(await dialog.isVisible({ timeout: 5000 }).catch(() => false))) {
-    const edit = page.locator('.item.edit, [data-test-id="files-menu-rename"]').first()
-    if (await edit.isVisible().catch(() => false)) {
-      await clickReady(edit)
-    }
-  }
-  await expect(dialog).toBeVisible({ timeout: 15000 })
+  const dialog = page.getByTestId('files-rename-dialog')
+  // A single click is enough — the popup may just take a moment to render.
+  // isVisible() does not poll, so we wait properly instead of re-clicking
+  // (a re-click here would hit the now-open dialog's own mask).
+  await expect(dialog).toBeVisible({ timeout: T(15000) })
   return dialog
 }
 

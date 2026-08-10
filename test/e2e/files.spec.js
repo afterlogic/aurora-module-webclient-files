@@ -4,6 +4,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
   'helpers/paths'
 ))
 const { test, expect } = require('@playwright/test')
+const { T } = sharedHelper('timeouts')
 const { loginAsTestUser, step, attachScreenshot, hasCredentials } = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
@@ -19,7 +20,7 @@ test.describe('Desktop files', () => {
   test.skip(!hasCredentials(), 'Set E2E_LOGIN_0/E2E_PASSWORD_0 (or E2E_LOGIN/E2E_PASSWORD) in .env.e2e')
 
   test('opens first file from the list', async ({ page }) => {
-    test.setTimeout(120000)
+    test.setTimeout(T(120000))
 
     await loginAsTestUser(page)
     await openFiles(page)
@@ -53,7 +54,7 @@ test.describe('Desktop files', () => {
     await step('Select first item', async () => {
       await clickReady(fileItems.first())
       await expect(fileItems.first()).toHaveClass(/selected|checked/, {
-        timeout: 10000,
+        timeout: T(10000),
       })
       await attachScreenshot(page, 'files-03-selected')
     })
@@ -64,7 +65,7 @@ test.describe('Desktop files', () => {
   })
 
   test('lists files, creates folder, uploads file', async ({ page }) => {
-    test.setTimeout(180000)
+    test.setTimeout(T(180000))
 
     const folderName = `e2e-folder-${Date.now()}`
 
@@ -79,7 +80,7 @@ test.describe('Desktop files', () => {
         .getByTestId('files-item')
         .filter({ hasText: folderName })
         .first()
-      await expect(folder).toBeVisible({ timeout: 30000 })
+      await expect(folder).toBeVisible({ timeout: T(30000) })
       console.log(`  → Folder created: ${folderName}`)
     })
 
@@ -90,7 +91,7 @@ test.describe('Desktop files', () => {
         .getByTestId('files-item')
         .filter({ hasText: 'e2e-attach.txt' })
         .first()
-      await expect(file).toBeVisible({ timeout: 60000 })
+      await expect(file).toBeVisible({ timeout: T(60000) })
       console.log('  → Upload visible')
       await attachScreenshot(page, 'files-create-02-after-upload')
     })

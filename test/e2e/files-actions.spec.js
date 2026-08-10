@@ -4,6 +4,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
   'helpers/paths'
 ))
 const { test, expect } = require('@playwright/test')
+const { T } = sharedHelper('timeouts')
 const { loginAsTestUser, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
 const { clickReady, waitForListReady } = sharedHelper('ready')
 const {
@@ -23,13 +24,13 @@ test.describe('Desktop files actions', () => {
   test.skip(!hasCredentials(), 'Set E2E_LOGIN_0/E2E_PASSWORD_0 (or E2E_LOGIN/E2E_PASSWORD) in .env.e2e')
 
   test('shows storages in sidebar', async ({ page }) => {
-    test.setTimeout(120000)
+    test.setTimeout(T(120000))
     await loginAsTestUser(page)
     await openFiles(page)
 
     await step('Expect files storages in sidebar', async () => {
       const storages = page.getByTestId('files-storage-item')
-      await expect(storages.first()).toBeVisible({ timeout: 15000 })
+      await expect(storages.first()).toBeVisible({ timeout: T(15000) })
       const count = await storages.count()
       console.log(`  → Storages: ${count}`)
       expect(count).toBeGreaterThan(0)
@@ -44,7 +45,7 @@ test.describe('Desktop files actions', () => {
   })
 
   test('search filters files list', async ({ page }) => {
-    test.setTimeout(120000)
+    test.setTimeout(T(120000))
     await loginAsTestUser(page)
     await openFiles(page)
 
@@ -59,7 +60,7 @@ test.describe('Desktop files actions', () => {
 
     await step('Type search query', async () => {
       const input = page.getByTestId('files-search-input')
-      await expect(input).toBeVisible({ timeout: 15000 })
+      await expect(input).toBeVisible({ timeout: T(15000) })
       await input.fill(query)
       await input.press('Enter')
       console.log(`  → Search query: ${query}`)
@@ -70,7 +71,7 @@ test.describe('Desktop files actions', () => {
 
     await step('Expect filtered list contains query', async () => {
       await expect(page.getByTestId('files-item').first()).toBeVisible({
-        timeout: 30000,
+        timeout: T(30000),
       })
       await expect(page.getByTestId('files-item').first()).toContainText(
         new RegExp(query, 'i')
@@ -79,7 +80,7 @@ test.describe('Desktop files actions', () => {
   })
 
   test('creates a folder via New menu', async ({ page }) => {
-    test.setTimeout(180000)
+    test.setTimeout(T(180000))
     await loginAsTestUser(page)
     await openFiles(page)
 
@@ -89,7 +90,7 @@ test.describe('Desktop files actions', () => {
       await createFolder(page, folderName)
       await expect(
         page.getByTestId('files-item').filter({ hasText: folderName }).first()
-      ).toBeVisible({ timeout: 60000 })
+      ).toBeVisible({ timeout: T(60000) })
     })
 
     await step('Open folder and go back', async () => {
@@ -108,7 +109,7 @@ test.describe('Desktop files actions', () => {
   })
 
   test('uploads a file via New menu and deletes it', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -130,7 +131,7 @@ test.describe('Desktop files actions', () => {
   })
 
   test('renames uploaded file', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -160,11 +161,11 @@ test.describe('Desktop files actions', () => {
             '[data-test-id="files-rename-dialog"], .files_popup.rename_popup, .rename_popup'
           )
           .first()
-      ).toBeHidden({ timeout: 45000 })
+      ).toBeHidden({ timeout: T(45000) })
       await waitForFilesList(page)
       await expect(
         page.getByTestId('files-item').filter({ hasText: renamedName }).first()
-      ).toBeVisible({ timeout: 30000 })
+      ).toBeVisible({ timeout: T(30000) })
       console.log(`  → Renamed: ${originalName} → ${renamedName}`)
       await attachScreenshot(page, 'files-rename-02-done')
     })
@@ -176,7 +177,7 @@ test.describe('Desktop files actions', () => {
   })
 
   test('creates and removes a public share link', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -197,11 +198,21 @@ test.describe('Desktop files actions', () => {
       )
       await clickReady(shareBtn)
       await expect(page.getByTestId('files-share-link-dialog')).toBeVisible({
-        timeout: 15000,
+        timeout: T(15000),
       })
       // Desktop may auto-create the link when opening the dialog.
       const url = page.getByTestId('files-share-link-url')
-      await expect(url).toBeVisible({ timeout: 45000 })
+      await expect(url).toBeVisible({ timeout: T(45000) })
+      // Link is created async after the dialog opens on both apps (legacy's
+      // SharePopup.js starts `pub` empty too, filled once CreatePublicLink
+      // responds) — wait for the field to actually be populated, not just
+      // rendered, or this can read the field while it's still empty.
+      await expect
+        .poll(
+          async () => (await url.inputValue().catch(() => url.innerText())).trim(),
+          { timeout: T(45000) }
+        )
+        .not.toBe('')
       const linkText = (await url.inputValue().catch(() => url.innerText())).trim()
       console.log(`  → Public link created (${linkText.length} chars)`)
       expect(linkText.length).toBeGreaterThan(0)
@@ -211,7 +222,7 @@ test.describe('Desktop files actions', () => {
     await step('Remove public link and close dialog', async () => {
       await clickReady(page.getByTestId('files-share-link-remove'))
       await expect(page.getByTestId('files-share-link-dialog')).toBeHidden({
-        timeout: 45000,
+        timeout: T(45000),
       })
       console.log('  → Public link removed')
       await attachScreenshot(page, 'files-share-02-removed')
@@ -224,7 +235,7 @@ test.describe('Desktop files actions', () => {
   })
 
   test('moves uploaded file into a folder via cut/paste', async ({ page }) => {
-    test.setTimeout(240000)
+    test.setTimeout(T(240000))
     await loginAsTestUser(page)
     await openFiles(page)
     await openPersonalStorage(page)
@@ -281,7 +292,7 @@ test.describe('Desktop files actions', () => {
         .filter({ hasText: uniqueName })
         .first()
       try {
-        await expect(moved).toBeVisible({ timeout: 30000 })
+        await expect(moved).toBeVisible({ timeout: T(30000) })
       } catch {
         test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
       }
