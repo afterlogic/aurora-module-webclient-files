@@ -5,7 +5,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
 ))
 const { test, expect } = require('@playwright/test')
 const { T } = sharedHelper('timeouts')
-const { loginAsTestUser, step, attachScreenshot, hasCredentials } = sharedHelper('login')
+const { gotoLoggedIn, step, attachScreenshot, hasCredentials } = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
   openFiles,
@@ -22,7 +22,7 @@ test.describe('Desktop files', () => {
   test('opens first file from the list', async ({ page }) => {
     test.setTimeout(T(120000))
 
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await attachScreenshot(page, 'files-01-list')
 
@@ -69,7 +69,7 @@ test.describe('Desktop files', () => {
 
     const folderName = `e2e-folder-${Date.now()}`
 
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await attachScreenshot(page, 'files-create-01-list')
 

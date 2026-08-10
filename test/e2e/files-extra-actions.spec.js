@@ -5,7 +5,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
 ))
 const { test, expect } = require('@playwright/test')
 const { T } = sharedHelper('timeouts')
-const { loginAsTestUser, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
+const { gotoLoggedIn, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
   openFiles,
@@ -27,7 +27,7 @@ test.describe('Desktop files select-copy and download', () => {
 
   test('multi-select copy into a folder', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -109,7 +109,7 @@ test.describe('Desktop files select-copy and download', () => {
     page,
   }) => {
     test.setTimeout(T(180000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -151,7 +151,7 @@ test.describe('Desktop files select-copy and download', () => {
 
   test('renames folder via toolbar', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -173,7 +173,7 @@ test.describe('Desktop files select-copy and download', () => {
       )
       const rename = page.getByTestId('files-menu-rename')
       test.skip((await rename.count()) === 0, 'Rename control missing')
-      const dialog = await openRenameDialog(page)
+      const dialog = await openRenameDialog(page, folderName)
       test.skip(!dialog, 'Rename control missing')
       await fieldControl(page, 'files-rename-name').fill(renamed)
       await clickReady(page.getByTestId('files-rename-submit'))

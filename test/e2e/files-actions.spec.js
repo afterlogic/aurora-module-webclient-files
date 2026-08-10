@@ -5,7 +5,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
 ))
 const { test, expect } = require('@playwright/test')
 const { T } = sharedHelper('timeouts')
-const { loginAsTestUser, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
+const { gotoLoggedIn, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
 const { clickReady, waitForListReady } = sharedHelper('ready')
 const {
   openFiles,
@@ -25,7 +25,7 @@ test.describe('Desktop files actions', () => {
 
   test('shows storages in sidebar', async ({ page }) => {
     test.setTimeout(T(120000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
 
     await step('Expect files storages in sidebar', async () => {
@@ -46,7 +46,7 @@ test.describe('Desktop files actions', () => {
 
   test('search filters files list', async ({ page }) => {
     test.setTimeout(T(120000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
 
     const items = page.getByTestId('files-item')
@@ -81,7 +81,7 @@ test.describe('Desktop files actions', () => {
 
   test('creates a folder via New menu', async ({ page }) => {
     test.setTimeout(T(180000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
 
     const folderName = `E2E Folder ${Date.now()}`
@@ -110,7 +110,7 @@ test.describe('Desktop files actions', () => {
 
   test('uploads a file via New menu and deletes it', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -132,7 +132,7 @@ test.describe('Desktop files actions', () => {
 
   test('renames uploaded file', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -147,7 +147,7 @@ test.describe('Desktop files actions', () => {
       await openFileByName(page, originalName)
       const rename = page.getByTestId('files-menu-rename')
       test.skip((await rename.count()) === 0, 'Rename control missing')
-      const dialog = await openRenameDialog(page)
+      const dialog = await openRenameDialog(page, originalName)
       test.skip(!dialog, 'Rename control missing')
       await attachScreenshot(page, 'files-rename-01-dialog')
     })
@@ -178,7 +178,7 @@ test.describe('Desktop files actions', () => {
 
   test('creates and removes a public share link', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -236,7 +236,7 @@ test.describe('Desktop files actions', () => {
 
   test('moves uploaded file into a folder via cut/paste', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 

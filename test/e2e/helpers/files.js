@@ -113,20 +113,39 @@ async function uploadFileViaFab(
     .filter({ hasText: uniqueName })
     .first()
   await expect(item).toBeVisible({ timeout: T(90000) })
-  // The item renders as soon as upload starts, before it actually finishes
-  // (progress bar still showing e.g. "99%" — visibleProgress in both apps).
-  // Interacting with (selecting/deleting) a file mid-upload can silently
-  // no-op server-side. Wait for the per-item progress indicator to clear.
-  await item
-    .locator('.progress')
-    .waitFor({ state: 'hidden', timeout: T(90000) })
+  // A completed single-file upload triggers CFilesView's own routeFiles() ->
+  // clearAndShowLoading() + currentGetFiles() right after this item is pushed
+  // in (onFileUploadComplete), replacing files() with freshly-fetched item
+  // objects. If a caller selects this item before that settles, CSelector's
+  // list.subscribe drops the selection (no isEqual() on CFileModel -> falls
+  // back to reference equality against the new array) and the very next
+  // toolbar command (rename/delete/download/...) silently no-ops because
+  // nothing is selected anymore. Wait for the list to settle before
+  // returning so callers always select the final, stable item.
+  await waitForListReady(page, listReadyOptions)
   return item
+}
+
+/**
+ * Click target that actually selects a files-item.
+ *
+ * FileView.html overlays each file with a `.main_action` "View" button
+ * (position: absolute, top: 0, height: 88px, width: 100%, opacity: 0 until
+ * hover) whose Knockout binding sets `clickBubble: false`. A plain click at
+ * the item's bounding-box center often lands on that invisible overlay
+ * instead of the item — the click fires the View action and never reaches
+ * CSelector's delegated listener, so the item is silently never selected.
+ * Click the filename text (outside the overlay's region, and present on
+ * both FileView and FolderView) instead of the item root to avoid it.
+ */
+function itemClickTarget(item) {
+  return item.locator('.name').first()
 }
 
 async function openFileByName(page, name) {
   const item = page.getByTestId('files-item').filter({ hasText: name }).first()
   await expect(item).toBeVisible({ timeout: T(30000) })
-  await clickReady(item)
+  await clickReady(itemClickTarget(item))
   await expect(item)
     .toHaveClass(/selected|checked/, { timeout: T(10000) })
     .catch(() => undefined)
@@ -134,6 +153,13 @@ async function openFileByName(page, name) {
 }
 
 async function deleteOpenedFile(page, name) {
+  // Re-select right before acting: selection can silently drop between the
+  // caller's earlier select-click and this call (see uploadFileViaFab for
+  // why), and deleteCommand's canExecute is gated on something being
+  // selected -- a stale/lost selection makes this click a silent no-op.
+  const item = page.getByTestId('files-item').filter({ hasText: name }).first()
+  await clickReady(itemClickTarget(item))
+  await expect(item).toHaveClass(/selected|checked/, { timeout: 10000 })
   await clickReady(page.getByTestId('files-delete'))
   // Trash path often deletes without ConfirmPopup (deleteItems(..., true)).
   await confirmOkIfVisible(page, 5000)
@@ -149,7 +175,7 @@ async function deleteItemByName(page, name) {
       .getByTestId('files-item')
       .filter({ hasText: name })
       .first()
-    await clickReady(item)
+    await clickReady(itemClickTarget(item))
     await clickReady(page.getByTestId('files-delete'))
     await confirmOkIfVisible(page, 5000)
     await waitForListReady(page, listReadyOptions)
@@ -158,10 +184,12 @@ async function deleteItemByName(page, name) {
 
 async function selectFilesItem(page, item, { modifiers } = {}) {
   await item.scrollIntoViewIfNeeded()
+  const target = itemClickTarget(item)
   if (modifiers && modifiers.length) {
-    await item.click({ modifiers })
+    await expect(target).toBeVisible({ timeout: 30000 })
+    await target.click({ modifiers })
   } else {
-    await clickReady(item)
+    await clickReady(target)
   }
 }
 
@@ -197,12 +225,21 @@ async function openPersonalStorage(page) {
 
 /**
  * Open rename dialog after clicking rename; retry via .item.edit if needed.
+ * @param {string=} name Re-select this item by name right before clicking
+ *   rename -- selection can silently drop between an earlier select-click
+ *   and this call (see uploadFileViaFab), making renameCommand's click a
+ *   silent no-op instead of opening the dialog.
  * @returns {import('@playwright/test').Locator} visible rename dialog
  */
-async function openRenameDialog(page) {
+async function openRenameDialog(page, name) {
   const renameControl = page.getByTestId('files-menu-rename')
   if ((await renameControl.count()) === 0) {
     return null
+  }
+  if (name) {
+    const item = page.getByTestId('files-item').filter({ hasText: name }).first()
+    await clickReady(itemClickTarget(item))
+    await expect(item).toHaveClass(/selected|checked/, { timeout: 10000 })
   }
   await clickReady(renameControl)
   const dialog = page.getByTestId('files-rename-dialog')

@@ -5,7 +5,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
 ))
 const { test, expect } = require('@playwright/test')
 const { T } = sharedHelper('timeouts')
-const { loginAsTestUser, step, attachScreenshot, hasCredentials } = sharedHelper('login')
+const { gotoLoggedIn, step, attachScreenshot, hasCredentials } = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
   openFiles,
@@ -32,7 +32,7 @@ test.describe('Desktop files copy, select, share', () => {
     page,
   }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -111,7 +111,7 @@ test.describe('Desktop files copy, select, share', () => {
 
   test('multi-select bulk deletes uploaded files', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -138,6 +138,18 @@ test.describe('Desktop files copy, select, share', () => {
     })
 
     await step('Bulk delete → confirm', async () => {
+      // Re-select right before acting: selection/checked state can silently
+      // drop between the earlier select step and this click (see
+      // uploadFileViaFab), making deleteCommand's click a silent no-op.
+      await selectFilesItem(
+        page,
+        page.getByTestId('files-item').filter({ hasText: nameA }).first()
+      )
+      await selectFilesItem(
+        page,
+        page.getByTestId('files-item').filter({ hasText: nameB }).first(),
+        { modifiers: ['ControlOrMeta'] }
+      )
       await clickReady(page.getByTestId('files-delete'))
       await confirmOkIfVisible(page, 5000)
       await waitForFilesList(page)
@@ -154,7 +166,7 @@ test.describe('Desktop files copy, select, share', () => {
 
   test('opens Share with teammates dialog', async ({ page }) => {
     test.setTimeout(T(180000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -203,7 +215,7 @@ test.describe('Desktop files copy, select, share', () => {
 
   test('leave share action when shared item is available', async ({ page }) => {
     test.setTimeout(T(180000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
 
     await step('Open Shared storage if present', async () => {
