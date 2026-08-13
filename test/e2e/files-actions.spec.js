@@ -17,6 +17,10 @@ const {
   createFolder,
   openPersonalStorage,
   openRenameDialog,
+  clickCutCopyPasteAction,
+  waitForPasteEnabled,
+  openFolderItemByName,
+  pasteIntoCurrentFolder,
 } = require('./helpers/files')
 
 
@@ -264,38 +268,19 @@ test.describe('Desktop files actions', () => {
     })
 
     await step('Cut file then paste into folder', async () => {
-      await openFileByName(page, uniqueName)
-      const moveBtn = page.getByTestId('files-menu-move')
-      test.skip(
-        (await moveBtn.count()) === 0,
-        'Cut/Move toolbar not available (FilesCutCopyPaste plugin)'
-      )
-      await clickReady(moveBtn)
+      await clickCutCopyPasteAction(page, 'files-menu-move', {
+        fileName: uniqueName,
+      })
+      await waitForPasteEnabled(page)
       await attachScreenshot(page, 'files-move-01-mode')
 
-      const paste = page.getByTestId('files-paste')
-      test.skip(
-        (await paste.count()) === 0,
-        'Paste not available (FilesCutCopyPaste plugin)'
-      )
-
-      await page
-        .getByTestId('files-item')
-        .filter({ hasText: folderName })
-        .first()
-        .dblclick()
-      await waitForFilesList(page)
-      await clickReady(paste)
-      await waitForFilesList(page)
+      await openFolderItemByName(page, folderName)
+      await pasteIntoCurrentFolder(page)
       const moved = page
         .getByTestId('files-item')
         .filter({ hasText: uniqueName })
         .first()
-      try {
-        await expect(moved).toBeVisible({ timeout: T(30000) })
-      } catch {
-        test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
-      }
+      await expect(moved).toBeVisible({ timeout: T(60000) })
       console.log(`  → Moved into: ${folderName}`)
       await attachScreenshot(page, 'files-move-02-in-folder')
     })

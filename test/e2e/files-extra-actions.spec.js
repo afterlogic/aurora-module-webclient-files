@@ -19,6 +19,9 @@ const {
   createFolder,
   openRenameDialog,
   confirmOkIfVisible,
+  clickCutCopyPasteAction,
+  openFolderItemByName,
+  pasteIntoCurrentFolder,
 } = require('./helpers/files')
 
 
@@ -54,38 +57,18 @@ test.describe('Desktop files select-copy and download', () => {
 
     await step('Select → Copy', async () => {
       await openFileByName(page, uniqueName)
-      const copy = page.getByTestId('files-menu-copy')
-      test.skip(
-        (await copy.count()) === 0,
-        'Copy toolbar not available (FilesCutCopyPaste plugin)'
-      )
-      await clickReady(copy)
+      await clickCutCopyPasteAction(page, 'files-menu-copy')
       await attachScreenshot(page, 'files-select-copy-01')
     })
 
     await step(`Paste copy into "${folderName}"`, async () => {
-      const paste = page.getByTestId('files-paste')
-      test.skip(
-        (await paste.count()) === 0,
-        'Paste not available (FilesCutCopyPaste plugin)'
-      )
-      await page
-        .getByTestId('files-item')
-        .filter({ hasText: folderName })
-        .first()
-        .dblclick()
-      await waitForFilesList(page)
-      await clickReady(paste)
-      await waitForFilesList(page)
+      await openFolderItemByName(page, folderName)
+      await pasteIntoCurrentFolder(page)
       const copied = page
         .getByTestId('files-item')
         .filter({ hasText: uniqueName })
         .first()
-      try {
-        await expect(copied).toBeVisible({ timeout: T(30000) })
-      } catch {
-        test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
-      }
+      await expect(copied).toBeVisible({ timeout: T(30000) })
       console.log(`  → Copy in folder: ${folderName}`)
       await attachScreenshot(page, 'files-select-copy-02')
     })
