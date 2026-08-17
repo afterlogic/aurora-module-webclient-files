@@ -55,7 +55,7 @@
 		</div>
 	</span>
 	<span class="main_action dragHandle" data-bind="visible: firstAction().length > 0">
-		<a class="button view" href="javascript: void(0)" data-bind="click: function () { executeAction(firstAction()); }, text: getActionText(firstAction()), clickBubble: false"></a>
+		<a class="button view" href="javascript: void(0)" data-test-id="files-item-view" data-bind="click: function () { executeAction(firstAction()); }, text: getActionText(firstAction()), clickBubble: false"></a>
 	</span>
 	
 	<div class="buttons" data-bind="visible: allowActions() && uploaded() && !uploadError() && statusText().length === 0 && !downloading() && !visibleProgress()">

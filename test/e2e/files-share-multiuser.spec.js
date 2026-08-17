@@ -24,6 +24,8 @@ const {
   shareFileWithTeammate,
   clickLeaveShareToolbarAction,
   confirmOkIfVisible,
+  filesItemByName,
+  filesItemsByName,
 } = require('./helpers/files')
 
 function uniqueFileName(prefix) {
@@ -73,27 +75,20 @@ test.describe('Desktop files multi-user share', () => {
       await step('SECONDARY opens Shared storage and finds file', async () => {
         await openFiles(secondary.page)
         await openSharedStorage(secondary.page)
-        const item = secondary.page
-          .getByTestId('files-item')
-          .filter({ hasText: uniqueName })
-          .first()
+        const item = filesItemByName(secondary.page, uniqueName)
         await expect(item).toBeVisible({ timeout: 90000 })
         await attachScreenshot(secondary.page, 'share-ab-02-secondary-sees')
       })
 
       await step('SECONDARY leaves share', async () => {
-        const item = secondary.page
-          .getByTestId('files-item')
-          .filter({ hasText: uniqueName })
-          .first()
+        const item = filesItemByName(secondary.page, uniqueName)
         await selectFilesItem(secondary.page, item)
         await clickLeaveShareToolbarAction(secondary.page)
         await confirmOkIfVisible(secondary.page, 15000)
-        await expect(
-          secondary.page
-            .getByTestId('files-item')
-            .filter({ hasText: uniqueName })
-        ).toHaveCount(0, { timeout: 60000 })
+        await expect(filesItemsByName(secondary.page, uniqueName)).toHaveCount(
+          0,
+          { timeout: 60000 }
+        )
         console.log('  → SECONDARY left share')
         await attachScreenshot(secondary.page, 'share-ab-02b-left')
       })

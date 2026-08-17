@@ -16,23 +16,82 @@ const listReadyOptions = {
   timeout: 60000,
 }
 
+function filesItemsByName(page, name) {
+  return page
+    .locator(
+      [
+        '[data-test-id="files-item"]',
+        '.items_list .item.file',
+        '.items_list .item.folder',
+        '.item_list_table_view .item.file',
+        '.item_list_table_view .item.folder2',
+      ].join(', ')
+    )
+    .filter({ hasText: name })
+}
+
+function filesItemByName(page, name) {
+  return filesItemsByName(page, name).first()
+}
+
 const defaultFixturePath = fixturePath('e2e-attach.txt')
 
-async function openFiles(page) {
-  await step('Open Files', async () => {
-    await clickNav(page, 'nav-files')
-    await expect(page.getByTestId('files-list')).toBeVisible({
-      timeout: T(60000),
-    })
-    await waitForListReady(page, listReadyOptions)
-  })
+async function isFilesListLoading(page) {
+  const empty = page.getByTestId('files-empty')
+  if (!(await empty.isVisible().catch(() => false))) {
+    return false
+  }
+  const text = (await empty.innerText().catch(() => '')).trim()
+  return /loading/i.test(text)
 }
 
 async function waitForFilesList(page) {
   await expect(page.getByTestId('files-list')).toBeVisible({
+    timeout: T(60000),
+  })
+  // files-empty is reused for INFO_LOADING — waitForListReady would treat
+  // that as a settled empty list after 2s.
+  await expect
+    .poll(async () => !(await isFilesListLoading(page)), {
+      timeout: T(60000),
+    })
+    .toBe(true)
+  await waitForListReady(page, listReadyOptions)
+}
+
+async function openFiles(page) {
+  await step('Open Files', async () => {
+    await clickNav(page, 'nav-files')
+    await waitForFilesList(page)
+  })
+}
+
+function storageItem(page, type) {
+  return page
+    .locator(
+      `[data-test-id="files-storage-item"][data-storage-type="${type}"]`
+    )
+    .first()
+}
+
+async function waitForStoragesSidebar(page) {
+  await expect(page.getByTestId('files-storage-item').first()).toBeVisible({
     timeout: T(30000),
   })
-  await waitForListReady(page, listReadyOptions)
+}
+
+/** True if the storage row is in the DOM (may be below the sidebar fold). */
+async function storageTabAvailable(page, type, timeout = T(15000)) {
+  const item = storageItem(page, type)
+  return item
+    .waitFor({ state: 'attached', timeout })
+    .then(() => true)
+    .catch(() => false)
+}
+
+async function clickStorageItem(page, item) {
+  await item.scrollIntoViewIfNeeded()
+  await clickReady(item)
 }
 
 async function openNewItemsMenu(page) {
@@ -85,7 +144,8 @@ async function uploadFixture(page) {
 async function uploadFileViaFab(
   page,
   uniqueName,
-  sourcePath = defaultFixturePath
+  sourcePath = defaultFixturePath,
+  { mimeType = 'text/plain' } = {}
 ) {
   await openNewItemsMenu(page)
   const fileInput = page.locator('input[type="file"]').first()
@@ -93,7 +153,7 @@ async function uploadFileViaFab(
   if ((await fileInput.count()) > 0) {
     await fileInput.setInputFiles({
       name: uniqueName,
-      mimeType: 'text/plain',
+      mimeType,
       buffer,
     })
   } else {
@@ -103,15 +163,12 @@ async function uploadFileViaFab(
     ])
     await fileChooser.setFiles({
       name: uniqueName,
-      mimeType: 'text/plain',
+      mimeType,
       buffer,
     })
   }
 
-  const item = page
-    .getByTestId('files-item')
-    .filter({ hasText: uniqueName })
-    .first()
+  const item = filesItemByName(page, uniqueName)
   await expect(item).toBeVisible({ timeout: T(90000) })
   // A completed single-file upload triggers CFilesView's own routeFiles() ->
   // clearAndShowLoading() + currentGetFiles() right after this item is pushed
@@ -179,7 +236,7 @@ async function clickItemToSelect(item) {
 }
 
 async function openFileByName(page, name) {
-  const item = page.getByTestId('files-item').filter({ hasText: name }).first()
+  const item = filesItemByName(page, name)
   await expect(item).toBeVisible({ timeout: T(30000) })
   await waitForFileItemReady(item)
   await clickItemToSelect(item)
@@ -302,10 +359,7 @@ async function clickCutCopyPasteAction(page, testId, { fileName } = {}) {
 }
 
 async function openFolderItemByName(page, folderName) {
-  const folder = page
-    .getByTestId('files-item')
-    .filter({ hasText: folderName })
-    .first()
+  const folder = filesItemByName(page, folderName)
   await expect(folder).toBeVisible({ timeout: T(30000) })
   const target = itemClickTarget(folder)
   await expect(target).toBeVisible({ timeout: T(10000) })
@@ -344,23 +398,18 @@ async function deleteOpenedFile(page, name) {
   // caller's earlier select-click and this call (see uploadFileViaFab for
   // why), and deleteCommand's canExecute is gated on something being
   // selected -- a stale/lost selection makes this click a silent no-op.
-  const item = page.getByTestId('files-item').filter({ hasText: name }).first()
+  const item = filesItemByName(page, name)
   await clickItemToSelect(item)
   await clickReady(page.getByTestId('files-delete'))
   // Trash path often deletes without ConfirmPopup (deleteItems(..., true)).
   await confirmOkIfVisible(page, 5000)
   await waitForFilesList(page)
-  await expect(
-    page.getByTestId('files-item').filter({ hasText: name })
-  ).toHaveCount(0, { timeout: T(60000) })
+  await expect(filesItemsByName(page, name)).toHaveCount(0, { timeout: T(60000) })
 }
 
 async function deleteItemByName(page, name) {
   await step(`Delete item ${name}`, async () => {
-    const item = page
-      .getByTestId('files-item')
-      .filter({ hasText: name })
-      .first()
+    const item = filesItemByName(page, name)
     await clickReady(itemClickTarget(item))
     await clickReady(page.getByTestId('files-delete'))
     await confirmOkIfVisible(page, 5000)
@@ -383,7 +432,7 @@ async function selectFilesItem(page, item, { modifiers } = {}) {
 async function navigateToStorageRoot(page) {
   for (let i = 0; i < 10; i++) {
     const crumbs = page.locator(
-      '.files_panel .path a, .panel.files .path a, .breadcrumbs a'
+      '[data-test-id="files-breadcrumb"], .files_panel .path a, .panel.files .path a, .pathway a, .breadcrumbs a'
     )
     const count = await crumbs.count()
     if (count <= 1) break
@@ -394,30 +443,43 @@ async function navigateToStorageRoot(page) {
 
 async function openPersonalStorage(page) {
   await navigateToStorageRoot(page)
-  const personal = page
-    .locator(
-      '[data-test-id="files-storage-item"][data-storage-type="personal"]'
-    )
-    .first()
-  if ((await personal.count()) > 0) {
-    await clickReady(personal)
+  await waitForStoragesSidebar(page)
+  const personal = storageItem(page, 'personal')
+  if (await storageTabAvailable(page, 'personal', T(5000))) {
+    await clickStorageItem(page, personal)
   } else {
-    const first = page.getByTestId('files-storage-item').first()
-    if ((await first.count()) > 0) {
-      await clickReady(first)
-    }
+    await clickStorageItem(page, page.getByTestId('files-storage-item').first())
   }
   await waitForFilesList(page)
 }
 
 async function openSharedStorage(page) {
   await navigateToStorageRoot(page)
-  const shared = page
-    .locator('[data-test-id="files-storage-item"][data-storage-type="shared"]')
-    .first()
-  await expect(shared).toBeVisible({ timeout: T(30000) })
-  await clickReady(shared)
+  await waitForStoragesSidebar(page)
+  const shared = storageItem(page, 'shared')
+  await expect(shared).toBeAttached({ timeout: T(30000) })
+  await clickStorageItem(page, shared)
   await waitForFilesList(page)
+}
+
+async function openStorageByType(page, type) {
+  await navigateToStorageRoot(page)
+  await waitForStoragesSidebar(page)
+  const storage = storageItem(page, type)
+  if (!(await storageTabAvailable(page, type, T(5000)))) {
+    return false
+  }
+  await clickStorageItem(page, storage)
+  await waitForFilesList(page)
+  return true
+}
+
+async function openCorporateStorage(page) {
+  return openStorageByType(page, 'corporate')
+}
+
+async function openTrashStorage(page) {
+  return openStorageByType(page, 'trash')
 }
 
 /**
@@ -618,7 +680,7 @@ async function openRenameDialog(page, name) {
     return null
   }
   if (name) {
-    const item = page.getByTestId('files-item').filter({ hasText: name }).first()
+    const item = filesItemByName(page, name)
     await clickItemToSelect(item)
   }
   await clickReady(renameControl)
@@ -633,6 +695,8 @@ async function openRenameDialog(page, name) {
 module.exports = {
   listReadyOptions,
   fixturePath: defaultFixturePath,
+  filesItemByName,
+  filesItemsByName,
   openFiles,
   waitForFilesList,
   openNewItemsMenu,
@@ -644,8 +708,14 @@ module.exports = {
   deleteItemByName,
   selectFilesItem,
   navigateToStorageRoot,
+  storageItem,
+  waitForStoragesSidebar,
+  storageTabAvailable,
   openPersonalStorage,
   openSharedStorage,
+  openCorporateStorage,
+  openTrashStorage,
+  openStorageByType,
   shareFileWithTeammate,
   shareToolbarButton,
   waitForShareToolbar,
