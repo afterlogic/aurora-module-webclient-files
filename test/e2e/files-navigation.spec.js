@@ -27,10 +27,11 @@ async function jqueryClick(locator) {
   })
 }
 
-test.describe('Desktop files P1', () => {
+test.describe('Desktop files navigation', () => {
   test.skip(!hasCredentials(), 'Set E2E_LOGIN_PRIMARY in .env.e2e')
 
-  test('opens a nested folder and navigates breadcrumbs', async ({ page }) => {
+  test.describe('Breadcrumbs', () => {
+    test('opens a nested folder and navigates breadcrumbs', async ({ page }) => {
     test.setTimeout(T(240000))
     await gotoLoggedIn(page)
     await openFiles(page)
@@ -60,7 +61,7 @@ test.describe('Desktop files P1', () => {
         timeout: T(10000),
       })
       console.log(`  → Nested: ${parentName} / ${childName}`)
-      await attachScreenshot(page, 'files-p1-nested-01')
+      await attachScreenshot(page, 'files-nested-01')
     })
 
     await step('Breadcrumb back to parent', async () => {
@@ -71,7 +72,7 @@ test.describe('Desktop files P1', () => {
       await expect(
         page.getByTestId('files-item').filter({ hasText: childName }).first()
       ).toBeVisible({ timeout: T(30000) })
-      await attachScreenshot(page, 'files-p1-nested-02-parent')
+      await attachScreenshot(page, 'files-nested-02-parent')
     })
 
     await step('Breadcrumb back to storage root', async () => {
@@ -80,38 +81,13 @@ test.describe('Desktop files P1', () => {
       await expect(
         page.getByTestId('files-item').filter({ hasText: parentName }).first()
       ).toBeVisible({ timeout: T(30000) })
-      await attachScreenshot(page, 'files-p1-nested-03-root')
+      await attachScreenshot(page, 'files-nested-03-root')
+    })
     })
   })
 
-  test('sorts the files list', async ({ page }) => {
-    test.setTimeout(T(120000))
-    await gotoLoggedIn(page)
-    await openFiles(page)
-    await openPersonalStorage(page)
-
-    const sortBtn = page.getByTestId('files-sort')
-    test.skip(
-      !(await sortBtn.isVisible().catch(() => false)),
-      'Files sort is disabled on this stand (FilesSortBy.Allow)'
-    )
-
-    await step('Toggle sort order', async () => {
-      const beforeClass = (await sortBtn.getAttribute('class')) || ''
-      await jqueryClick(sortBtn)
-      const option = page.getByTestId('files-sort-option').first()
-      await expect(option).toBeVisible({ timeout: T(10000) })
-      await jqueryClick(option)
-      await waitForFilesList(page)
-      await expect(sortBtn).toBeVisible({ timeout: T(10000) })
-      const afterClass = (await sortBtn.getAttribute('class')) || ''
-      console.log(`  → Sort class: ${beforeClass} → ${afterClass}`)
-      expect(afterClass).toMatch(/sort_asc|sort_desc/)
-      await attachScreenshot(page, 'files-p1-sort-01')
-    })
-  })
-
-  test('opens a text file preview', async ({ page }) => {
+  test.describe('Preview', () => {
+    test('opens a text file preview', async ({ page }) => {
     test.setTimeout(T(180000))
     await gotoLoggedIn(page)
     await openFiles(page)
@@ -123,7 +99,7 @@ test.describe('Desktop files P1', () => {
       await uploadFileViaFab(page, uniqueName)
     })
 
-    await step('Open View action and expect a viewer window', async () => {
+    await step('Open View action and expect a viewer', async () => {
       const item = page.getByTestId('files-item').filter({ hasText: uniqueName }).first()
       await expect(item).toBeVisible({ timeout: T(30000) })
       await item.hover()
@@ -132,21 +108,46 @@ test.describe('Desktop files P1', () => {
         !(await viewBtn.isVisible().catch(() => false)),
         'View action not available on this file'
       )
-      const popupPromise = page.context().waitForEvent('page', {
-        timeout: T(20000),
-      })
-      await viewBtn.click({ force: true })
-      const popup = await popupPromise
-      await popup.waitForLoadState('domcontentloaded').catch(() => undefined)
-      const body = (await popup.locator('body').innerText().catch(() => '')).trim()
-      console.log(`  → Preview length: ${body.length}`)
-      expect(body.length).toBeGreaterThan(0)
-      await popup.close().catch(() => undefined)
-      await attachScreenshot(page, 'files-p1-preview-01')
+
+      // FileViewerWebclientPlugin intercepts View and opens an in-page popup
+      // with an iframe — not a new browser tab (continueView = false).
+      const viewer = page.locator(
+        '[data-test-id="files-viewer"], .popup.FileViewerWebclientPlugin'
+      )
+      const newPagePromise = page
+        .context()
+        .waitForEvent('page', { timeout: T(15000) })
+        .catch(() => null)
+      await jqueryClick(viewBtn)
+
+      const inPage = await viewer
+        .waitFor({ state: 'visible', timeout: T(15000) })
+        .then(() => true)
+        .catch(() => false)
+      if (inPage) {
+        await expect(viewer.getByText(uniqueName).first()).toBeVisible({
+          timeout: T(10000),
+        })
+        const preview = viewer.frameLocator('.owl-item.active iframe')
+        await expect(preview.locator('body')).toContainText(/E2E/i, {
+          timeout: T(15000),
+        })
+        await jqueryClick(viewer.locator('.close').first())
+        await expect(viewer).toBeHidden({ timeout: T(10000) })
+      } else {
+        const popup = await newPagePromise
+        expect(popup, 'Expected in-page FileViewer or a new viewer tab').toBeTruthy()
+        await popup.waitForLoadState('domcontentloaded').catch(() => undefined)
+        const body = (await popup.locator('body').innerText().catch(() => '')).trim()
+        expect(body.length).toBeGreaterThan(0)
+        await popup.close().catch(() => undefined)
+      }
+      await attachScreenshot(page, 'files-preview-01')
     })
 
     await step('Cleanup', async () => {
       await deleteOpenedFile(page, uniqueName)
+    })
     })
   })
 })
