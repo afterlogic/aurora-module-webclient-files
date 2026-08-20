@@ -200,7 +200,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                 if ($this->oMinModuleDecorator) {
                     if (isset($aHash['__hash__'])
                         && ((isset($aHash['IsFolder']) && (bool) $aHash['IsFolder'] === false) || !isset($aHash['IsFolder']))
-                        && (!isset($aHash['Password']) || (isset($aHash['Password']) && $sPassword && Utils::EncryptValue($sPassword) === $aHash['Password']))
+                        && (!isset($aHash['Password']) || (isset($aHash['Password']) && $sPassword && Utils::DecryptValue($aHash['Password']) === $sPassword))
                         && isset($aHash['Type']) && isset($aHash['Path']) && isset($aHash['Name'])
                     ) {
                         $bskipCheckUserRoleStatus = \Aurora\Api::skipCheckUserRole(true);
