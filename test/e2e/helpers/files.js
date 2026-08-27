@@ -95,12 +95,36 @@ async function clickStorageItem(page, item) {
 }
 
 async function openNewItemsMenu(page) {
+  const folderItem = page.getByTestId('files-create-folder')
+  // Dropdown toggles on each click — do not close an already-open menu.
+  if (await folderItem.isVisible().catch(() => false)) {
+    return
+  }
   await clickReady(
     page
       .getByTestId('files-new-menu')
       .locator('.control.button, .button')
       .first()
   )
+  await expect(folderItem).toBeVisible({ timeout: T(15000) })
+}
+
+async function closeNewItemsMenu(page) {
+  const folderItem = page.getByTestId('files-create-folder')
+  if (!(await folderItem.isVisible().catch(() => false))) {
+    return
+  }
+  await page.keyboard.press('Escape').catch(() => undefined)
+  if (await folderItem.isVisible().catch(() => false)) {
+    // Escape may not close the Knockout dropdown — toggle via the New button.
+    await clickReady(
+      page
+        .getByTestId('files-new-menu')
+        .locator('.control.button, .button')
+        .first()
+    )
+  }
+  await expect(folderItem).toBeHidden({ timeout: T(10000) }).catch(() => undefined)
 }
 
 async function createFolder(page, folderName) {
@@ -117,6 +141,304 @@ async function createFolder(page, folderName) {
     })
     await waitForListReady(page, listReadyOptions)
   })
+}
+
+/**
+ * True when New → Create shortcut is available (not DisableShortcuts / wrong storage).
+ */
+async function isCreateShortcutAvailable(page) {
+  await openNewItemsMenu(page)
+  const item = page.getByTestId('files-create-shortcut')
+  const visible = await item.isVisible().catch(() => false)
+  await closeNewItemsMenu(page)
+  return visible
+}
+
+/**
+ * Match Files API form posts (Module/Method in urlencoded body).
+ */
+function isFilesApiMethod(res, methodName) {
+  if (!res.url().includes('Api')) return false
+  if (res.request().method() !== 'POST') return false
+  const post = res.request().postData() || ''
+  return (
+    post.includes(`Method=${methodName}`) ||
+    post.includes(`"Method":"${methodName}"`) ||
+    post.includes(`Method%22%3A%22${methodName}`)
+  )
+}
+
+/** Tolerate non-JSON prefixes in Aurora API bodies. */
+function parseApiResponseText(text) {
+  const trimmed = String(text || '').trim()
+  try {
+    return JSON.parse(trimmed)
+  } catch {
+    const start = trimmed.indexOf('{')
+    const end = trimmed.lastIndexOf('}')
+    if (start === -1 || end === -1 || end <= start) {
+      return null
+    }
+    try {
+      return JSON.parse(trimmed.slice(start, end + 1))
+    } catch {
+      return null
+    }
+  }
+}
+
+/**
+ * Strip PHP notice HTML that local stands emit before JSON when display_errors=On.
+ * Desktop jQuery Ajax uses a strict JSON parse; a `<br /><b>Deprecated</b>…`
+ * prefix becomes DataTransferFailed, so Create shortcut never enables Add.
+ * Production typically has display_errors=Off — this keeps E2E aligned with that.
+ */
+function stripPhpNoticePrefix(body) {
+  const text = String(body || '')
+  const trimmed = text.trimStart()
+  if (!trimmed.startsWith('<')) {
+    return text
+  }
+  const start = trimmed.indexOf('{')
+  const end = trimmed.lastIndexOf('}')
+  if (start === -1 || end <= start) {
+    return text
+  }
+  return trimmed.slice(start, end + 1)
+}
+
+async function installApiJsonSanitizeRoute(page) {
+  if (page.__auroraApiJsonSanitize) {
+    return
+  }
+  page.__auroraApiJsonSanitize = true
+  const handler = async (route) => {
+    try {
+      const response = await route.fetch()
+      const headers = { ...response.headers() }
+      const raw = await response.text()
+      const body = stripPhpNoticePrefix(raw)
+      // Drop length so Playwright / browser recompute for the rewritten body.
+      delete headers['content-length']
+      await route.fulfill({
+        status: response.status(),
+        headers,
+        body,
+      })
+    } catch {
+      // Test ended or request aborted while a route was in flight.
+      try {
+        await route.abort()
+      } catch {
+        // ignore
+      }
+    }
+  }
+  page.__auroraApiJsonSanitizeHandler = handler
+  await page.route((url) => String(url).includes('?/Api'), handler)
+}
+
+async function uninstallApiJsonSanitizeRoute(page) {
+  if (!page.__auroraApiJsonSanitize) {
+    return
+  }
+  const handler = page.__auroraApiJsonSanitizeHandler
+  page.__auroraApiJsonSanitize = false
+  page.__auroraApiJsonSanitizeHandler = null
+  if (handler) {
+    await page
+      .unroute((url) => String(url).includes('?/Api'), handler)
+      .catch(() => {})
+  }
+}
+
+/**
+ * URL for Create shortcut that PHP CheckUrl can probe without outbound internet.
+ * Prefer 127.0.0.1 (avoids IPv6/localhost curl quirks) and a unique path for Name.
+ */
+function uniqueShortcutUrl() {
+  const base = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8888/'
+  let origin = 'http://127.0.0.1:8888'
+  try {
+    const u = new URL(base)
+    if (u.hostname === 'localhost') {
+      u.hostname = '127.0.0.1'
+    }
+    origin = u.origin
+  } catch {
+    // keep default
+  }
+  // Non-html path: CheckUrl uses the basename (unique) instead of an HTML <title>
+  // like "404 Not Found" / the site title that collides across runs.
+  return `${origin}/e2e-sc-${Date.now()}.txt`
+}
+
+/**
+ * Wait until CheckUrl succeeds for this URL (UI enables Add shortcut).
+ */
+async function waitForShortcutCheckUrl(page, url) {
+  const submit = page.getByTestId('files-create-link-submit')
+  const token = (url.match(/e2e-sc-\d+/) || [url])[0]
+  let checkResult = null
+  let lastCheckBody = null
+  let lastRawSnippet = ''
+  let sawMatchingRequest = false
+  let sawPhpNoticePrefix = false
+
+  const onResponse = async (res) => {
+    try {
+      if (!isFilesApiMethod(res, 'CheckUrl')) return
+      const post = res.request().postData() || ''
+      if (!post.includes(token) && !post.includes(encodeURIComponent(token))) {
+        return
+      }
+      sawMatchingRequest = true
+      const raw = await res.text()
+      lastRawSnippet = String(raw || '').slice(0, 240).replace(/\s+/g, ' ')
+      if (/<(br|b)\b/i.test(raw) && /Deprecated|Warning/i.test(raw)) {
+        sawPhpNoticePrefix = true
+      }
+      const body = parseApiResponseText(raw)
+      lastCheckBody = body
+      if (body?.Result) {
+        checkResult = body.Result
+      }
+    } catch {
+      // ignore parse races
+    }
+  }
+
+  page.on('response', onResponse)
+  try {
+    await expect(submit).not.toHaveClass(/disabled/, { timeout: T(45000) })
+  } catch (e) {
+    const err = new Error(
+      `Files.CheckUrl did not enable Add shortcut for "${url}". ` +
+        `sawMatchingRequest=${sawMatchingRequest}. ` +
+        `sawPhpNoticePrefix=${sawPhpNoticePrefix}. ` +
+        `Last API body: ${JSON.stringify(lastCheckBody)}. ` +
+        `Raw snippet: ${lastRawSnippet}`
+    )
+    err.code = 'CHECK_URL_FAILED'
+    throw err
+  } finally {
+    page.off('response', onResponse)
+  }
+
+  return checkResult
+}
+
+/**
+ * Set CreateLinkPopup URL via Knockout observable (valueUpdate typing is flaky in PW).
+ */
+async function fillShortcutUrlInput(page, url) {
+  const urlInput = fieldControl(page, 'files-create-link-url')
+  await expect(urlInput).toBeVisible({ timeout: T(10000) })
+  await urlInput.click()
+
+  const setOk = await page.evaluate((value) => {
+    const el = document.querySelector(
+      'input[data-test-id="files-create-link-url"], [data-test-id="files-create-link-url"] input'
+    )
+    if (!el) {
+      return false
+    }
+    el.focus()
+    el.value = value
+    if (window.ko) {
+      try {
+        const ctx = window.ko.contextFor(el)
+        if (ctx && ctx.$data && typeof ctx.$data.link === 'function') {
+          ctx.$data.link(value)
+          return true
+        }
+      } catch (e) {
+        // fall through
+      }
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+    el.dispatchEvent(new Event('change', { bubbles: true }))
+    el.dispatchEvent(
+      new KeyboardEvent('keyup', { bubbles: true, key: 'a', keyCode: 65 })
+    )
+    if (typeof window.jQuery === 'function') {
+      window.jQuery(el).val(value).trigger('input').trigger('keyup')
+    }
+    return true
+  }, url)
+
+  if (!setOk) {
+    await urlInput.fill(url)
+  }
+  // CreateLinkPopup polls CheckUrl about once per second after open.
+  await page.waitForTimeout(1200)
+}
+
+/**
+ * New → Create shortcut → CheckUrl → CreateLink.
+ * @returns {{ name: string, url: string, item: import('@playwright/test').Locator }}
+ */
+async function createShortcut(page, url) {
+  await installApiJsonSanitizeRoute(page)
+  await openNewItemsMenu(page)
+  const shortcutEntry = page.getByTestId('files-create-shortcut')
+  await expect(shortcutEntry).toBeVisible({ timeout: T(15000) })
+  await clickReady(shortcutEntry)
+
+  const dialog = page.getByTestId('files-create-link-dialog')
+  await expect(dialog).toBeVisible({ timeout: T(15000) })
+
+  const checkResultPromise = waitForShortcutCheckUrl(page, url)
+  await fillShortcutUrlInput(page, url)
+
+  const checkResult = await checkResultPromise
+
+  let name = String(checkResult?.Name || '').trim()
+  if (!name) {
+    name = (
+      await dialog
+        .locator('.attachments .name, .item.file .name, .item .name')
+        .first()
+        .textContent()
+        .catch(() => '')
+    ).trim()
+  }
+  if (!name) {
+    const err = new Error(
+      `Files.CheckUrl did not yield a name for "${url}"`
+    )
+    err.code = 'CHECK_URL_FAILED'
+    throw err
+  }
+
+  const submit = page.getByTestId('files-create-link-submit')
+  const createRespPromise = page.waitForResponse(
+    (res) => isFilesApiMethod(res, 'CreateLink'),
+    { timeout: T(60000) }
+  )
+  await clickReady(submit)
+  const createResp = await createRespPromise
+  const createBody = parseApiResponseText(await createResp.text())
+  if (!createBody?.Result) {
+    throw new Error(
+      `Files.CreateLink failed for "${url}": ${JSON.stringify(createBody)}`
+    )
+  }
+
+  await expect(dialog).toBeHidden({ timeout: T(30000) })
+  await waitForFilesList(page)
+
+  const item = filesItemByName(page, name)
+  const visible = await item
+    .waitFor({ state: 'visible', timeout: T(30000) })
+    .then(() => true)
+    .catch(() => false)
+  if (!visible) {
+    const withExt = filesItemByName(page, `${name}.url`)
+    await expect(withExt).toBeVisible({ timeout: T(60000) })
+    return { name: `${name}.url`, url, item: withExt }
+  }
+  return { name, url, item }
 }
 
 async function uploadFixture(page) {
@@ -700,7 +1022,13 @@ module.exports = {
   openFiles,
   waitForFilesList,
   openNewItemsMenu,
+  closeNewItemsMenu,
   createFolder,
+  isCreateShortcutAvailable,
+  uniqueShortcutUrl,
+  installApiJsonSanitizeRoute,
+  uninstallApiJsonSanitizeRoute,
+  createShortcut,
   uploadFixture,
   uploadFileViaFab,
   openFileByName,
@@ -724,6 +1052,7 @@ module.exports = {
   clickLeaveShareToolbarAction,
   filesShareDialog,
   openRenameDialog,
+  itemClickTarget,
   enabledToolbarButton,
   clickCutCopyPasteAction,
   waitForCutCopyPastePlugin,
