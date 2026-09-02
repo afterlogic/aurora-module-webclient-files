@@ -7,19 +7,19 @@
 		<!-- <link type="text/css" rel="stylesheet" href="static/styles/sharing.css"> -->
 		<link type="text/css" rel="stylesheet" href="./static/styles/themes/{{Theme}}/styles.css" />
 	</head>
-	<body class="public-page-view">
+	<body class="public-page-view" data-test-id="files-pub-page">
 		<div class="public-page-card">
 			<div class="item file">
 				<div class="item_content">
 					<span class="data">
 						<span class="icon {{FileType}}"></span>
-						<span class="name">{{FileName}}</span>
+						<span class="name" data-test-id="files-pub-name">{{FileName}}</span>
 						<span class="size">{{FileSize}}</span>
 					</span>
 				</div>
 			</div>
 			<span class="buttons">
-				<a class="button download" href="{{Url}}">Download</a>
+				<a class="button download" data-test-id="files-pub-download" href="{{Url}}">Download</a>
 			</span>
 		</div>
 	</body>

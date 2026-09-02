@@ -1014,6 +1014,68 @@ async function openRenameDialog(page, name) {
   return dialog
 }
 
+function resolvePublicLinkUrl(link, baseURL) {
+  const trimmed = String(link || '').trim()
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed
+  }
+  try {
+    return new URL(trimmed, baseURL).href
+  } catch {
+    return trimmed
+  }
+}
+
+/**
+ * Open public-link dialog for the selected file and wait until the URL field is populated.
+ * @returns {Promise<string>} absolute or app-relative public link URL
+ */
+async function createPublicLinkUrl(page) {
+  const shareBtn = page.getByTestId('files-menu-public-link')
+  await clickReady(shareBtn)
+  await expect(page.getByTestId('files-share-link-dialog')).toBeVisible({
+    timeout: T(15000),
+  })
+  const urlInput = page.getByTestId('files-share-link-url')
+  await expect
+    .poll(
+      async () => (await urlInput.inputValue().catch(() => urlInput.innerText())).trim(),
+      { timeout: T(45000) }
+    )
+    .not.toBe('')
+  return (await urlInput.inputValue().catch(() => urlInput.innerText())).trim()
+}
+
+/** Close share-link dialog without revoking the link (Close button / Escape). */
+async function closeShareLinkDialog(page) {
+  const dialog = page.getByTestId('files-share-link-dialog')
+  if (!(await dialog.isVisible().catch(() => false))) {
+    return
+  }
+  const closeBtn = dialog.locator('.button.secondary_button').first()
+  if (await closeBtn.isVisible().catch(() => false)) {
+    await clickReady(closeBtn)
+  } else {
+    await page.keyboard.press('Escape').catch(() => undefined)
+  }
+  await expect(dialog).toBeHidden({ timeout: T(15000) })
+}
+
+/** Remove public link via the open share-link dialog. */
+async function removePublicLinkFromDialog(page) {
+  const dialog = page.getByTestId('files-share-link-dialog')
+  if (!(await dialog.isVisible().catch(() => false))) {
+    const shareBtn = page.getByTestId('files-menu-public-link')
+    if ((await shareBtn.count()) === 0) {
+      return
+    }
+    await clickReady(shareBtn)
+    await expect(dialog).toBeVisible({ timeout: T(15000) })
+  }
+  await clickReady(page.getByTestId('files-share-link-remove'))
+  await expect(dialog).toBeHidden({ timeout: T(45000) })
+}
+
 module.exports = {
   listReadyOptions,
   fixturePath: defaultFixturePath,
@@ -1052,6 +1114,10 @@ module.exports = {
   clickLeaveShareToolbarAction,
   filesShareDialog,
   openRenameDialog,
+  resolvePublicLinkUrl,
+  createPublicLinkUrl,
+  closeShareLinkDialog,
+  removePublicLinkFromDialog,
   itemClickTarget,
   enabledToolbarButton,
   clickCutCopyPasteAction,

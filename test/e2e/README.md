@@ -28,6 +28,7 @@ Filter Playwright UI / CLI by **file name** or nested `test.describe`.
 | `files-zip.spec.js` | Open uploaded zip as a folder |
 | `files-zip-selected.spec.js` | Open selected zip as a folder |
 | `files-navigation.spec.js` | Nested folders + breadcrumbs, text preview |
+| `files-public-link.spec.js` | Anonymous public URL open + download; revoked link |
 
 ## Stand gates
 
