@@ -14,7 +14,7 @@
 											i18n: {'key': '%MODULENAME%/ACTION_UPLOAD_FILES'}"></div>
 									<div class="item" data-test-id="files-create-folder" data-bind="command: createFolderCommand,
 											i18n: {'key': '%MODULENAME%/ACTION_NEW_FOLDER'}"></div>
-									<div class="item" data-bind="visible: !isShortcutsDisabled(),
+									<div class="item" data-test-id="files-create-shortcut" data-bind="visible: !isShortcutsDisabled(),
 											command: createShortcutCommand,
 											i18n: {'key': '%MODULENAME%/ACTION_CREATE_SHORTCUT'}"></div>
 									<!-- ko foreach: createButtonsControllers -->

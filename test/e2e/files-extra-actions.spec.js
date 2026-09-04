@@ -5,7 +5,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
 ))
 const { test, expect } = require('@playwright/test')
 const { T } = sharedHelper('timeouts')
-const { loginAsTestUser, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
+const { gotoLoggedIn, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
   openFiles,
@@ -19,6 +19,9 @@ const {
   createFolder,
   openRenameDialog,
   confirmOkIfVisible,
+  clickCutCopyPasteAction,
+  openFolderItemByName,
+  pasteIntoCurrentFolder,
 } = require('./helpers/files')
 
 
@@ -27,7 +30,7 @@ test.describe('Desktop files select-copy and download', () => {
 
   test('multi-select copy into a folder', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -54,38 +57,18 @@ test.describe('Desktop files select-copy and download', () => {
 
     await step('Select → Copy', async () => {
       await openFileByName(page, uniqueName)
-      const copy = page.getByTestId('files-menu-copy')
-      test.skip(
-        (await copy.count()) === 0,
-        'Copy toolbar not available (FilesCutCopyPaste plugin)'
-      )
-      await clickReady(copy)
+      await clickCutCopyPasteAction(page, 'files-menu-copy')
       await attachScreenshot(page, 'files-select-copy-01')
     })
 
     await step(`Paste copy into "${folderName}"`, async () => {
-      const paste = page.getByTestId('files-paste')
-      test.skip(
-        (await paste.count()) === 0,
-        'Paste not available (FilesCutCopyPaste plugin)'
-      )
-      await page
-        .getByTestId('files-item')
-        .filter({ hasText: folderName })
-        .first()
-        .dblclick()
-      await waitForFilesList(page)
-      await clickReady(paste)
-      await waitForFilesList(page)
+      await openFolderItemByName(page, folderName)
+      await pasteIntoCurrentFolder(page)
       const copied = page
         .getByTestId('files-item')
         .filter({ hasText: uniqueName })
         .first()
-      try {
-        await expect(copied).toBeVisible({ timeout: T(30000) })
-      } catch {
-        test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
-      }
+      await expect(copied).toBeVisible({ timeout: T(30000) })
       console.log(`  → Copy in folder: ${folderName}`)
       await attachScreenshot(page, 'files-select-copy-02')
     })
@@ -109,7 +92,7 @@ test.describe('Desktop files select-copy and download', () => {
     page,
   }) => {
     test.setTimeout(T(180000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -151,7 +134,7 @@ test.describe('Desktop files select-copy and download', () => {
 
   test('renames folder via toolbar', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -173,7 +156,7 @@ test.describe('Desktop files select-copy and download', () => {
       )
       const rename = page.getByTestId('files-menu-rename')
       test.skip((await rename.count()) === 0, 'Rename control missing')
-      const dialog = await openRenameDialog(page)
+      const dialog = await openRenameDialog(page, folderName)
       test.skip(!dialog, 'Rename control missing')
       await fieldControl(page, 'files-rename-name').fill(renamed)
       await clickReady(page.getByTestId('files-rename-submit'))

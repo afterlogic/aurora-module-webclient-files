@@ -5,7 +5,7 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
 ))
 const { test, expect } = require('@playwright/test')
 const { T } = sharedHelper('timeouts')
-const { loginAsTestUser, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
+const { gotoLoggedIn, step, attachScreenshot, fieldControl, hasCredentials } = sharedHelper('login')
 const { clickReady, waitForListReady } = sharedHelper('ready')
 const {
   openFiles,
@@ -17,6 +17,10 @@ const {
   createFolder,
   openPersonalStorage,
   openRenameDialog,
+  clickCutCopyPasteAction,
+  waitForPasteEnabled,
+  openFolderItemByName,
+  pasteIntoCurrentFolder,
 } = require('./helpers/files')
 
 
@@ -25,7 +29,7 @@ test.describe('Desktop files actions', () => {
 
   test('shows storages in sidebar', async ({ page }) => {
     test.setTimeout(T(120000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
 
     await step('Expect files storages in sidebar', async () => {
@@ -46,7 +50,7 @@ test.describe('Desktop files actions', () => {
 
   test('search filters files list', async ({ page }) => {
     test.setTimeout(T(120000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
 
     const items = page.getByTestId('files-item')
@@ -81,7 +85,7 @@ test.describe('Desktop files actions', () => {
 
   test('creates a folder via New menu', async ({ page }) => {
     test.setTimeout(T(180000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
 
     const folderName = `E2E Folder ${Date.now()}`
@@ -110,7 +114,7 @@ test.describe('Desktop files actions', () => {
 
   test('uploads a file via New menu and deletes it', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -132,7 +136,7 @@ test.describe('Desktop files actions', () => {
 
   test('renames uploaded file', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -147,7 +151,7 @@ test.describe('Desktop files actions', () => {
       await openFileByName(page, originalName)
       const rename = page.getByTestId('files-menu-rename')
       test.skip((await rename.count()) === 0, 'Rename control missing')
-      const dialog = await openRenameDialog(page)
+      const dialog = await openRenameDialog(page, originalName)
       test.skip(!dialog, 'Rename control missing')
       await attachScreenshot(page, 'files-rename-01-dialog')
     })
@@ -178,7 +182,7 @@ test.describe('Desktop files actions', () => {
 
   test('creates and removes a public share link', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -236,7 +240,7 @@ test.describe('Desktop files actions', () => {
 
   test('moves uploaded file into a folder via cut/paste', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -264,38 +268,19 @@ test.describe('Desktop files actions', () => {
     })
 
     await step('Cut file then paste into folder', async () => {
-      await openFileByName(page, uniqueName)
-      const moveBtn = page.getByTestId('files-menu-move')
-      test.skip(
-        (await moveBtn.count()) === 0,
-        'Cut/Move toolbar not available (FilesCutCopyPaste plugin)'
-      )
-      await clickReady(moveBtn)
+      await clickCutCopyPasteAction(page, 'files-menu-move', {
+        fileName: uniqueName,
+      })
+      await waitForPasteEnabled(page)
       await attachScreenshot(page, 'files-move-01-mode')
 
-      const paste = page.getByTestId('files-paste')
-      test.skip(
-        (await paste.count()) === 0,
-        'Paste not available (FilesCutCopyPaste plugin)'
-      )
-
-      await page
-        .getByTestId('files-item')
-        .filter({ hasText: folderName })
-        .first()
-        .dblclick()
-      await waitForFilesList(page)
-      await clickReady(paste)
-      await waitForFilesList(page)
+      await openFolderItemByName(page, folderName)
+      await pasteIntoCurrentFolder(page)
       const moved = page
         .getByTestId('files-item')
         .filter({ hasText: uniqueName })
         .first()
-      try {
-        await expect(moved).toBeVisible({ timeout: T(30000) })
-      } catch {
-        test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
-      }
+      await expect(moved).toBeVisible({ timeout: T(60000) })
       console.log(`  → Moved into: ${folderName}`)
       await attachScreenshot(page, 'files-move-02-in-folder')
     })

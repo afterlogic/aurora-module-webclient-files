@@ -5,7 +5,15 @@ const { sharedHelper, moduleHelper, fixturePath } = require(path.join(
 ))
 const { test, expect } = require('@playwright/test')
 const { T } = sharedHelper('timeouts')
-const { loginAsTestUser, step, attachScreenshot, hasCredentials } = sharedHelper('login')
+const {
+  gotoLoggedIn,
+  step,
+  attachScreenshot,
+  hasCredentials,
+  hasSecondaryCredentials,
+  getSecondaryCredentials,
+  openLoggedInPage,
+} = sharedHelper('login')
 const { clickReady } = sharedHelper('ready')
 const {
   openFiles,
@@ -15,9 +23,16 @@ const {
   deleteOpenedFile,
   selectFilesItem,
   openPersonalStorage,
-  navigateToStorageRoot,
+  openSharedStorage,
   createFolder,
   confirmOkIfVisible,
+  clickCutCopyPasteAction,
+  clickShareToolbarAction,
+  clickLeaveShareToolbarAction,
+  filesShareDialog,
+  shareFileWithTeammate,
+  openFolderItemByName,
+  pasteIntoCurrentFolder,
 } = require('./helpers/files')
 
 
@@ -32,7 +47,7 @@ test.describe('Desktop files copy, select, share', () => {
     page,
   }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -58,38 +73,18 @@ test.describe('Desktop files copy, select, share', () => {
 
     await step('Select file → Copy', async () => {
       await openFileByName(page, uniqueName)
-      const copy = page.getByTestId('files-menu-copy')
-      test.skip(
-        (await copy.count()) === 0,
-        'Copy toolbar not available (FilesCutCopyPaste plugin)'
-      )
-      await clickReady(copy)
+      await clickCutCopyPasteAction(page, 'files-menu-copy')
       await attachScreenshot(page, 'files-copy-01-mode')
     })
 
     await step(`Paste into folder "${folderName}"`, async () => {
-      const paste = page.getByTestId('files-paste')
-      test.skip(
-        (await paste.count()) === 0,
-        'Paste not available (FilesCutCopyPaste plugin)'
-      )
-      await page
-        .getByTestId('files-item')
-        .filter({ hasText: folderName })
-        .first()
-        .dblclick()
-      await waitForFilesList(page)
-      await clickReady(paste)
-      await waitForFilesList(page)
+      await openFolderItemByName(page, folderName)
+      await pasteIntoCurrentFolder(page)
       const copied = page
         .getByTestId('files-item')
         .filter({ hasText: uniqueName })
         .first()
-      try {
-        await expect(copied).toBeVisible({ timeout: T(30000) })
-      } catch {
-        test.skip(true, 'Cut/Copy/Paste did not complete on desktop')
-      }
+      await expect(copied).toBeVisible({ timeout: T(30000) })
       console.log(`  → Copy present in folder: ${folderName}`)
       await attachScreenshot(page, 'files-copy-02-in-folder')
     })
@@ -111,7 +106,7 @@ test.describe('Desktop files copy, select, share', () => {
 
   test('multi-select bulk deletes uploaded files', async ({ page }) => {
     test.setTimeout(T(240000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -138,6 +133,18 @@ test.describe('Desktop files copy, select, share', () => {
     })
 
     await step('Bulk delete → confirm', async () => {
+      // Re-select right before acting: selection/checked state can silently
+      // drop between the earlier select step and this click (see
+      // uploadFileViaFab), making deleteCommand's click a silent no-op.
+      await selectFilesItem(
+        page,
+        page.getByTestId('files-item').filter({ hasText: nameA }).first()
+      )
+      await selectFilesItem(
+        page,
+        page.getByTestId('files-item').filter({ hasText: nameB }).first(),
+        { modifiers: ['ControlOrMeta'] }
+      )
       await clickReady(page.getByTestId('files-delete'))
       await confirmOkIfVisible(page, 5000)
       await waitForFilesList(page)
@@ -154,7 +161,7 @@ test.describe('Desktop files copy, select, share', () => {
 
   test('opens Share with teammates dialog', async ({ page }) => {
     test.setTimeout(T(180000))
-    await loginAsTestUser(page)
+    await gotoLoggedIn(page)
     await openFiles(page)
     await openPersonalStorage(page)
 
@@ -162,32 +169,25 @@ test.describe('Desktop files copy, select, share', () => {
 
     await step('Upload file', async () => {
       await uploadFileViaFab(page, uniqueName)
-      await openFileByName(page, uniqueName)
     })
 
     await step('Open Share with teammates', async () => {
-      const shareMenu = page.getByTestId('files-menu-share')
-      test.skip(
-        (await shareMenu.count()) === 0 ||
-          !(await shareMenu.isVisible().catch(() => false)),
-        'Share with teammates not available (corporate storage or no rights)'
-      )
-      await clickReady(shareMenu)
-      const dialog = page.getByTestId('files-share-dialog')
-      if (!(await dialog.isVisible({ timeout: T(5000) }).catch(() => false))) {
-        test.skip(true, 'Share dialog not available')
-      }
-      await expect(dialog).toBeVisible()
-      await expect(page.getByTestId('files-share-save')).toBeVisible()
+      await clickShareToolbarAction(page, { fileName: uniqueName })
+      const dialog = filesShareDialog(page)
+      await expect(dialog).toBeVisible({ timeout: T(15000) })
+      const save = dialog
+        .locator('[data-test-id="files-share-save"], .button:not(.secondary_button)')
+        .first()
+      await expect(save).toBeVisible({ timeout: T(10000) })
       console.log('  → Share with teammates dialog open')
       await attachScreenshot(page, 'files-teammates-01')
     })
 
     await step('Close dialog without saving', async () => {
-      const dialog = page.getByTestId('files-share-dialog')
+      const dialog = filesShareDialog(page)
       await page.keyboard.press('Escape').catch(() => undefined)
       if (await dialog.isVisible().catch(() => false)) {
-        const close = dialog.locator('.close, .button.cancel').first()
+        const close = dialog.locator('.close, .button.cancel, [data-test-id="files-share-cancel"]').first()
         if (await close.isVisible().catch(() => false)) {
           await clickReady(close)
         }
@@ -201,46 +201,64 @@ test.describe('Desktop files copy, select, share', () => {
     })
   })
 
-  test('leave share action when shared item is available', async ({ page }) => {
-    test.setTimeout(T(180000))
-    await loginAsTestUser(page)
-    await openFiles(page)
+  test('leave share action when shared item is available', async ({
+    page,
+    browser,
+    baseURL,
+  }) => {
+    test.skip(
+      !hasSecondaryCredentials(),
+      'Set E2E_LOGIN_SECONDARY and E2E_PASSWORD_SECONDARY in .env.e2e'
+    )
+    test.setTimeout(T(300000))
 
-    await step('Open Shared storage if present', async () => {
-      await navigateToStorageRoot(page)
-      const shared = page
-        .locator(
-          '[data-test-id="files-storage-item"][data-storage-type="shared"]'
-        )
-        .first()
-      test.skip((await shared.count()) === 0, 'No Shared storage on this stand')
-      await clickReady(shared)
-      await waitForFilesList(page)
+    const uniqueName = uniqueFileName('e2e-leave')
+    const secondaryEmail = getSecondaryCredentials().login
+
+    await gotoLoggedIn(page)
+    await openFiles(page)
+    await openPersonalStorage(page)
+
+    await step('PRIMARY uploads and shares with SECONDARY', async () => {
+      await uploadFileViaFab(page, uniqueName)
+      await openFileByName(page, uniqueName)
+      await shareFileWithTeammate(page, secondaryEmail)
+      await attachScreenshot(page, 'files-leave-01-shared')
     })
 
-    const items = page.getByTestId('files-item')
-    test.skip(
-      (await items.count()) === 0,
-      'Shared storage has no files to leave'
+    const secondary = await openLoggedInPage(
+      browser,
+      getSecondaryCredentials(),
+      { baseURL }
     )
+    try {
+      await step('SECONDARY leaves share', async () => {
+        await openFiles(secondary.page)
+        await openSharedStorage(secondary.page)
+        const item = secondary.page
+          .getByTestId('files-item')
+          .filter({ hasText: uniqueName })
+          .first()
+        await expect(item).toBeVisible({ timeout: T(90000) })
+        await selectFilesItem(secondary.page, item)
+        await clickLeaveShareToolbarAction(secondary.page)
+        await confirmOkIfVisible(secondary.page, 15000)
+        await expect(
+          secondary.page
+            .getByTestId('files-item')
+            .filter({ hasText: uniqueName })
+        ).toHaveCount(0, { timeout: T(60000) })
+        console.log('  → SECONDARY left share')
+        await attachScreenshot(secondary.page, 'files-leave-02-done')
+      })
+    } finally {
+      await secondary.context.close()
+    }
 
-    await step('Select item → Leave share if available', async () => {
-      await selectFilesItem(page, items.first())
-      const leave = page.locator(
-        '[data-test-id="files-item-menu-shareLeave"], .toolbar .item.leave, .toolbar .item.share_leave'
-      )
-      const leaveByText = page.getByText(/Leave share|Отказаться от доступа/i)
-      const hasLeave =
-        (await leave.count()) > 0 || (await leaveByText.count()) > 0
-      test.skip(!hasLeave, 'Leave share not available in desktop toolbar')
-      if ((await leave.count()) > 0) {
-        await clickReady(leave.first())
-      } else {
-        await clickReady(leaveByText.first())
-      }
-      await confirmOkIfVisible(page, 5000)
-      console.log('  → Left share')
-      await attachScreenshot(page, 'files-leave-02-done')
+    await step('Cleanup: PRIMARY deletes original file', async () => {
+      await openPersonalStorage(page)
+      await openFileByName(page, uniqueName)
+      await deleteOpenedFile(page, uniqueName)
     })
   })
 })
