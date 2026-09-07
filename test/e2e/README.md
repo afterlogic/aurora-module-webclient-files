@@ -32,5 +32,6 @@ Filter Playwright UI / CLI by **file name** or nested `test.describe`.
 
 ## Stand gates
 
+- **Paranoid Encryption on personal storage** — `uploadFileViaFab` / `uploadFixture` auto-click **Do not Encrypt** when the encrypt-on-upload dialog appears (`confirmUploadWithoutEncryption`). Encrypted upload is covered by `CoreParanoidEncryptionWebclientPlugin` E2E separately.
 - **Shared storage tab** — skipped when `[data-storage-type="shared"]` is absent (`files-storages-send.spec.js`).
 - **Open zip as folder** — `FilesZipFolder`: upload `.zip` → open as folder (`files-zip.spec.js`, `files-zip-selected.spec.js`). Skip when the zip stays a file (module disabled). Desktop Files has **no** “compress selection to zip” toolbar action.

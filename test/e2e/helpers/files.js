@@ -454,9 +454,35 @@ async function uploadFixture(page) {
       ])
       await fileChooser.setFiles(defaultFixturePath)
     }
+    await confirmUploadWithoutEncryption(page)
     await waitForListReady(page, listReadyOptions)
     await attachScreenshot(page, 'files-after-upload')
   })
+}
+
+/**
+ * Paranoid Encryption intercepts uploads in personal storage with an encrypt dialog.
+ * Regular Files E2E expects a plain upload — pick "Do not Encrypt" when shown.
+ */
+async function confirmUploadWithoutEncryption(page) {
+  const encryptBtn = page.getByTestId('files-upload-encrypt')
+  const appeared = await encryptBtn
+    .waitFor({ state: 'visible', timeout: T(5000) })
+    .then(() => true)
+    .catch(() => false)
+  if (!appeared) {
+    return false
+  }
+  const dialog = page.locator('.popup:visible').filter({ has: encryptBtn })
+  const skipBtn = dialog
+    .getByTestId('files-upload-skip-encrypt')
+    .or(
+      dialog.locator('.button').filter({ hasText: /do not encrypt|не шифровать/i })
+    )
+    .first()
+  await clickReady(skipBtn)
+  await expect(dialog).toBeHidden({ timeout: T(30000) })
+  return true
 }
 
 /**
@@ -489,6 +515,8 @@ async function uploadFileViaFab(
       buffer,
     })
   }
+
+  await confirmUploadWithoutEncryption(page)
 
   const item = filesItemByName(page, uniqueName)
   await expect(item).toBeVisible({ timeout: T(90000) })
@@ -1027,6 +1055,32 @@ function resolvePublicLinkUrl(link, baseURL) {
 }
 
 /**
+ * OpenPgpFilesWebclient intercepts FileEntryPub and serves the KO public app
+ * (FileView) instead of static FilesPub.html. Prefer test-ids; fall back to
+ * the shared .public-page-card markup until templates are rebuilt.
+ */
+function filesPubPage(page) {
+  return page
+    .getByTestId('files-pub-page')
+    .or(page.locator('.public-page-card').filter({ has: page.locator('.name') }))
+    .first()
+}
+
+function filesPubName(page) {
+  return page
+    .getByTestId('files-pub-name')
+    .or(page.locator('.public-page-card .name'))
+    .first()
+}
+
+function filesPubDownload(page) {
+  return page
+    .getByTestId('files-pub-download')
+    .or(page.locator('.public-page-card a.download, .public-page-card a.button.download'))
+    .first()
+}
+
+/**
  * Open public-link dialog for the selected file and wait until the URL field is populated.
  * @returns {Promise<string>} absolute or app-relative public link URL
  */
@@ -1093,6 +1147,7 @@ module.exports = {
   createShortcut,
   uploadFixture,
   uploadFileViaFab,
+  confirmUploadWithoutEncryption,
   openFileByName,
   deleteOpenedFile,
   deleteItemByName,
@@ -1115,6 +1170,9 @@ module.exports = {
   filesShareDialog,
   openRenameDialog,
   resolvePublicLinkUrl,
+  filesPubPage,
+  filesPubName,
+  filesPubDownload,
   createPublicLinkUrl,
   closeShareLinkDialog,
   removePublicLinkFromDialog,

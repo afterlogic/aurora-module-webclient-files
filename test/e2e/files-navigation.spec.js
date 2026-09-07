@@ -27,6 +27,14 @@ async function jqueryClick(locator) {
   })
 }
 
+/** FileViewer renders file content inside an iframe (in-page carousel or popup tab). */
+async function expectPreviewContainsText(root, pattern, { iframeSelector = 'iframe' } = {}) {
+  const frame = root.frameLocator(iframeSelector).first()
+  await expect(frame.locator('body')).toContainText(pattern, {
+    timeout: T(60000),
+  })
+}
+
 test.describe('Desktop files navigation', () => {
   test.skip(!hasCredentials(), 'Set E2E_LOGIN_PRIMARY in .env.e2e')
 
@@ -132,9 +140,8 @@ test.describe('Desktop files navigation', () => {
         await expect(viewer.getByText(uniqueName).first()).toBeVisible({
           timeout: T(10000),
         })
-        const preview = viewer.frameLocator('.owl-item.active iframe')
-        await expect(preview.locator('body')).toContainText(/E2E/i, {
-          timeout: T(30000),
+        await expectPreviewContainsText(viewer, /E2E/i, {
+          iframeSelector: '.owl-item.active iframe',
         })
         await jqueryClick(viewer.locator('.close').first())
         await expect(viewer).toBeHidden({ timeout: T(10000) })
@@ -144,10 +151,11 @@ test.describe('Desktop files navigation', () => {
           !popup,
           'FileViewerWebclientPlugin not active on this stand (no in-page viewer or popup tab)'
         )
-        await popup.waitForLoadState('load').catch(() => undefined)
-        await expect(popup.locator('body')).toContainText(/E2E/i, {
+        await popup.waitForLoadState('domcontentloaded').catch(() => undefined)
+        await expect(popup.locator('iframe').first()).toBeVisible({
           timeout: T(30000),
         })
+        await expectPreviewContainsText(popup, /E2E/i)
         await popup.close().catch(() => undefined)
       }
       await attachScreenshot(page, 'files-preview-01')

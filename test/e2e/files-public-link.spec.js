@@ -23,6 +23,9 @@ const {
   closeShareLinkDialog,
   removePublicLinkFromDialog,
   resolvePublicLinkUrl,
+  filesPubPage,
+  filesPubName,
+  filesPubDownload,
 } = require('./helpers/files')
 
 test.describe('Desktop files public link (anonymous)', () => {
@@ -63,19 +66,21 @@ test.describe('Desktop files public link (anonymous)', () => {
             waitUntil: 'domcontentloaded',
             timeout: T(90000),
           })
-          await expect(anon.page.getByTestId('files-pub-page')).toBeVisible({
+          // OpenPgpFilesWebclient serves a KO SPA (FileView), not static FilesPub.html —
+          // wait for the card after app boot, not only for a body test-id.
+          await expect(filesPubPage(anon.page)).toBeVisible({
+            timeout: T(60000),
+          })
+          await expect(filesPubName(anon.page)).toContainText(uniqueName, {
             timeout: T(30000),
           })
-          await expect(anon.page.getByTestId('files-pub-name')).toContainText(
-            uniqueName
-          )
           await attachScreenshot(anon.page, 'files-pub-02-anonymous-view')
         })
 
         await step('Download file from public page', async () => {
           const [download] = await Promise.all([
             anon.page.waitForEvent('download', { timeout: T(60000) }),
-            clickReady(anon.page.getByTestId('files-pub-download')),
+            clickReady(filesPubDownload(anon.page)),
           ])
           expect(download.suggestedFilename()).toContain(
             uniqueName.replace(/\.txt$/i, '')
