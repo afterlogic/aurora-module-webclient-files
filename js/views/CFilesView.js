@@ -1496,6 +1496,34 @@ CFilesView.prototype.executeDelete = function () {
   }
 }
 
+CFilesView.prototype.getTrashOriginalLocation = function (extendedProps) {
+  var
+    encryptedPrefix = '/.encrypted',
+    type = extendedProps.TrashOriginalType || Enums.FileStorageType.Personal,
+    path = extendedProps.TrashOriginalPath,
+    storage = null,
+    storageName = ''
+  ;
+
+  if (type === Enums.FileStorageType.Personal && (path === encryptedPrefix || path.indexOf(encryptedPrefix + '/') === 0)) {
+    type = Enums.FileStorageType.Encrypted
+    path = path.substr(encryptedPrefix.length)
+  }
+
+  storage = this.getStorageByType(type)
+  if (storage) {
+    storageName = storage.displayName
+  } else if (type === Enums.FileStorageType.Corporate) {
+    storageName = TextUtils.i18n('%MODULENAME%/LABEL_CORPORATE_STORAGE')
+  } else if (type === Enums.FileStorageType.Shared) {
+    storageName = TextUtils.i18n('%MODULENAME%/LABEL_SHARED_STORAGE')
+  } else {
+    storageName = TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE')
+  }
+
+  return TextUtils.encodeHtml(storageName + path)
+}
+
 CFilesView.prototype.executeRestore = function () {
   var
     itemsToRestore = this.selector.listCheckedAndSelected() || [],
@@ -1512,9 +1540,9 @@ CFilesView.prototype.executeRestore = function () {
 
   _.each(itemsToRestore, function(fileItem) {
     if (fileItem && fileItem.oExtendedProps && fileItem.oExtendedProps.TrashOriginalPath) {
-      originalPaths.push(TextUtils.i18n('%MODULENAME%/LABEL_PERSONAL_STORAGE') + TextUtils.encodeHtml(fileItem.oExtendedProps.TrashOriginalPath))
+      originalPaths.push(this.getTrashOriginalLocation(fileItem.oExtendedProps))
     }
-  })
+  }, this)
   originalPathsLength = originalPaths.length
   originalPaths = _.first(originalPaths, 3)
 
