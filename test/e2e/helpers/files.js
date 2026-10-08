@@ -46,7 +46,9 @@ async function isFilesListLoading(page) {
 }
 
 async function waitForFilesList(page) {
-  await expect(page.getByTestId('files-list')).toBeVisible({
+  // Attached, not visible: the list collapses to zero height while its only
+  // child is floated (table view) or while it is empty without an info text.
+  await expect(page.getByTestId('files-list')).toBeAttached({
     timeout: T(60000),
   })
   // files-empty is reused for INFO_LOADING — waitForListReady would treat

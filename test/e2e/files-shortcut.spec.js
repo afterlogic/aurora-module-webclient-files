@@ -65,7 +65,7 @@ test.describe('Desktop files shortcuts', () => {
         // Links often keep a single "open" action; FileView puts that on
         // secondAction (firstAction / files-item-view stays empty → no-op).
         const openBtn = item
-          .locator('.main_actions a.button, a.button')
+          .locator('.main_actions a.button, .actions a, a.button')
           .filter({ hasText: /open|открыть/i })
           .first()
 
@@ -73,7 +73,10 @@ test.describe('Desktop files shortcuts', () => {
         if (await openBtn.isVisible().catch(() => false)) {
           await clickReady(openBtn)
         } else {
-          const secondary = item.locator('.main_actions a.button').nth(1)
+          // Grid view: .main_actions buttons; table view: .actions links.
+          const secondary = item
+            .locator('.main_actions a.button, .actions a:visible')
+            .nth(1)
           await expect(secondary).toBeVisible({ timeout: T(10000) })
           await clickReady(secondary)
         }

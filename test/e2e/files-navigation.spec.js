@@ -111,7 +111,11 @@ test.describe('Desktop files navigation', () => {
       const item = page.getByTestId('files-item').filter({ hasText: uniqueName }).first()
       await expect(item).toBeVisible({ timeout: T(30000) })
       await item.hover()
-      const viewBtn = item.getByTestId('files-item-view')
+      // Table view has no files-item-view hook: its first action link is View.
+      const viewBtn = item
+        .getByTestId('files-item-view')
+        .or(item.locator('.actions a:visible').first())
+        .first()
       test.skip(
         !(await viewBtn.isVisible().catch(() => false)),
         'View action not available on this file'
