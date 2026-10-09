@@ -994,7 +994,12 @@ async function shareFileWithTeammate(page, email) {
       const readOption = dialog
         .locator('.new_share_access_select .dropdown_content .item, .dropdown_content .item')
         .first()
-      if (await readOption.isVisible({ timeout: T(5000) }).catch(() => false)) {
+      // The dropdown opens asynchronously; isVisible() would not wait for it.
+      const optionShown = await readOption
+        .waitFor({ state: 'visible', timeout: T(5000) })
+        .then(() => true)
+        .catch(() => false)
+      if (optionShown) {
         await clickReady(readOption)
       }
     }
