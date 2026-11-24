@@ -353,6 +353,7 @@ function CFilesView(bPopup = false, allowSelect = true) {
   this.isCreateAllowed = ko.computed(function () {
     var oSharedParentFolder = this.sharedParentFolder()
     return (
+      this.storageType() !== Enums.FileStorageType.Favorites &&
       !this.isTrashStorage() && !this.isZipFolder() &&
       ((oSharedParentFolder && oSharedParentFolder.sharedWithMeAccessWrite()) ||
         (!oSharedParentFolder && !this.isSharedStorage()))
@@ -373,8 +374,7 @@ function CFilesView(bPopup = false, allowSelect = true) {
   this.isNewItemsMenuOpened = ko.observable(false)
 
   this.bDragActiveComp = ko.computed(function () {
-    var bDrag = this.bDragActive()
-    return bDrag && this.searchPattern() === ''
+    return this.isCreateAllowed() && this.bDragActive() && this.searchPattern() === ''
   }, this)
 
   this.isDragAndDropSupported = ko.observable(false)
@@ -435,7 +435,7 @@ function CFilesView(bPopup = false, allowSelect = true) {
           sInfoText = TextUtils.i18n('%MODULENAME%/INFO_NOTHING_FOUND')
         } else if (this.isSharedStorage()) {
           sInfoText = TextUtils.i18n('%MODULENAME%/INFO_SHARED_FOLDER_IS_EMPTY')
-        } else if (this.currentPath() !== '' || this.bInPopup || this.bPublic) {
+        } else if (!this.isCreateAllowed() || this.currentPath() !== '' || this.bInPopup || this.bPublic) {
           sInfoText = TextUtils.i18n('%MODULENAME%/INFO_FOLDER_IS_EMPTY')
         } else if (this.isDragAndDropSupported()) {
           sInfoText = TextUtils.i18n('%MODULENAME%/INFO_DRAGNDROP_FILES_OR_CREATE_FOLDER')
@@ -638,6 +638,7 @@ CFilesView.prototype.initUploader = function () {
         )
       )
 
+    this.oJua.setDragAndDropEnabledStatus(this.isCreateAllowed())
     this.isDragAndDropSupported(this.oJua.isDragAndDropSupported())
   }
 }
@@ -675,7 +676,7 @@ CFilesView.prototype.isFileCanBeUploaded = function (oFileData) {
  * @param {Object} fileData
  */
 CFilesView.prototype.onFileUploadSelect = function (sFileUid, fileData) {
-  if (!this.isFileCanBeUploaded(fileData)) {
+  if (!this.isCreateAllowed() || !this.isFileCanBeUploaded(fileData)) {
     return false
   }
 
@@ -829,7 +830,7 @@ CFilesView.prototype.onFileWithSubfolderUploadComplete = function (oFile) {
 }
 
 CFilesView.prototype.onEmptyFolderDrop = function (folderData) {
-  if (folderData && folderData.fullPath) {
+  if (this.isCreateAllowed() && folderData && folderData.fullPath) {
     const folderName = folderData.fullPath.charAt(0) === '/' ? folderData.fullPath.substr(1) : folderData.fullPath
     Ajax.send(
       'CreateFolder',
@@ -1572,7 +1573,7 @@ CFilesView.prototype.onShow = function () {
   this.selector.useKeyboardKeys(true)
 
   if (this.oJua) {
-    this.oJua.setDragAndDropEnabledStatus(true)
+    this.oJua.setDragAndDropEnabledStatus(this.isCreateAllowed())
   }
 
   this.controllers().forEach((controller) => {
