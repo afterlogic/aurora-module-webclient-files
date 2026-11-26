@@ -1,5 +1,5 @@
 const path = require('path')
-const { sharedHelper, fixturePath } = require(path.join(
+const { sharedHelper } = require(path.join(
   process.env.AURORA_E2E_ROOT,
   'helpers/paths'
 ))
@@ -8,19 +8,18 @@ const { T } = sharedHelper('timeouts')
 const { gotoLoggedIn, step, attachScreenshot, hasCredentials } = sharedHelper('login')
 const {
   openFiles,
-  waitForFilesList,
   openPersonalStorage,
   openFolderItemByName,
   uploadFileViaFab,
   filesItemsByName,
 } = require('./helpers/files')
 
-const zipFixture = fixturePath('e2e-tiny.zip')
+const zipFixture = path.join(__dirname, 'preview-image.zip')
 
 test.describe('Desktop files zip folder', () => {
   test.skip(!hasCredentials(), 'Set E2E_LOGIN_PRIMARY in .env.e2e')
 
-  test('opens an uploaded zip as a folder when FilesZipFolder is enabled', async ({
+  test('opens an uploaded zip and previews the image inside', async ({
     page,
   }) => {
     test.setTimeout(T(180000))
@@ -38,7 +37,7 @@ test.describe('Desktop files zip folder', () => {
 
     await step('Open zip as folder', async () => {
       await openFolderItemByName(page, uniqueName)
-      const inner = filesItemsByName(page, 'hello.txt')
+      const inner = filesItemsByName(page, 'preview.png')
       const zipStillListed = filesItemsByName(page, uniqueName)
       const openedAsFolder = await inner
         .first()
@@ -51,6 +50,21 @@ test.describe('Desktop files zip folder', () => {
       )
       await expect(inner.first()).toBeVisible({ timeout: T(15000) })
       await attachScreenshot(page, 'files-zip-opened')
+    })
+
+    await step('Open preview.png and verify the decoded image', async () => {
+      const selector = 'img[src*="?download-file/"][src*="/view"]:visible'
+      const timeout = T(30000)
+      const [image] = await Promise.all([
+        Promise.race([
+          page.locator(selector).first().waitFor({ timeout }).then(() => page.locator(selector).first()),
+          page.waitForEvent('popup', { timeout }).then(popup => popup.locator('img:visible').first()),
+        ]),
+        filesItemsByName(page, 'preview.png').first().dblclick(),
+      ])
+      await expect(image).toBeVisible({ timeout })
+      await expect(image).toHaveJSProperty('naturalWidth', 17, { timeout })
+      await expect(image).toHaveJSProperty('naturalHeight', 13, { timeout })
     })
   })
 })
